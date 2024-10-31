@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SidebarItem from "./ui/SidebarItem";
-import IntegrationPopup from "./ui/IntegrationPopup";
+import IntegrationPopup from './ui/IntegrationPopup'
 
 interface SidebarProps {}
 
