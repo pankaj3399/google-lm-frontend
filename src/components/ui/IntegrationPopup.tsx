@@ -75,10 +75,10 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                         {integrations.map((integration, indx) => (
                             <button
                                 key={integration.name}
-                                className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-blue-500 transition-colors p-6 flex flex-col items-center justify-center gap-4 
+                                className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
-                                        ? 'border-blue-700'
+                                        ? 'border-black'
                                         : "none"
                                 }
                                         
