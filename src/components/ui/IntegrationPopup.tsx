@@ -21,33 +21,35 @@ const integrations: Integration[] = [
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const saveApiKey = async (apiKey: string, clerkId: string): Promise<void> => {
-    try {
-        const response = await axios.post(
-            `${API_URL}/api/users/saveApiKey/${clerkId}`,
-            {
-                api_key: apiKey,
-            }
-        );
-
-        toast.success(response.data.message);
-    } catch (error) {
-        let errorMessage = "Something went wrong. Please try again later.";
-        if (error instanceof Error) {
-            errorMessage = error.message;
-        } else if (axios.isAxiosError(error) && error.response?.data?.message) {
-            errorMessage = error.response.data.message;
-        }
-
-        toast.error(`Error saving settings: ${errorMessage}`);
-        console.error(error);
-    }
-};
-
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
+
+    const saveApiKey = async (clerkId: string): Promise<void> => {
+        try {
+            const response = await axios.post(
+                `${API_URL}/api/users/saveApiKey/${clerkId}`,
+                {
+                    api_key: apiKey,
+                }
+            );
+    
+            toast.success(response.data.message);
+            setApiKey('');
+        } catch (error) {
+            let errorMessage = "Something went wrong. Please try again later.";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+    
+            toast.error(`Error saving settings: ${errorMessage}`);
+            console.error(error);
+        }
+    };
+
     return (
         <div>
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
@@ -120,7 +122,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                         onClick={() =>
                                             saveApiKey(
-                                                apiKey,
                                                 user?.id as string
                                             )
                                         }
