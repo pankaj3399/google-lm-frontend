@@ -1,5 +1,9 @@
+import axios from "axios";
 import { Info, SendHorizontal, FileText } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface WorkspaceMainProps {
     handleNewNoteDisplay: () => void;
@@ -8,10 +12,31 @@ interface WorkspaceMainProps {
 const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     handleNewNoteDisplay,
 }) => {
+    const { workspaceId } = useParams();
+    const [workspaceName, setWorkspaceName] = useState("");
+
+    useEffect(() => {
+        fetchWorkspace();
+    }, []);
+
+    const fetchWorkspace = async () => {
+        
+        try {
+            const resp = await axios.get(
+                `${API_URL}/api/users/getWorkspace/${workspaceId}`
+            );
+            setWorkspaceName(resp.data.workspace.name);
+        } catch (error) {
+            console.log(error);
+        }
+    };
     return (
         <div className="flex-1 bg-gray-50 flex flex-col relative">
             <div className="flex items-center justify-between h-14 border-b border-gray-200 bg-white pl-5 pr-5">
-                <p className=" text-gray-600"> Untitled Workspace</p>
+                <p className=" text-gray-600">
+                    {" "}
+                    {workspaceName !== '' ? workspaceName : "Untitled Workspace"}
+                </p>
                 <img
                     loading="lazy"
                     src="https://cdn.builder.io/api/v1/image/assets/TEMP/10323ea2395e338a2e439eb5aa8707c2b16f628adc554e198cd7d75a66167836?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"

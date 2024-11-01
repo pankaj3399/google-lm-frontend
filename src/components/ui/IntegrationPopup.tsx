@@ -34,17 +34,20 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     api_key: apiKey,
                 }
             );
-    
+
             toast.success(response.data.message);
-            setApiKey('');
+            setApiKey("");
         } catch (error) {
             let errorMessage = "Something went wrong. Please try again later.";
             if (error instanceof Error) {
                 errorMessage = error.message;
-            } else if (axios.isAxiosError(error) && error.response?.data?.message) {
+            } else if (
+                axios.isAxiosError(error) &&
+                error.response?.data?.message
+            ) {
                 errorMessage = error.response.data.message;
             }
-    
+
             toast.error(`Error saving settings: ${errorMessage}`);
             console.error(error);
         }
@@ -80,7 +83,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
-                                        ? 'border-black'
+                                        ? "border-black"
                                         : "none"
                                 }
                                         
@@ -121,9 +124,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                     <button
                                         className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                                         onClick={() =>
-                                            saveApiKey(
-                                                user?.id as string
-                                            )
+                                            saveApiKey(user?.id as string)
                                         }
                                     >
                                         Save
