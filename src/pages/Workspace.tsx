@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import WorkspaceSidebar from "../components/WorkspaceSidebar";
 import WorkspaceMain from "../components/WorkspaceMain";
 import NewNotePopup from "../components/ui/NewNotePopup";
