@@ -1,6 +1,13 @@
 import { Info, CirclePlus } from "lucide-react";
+import React from "react";
 
-const WorkspaceSidebar = () => {
+interface WorkspaceSidebarProps {
+    handleAddSourceDisplay: () => void;
+}
+
+const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
+    handleAddSourceDisplay,
+}) => {
     return (
         <div className="w-[20%] bg-white border-r border-gray-200 h-screen flex flex-col">
             <div className="flex items-center justify-center w-full h-14 border-b border-gray-200 text-xl text-[#1B2559]">
@@ -33,7 +40,10 @@ const WorkspaceSidebar = () => {
                             <span className="font-medium">Sources</span>
                             <Info className="w-4 h-4 text-gray-400" />
                         </div>
-                        <CirclePlus className="w-4 h-4 text-gray-400" />
+                        <CirclePlus
+                            className="w-4 h-4 text-gray-400 cursor-pointer"
+                            onClick={handleAddSourceDisplay}
+                        />
                     </div>
                     <label className="flex items-center space-x-2 text-sm text-gray-600 justify-between">
                         <span>Select all Sources</span>

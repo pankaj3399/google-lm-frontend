@@ -22,7 +22,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
-    const {notes, setNotes} = useUserStore();
+    const { notes, setNotes, setSelectedNote } = useUserStore();
 
     useEffect(() => {
         fetchWorkspace();
@@ -50,7 +50,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             console.log(error);
         }
     };
-    
+
     return (
         <div className="h-screen w-[80%] flex flex-col">
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
@@ -70,7 +70,10 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             <div className="flex-1 w-full p-6 overflow-y-auto">
                 <div
                     className="flex gap-1 items-center h-4"
-                    onClick={handleNewNoteDisplay}
+                    onClick={() => {
+                        setSelectedNote(-1);
+                        handleNewNoteDisplay();
+                    }}
                 >
                     <FileText className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-600 cursor-pointer">
@@ -80,11 +83,12 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 
                 {notes.length > 0 ? (
                     <div className="flex mt-2 w-full  flex-wrap">
-                        {notes.map((note: Note) => (
+                        {notes.map((note: Note, indx) => (
                             <SingleNote
-                                key={note?._id}
+                                indx={indx}
                                 heading={note?.heading}
                                 content={note?.content}
+                                handleNewNoteDisplay={handleNewNoteDisplay}
                             />
                         ))}
                     </div>

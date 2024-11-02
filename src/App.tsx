@@ -12,6 +12,7 @@ import {
 import Workspace from "./pages/Workspace";
 import useUserStore from "./store/userStore";
 import { useUser } from "@clerk/clerk-react";
+import PageNotFound from "./pages/PageNotFound";
 const App = () => {
     const { user, setUser } = useUserStore();
     const { user: clerkUser } = useUser();
@@ -39,6 +40,7 @@ const App = () => {
                     element={user ? <Workspace /> : <Navigate to="/signup" />}
                 />
                 <Route path="/" element={<LandingPage />} />
+                <Route path="*" element={<PageNotFound />} />
             </Routes>
         </Router>
     );

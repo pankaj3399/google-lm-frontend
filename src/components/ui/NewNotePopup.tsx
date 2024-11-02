@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Minimize2, Pen } from "lucide-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -19,7 +19,14 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const [value, setValue] = useState("");
     const [heading, setHeading] = useState("");
     const { workspaceId } = useParams();
-    const { addNote } = useUserStore();
+    const { addNote, selectedNote, notes } = useUserStore();
+
+    useEffect(() => {
+        if(selectedNote != -1) {
+            setHeading(notes[selectedNote].heading);
+            setValue(notes[selectedNote].content)
+        }
+    }, []);
 
     const modules = {
         toolbar: [

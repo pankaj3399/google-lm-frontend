@@ -20,6 +20,8 @@ interface UserState {
     user: User | null;
     workspace: Workspace[];
     notes: Note[];
+    selectedNote: number;
+    setSelectedNote: (selectedNote: number) => void;
     setUser: (user: User) => void;
     clearUser: () => void;
     addWorkspace: (workspace: Workspace) => void;
@@ -32,6 +34,8 @@ const useUserStore = create<UserState>((set) => ({
     user: null,
     workspace: [],
     notes: [],
+    selectedNote: -1,
+    setSelectedNote: (selectedNote: number) => set({ selectedNote }),
     setUser: (user: User) => set({ user }),
     clearUser: () => set({ user: null, workspace: [], notes: [] }),
 
