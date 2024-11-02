@@ -6,6 +6,12 @@ import SingleNote from "./ui/SingleNote";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+interface Note {
+    _id: string;
+    heading: string;
+    content: string;
+}
+
 interface WorkspaceMainProps {
     handleNewNoteDisplay: () => void;
 }
@@ -15,11 +21,23 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
-    const [showItems, _] = useState(true);
+    const [notes, setNotes] = useState([]);
 
     useEffect(() => {
         fetchWorkspace();
+        fetchAllNotes();
     }, []);
+
+    const fetchAllNotes = async () => {
+        try {
+            const resp = await axios.get(
+                `${API_URL}/api/users/getAllNotes/${workspaceId}`
+            );
+            setNotes(resp.data);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const fetchWorkspace = async () => {
         try {
@@ -31,6 +49,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             console.log(error);
         }
     };
+    
     return (
         <div className="h-screen w-[80%] flex flex-col">
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
@@ -47,9 +66,9 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 />
             </div>
 
-            <div className="flex-1 w-full overflow-y-auto p-6 flex-wrap">
+            <div className="flex-1 w-full p-6 ">
                 <div
-                    className="flex gap-1 items-center"
+                    className="flex gap-1 items-center h-4"
                     onClick={handleNewNoteDisplay}
                 >
                     <FileText className="w-5 h-5 text-gray-600" />
@@ -58,8 +77,16 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                     </span>
                 </div>
 
-                {showItems ? (
-                    <SingleNote />
+                {notes.length > 0 ? (
+                    <div className="flex mt-2 w-full overflow-y-auto flex-wrap">
+                        {notes.map((note: Note) => (
+                            <SingleNote
+                                key={note?._id}
+                                heading={note?.heading}
+                                content={note?.content}
+                            />
+                        ))}
+                    </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
                         <h2 className="text-4xl text-gray-700 mb-2">

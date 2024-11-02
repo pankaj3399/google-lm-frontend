@@ -1,8 +1,19 @@
 import { BarChart3 } from "lucide-react";
+import React from "react";
 
-const SingleNote = () => {
+interface SingleNoteProps {
+    heading: string;
+    content: string;
+}
+
+const SingleNote: React.FC<SingleNoteProps> = ({ heading, content }) => {
+    const getPlainText = (html: string): string => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html"); // Parse HTML string
+        return doc.body.textContent || ""; // Extract plain text
+    };
     return (
-        <div className=" w-[350px] mt-5 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
+        <div className=" w-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl">
             <div className="p-5">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
@@ -15,19 +26,11 @@ const SingleNote = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="mb-5">Initial Pull Data - Last 30 days</h3>
+                <h3 className="mb-5">{heading} - Last 30 days</h3>
 
                 {/* Content */}
                 <div className="space-y-6 tracking-wide">
-                    <p className="text-[#5F6369]">
-                        For xyz.com, users are dropping off primarily at key
-                        stages such as [sign-up], [checkout], and [after
-                        browsing product pages] . Metrics indicate high bounce
-                        rates, prolonged time on certain pages without
-                        conversion, and increased abandonment at [specific
-                        actions] . Further analysis of these areas is needed to
-                        improve retention and engagement.
-                    </p>
+                    <p className="text-[#5F6369]">{getPlainText(content)}</p>
                 </div>
             </div>
         </div>

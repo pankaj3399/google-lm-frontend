@@ -1,6 +1,6 @@
 import { SignUp, useUser, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -9,20 +9,23 @@ export default function SignUpPage() {
     const { isSignedIn } = useAuth();
     const { user } = useUser();
     const navigate = useNavigate();
+    const hasSentDataRef = useRef(false); 
 
     useEffect(() => {
         if (isSignedIn) {
             navigate("/home");
         }
-        if (user) {
+
+        if (user && !hasSentDataRef.current) {
             const clerkId = user.id;
             const email = user.primaryEmailAddress?.emailAddress;
 
             if (clerkId && email) {
                 sendUserDataToBackend(clerkId, email);
+                hasSentDataRef.current = true; 
             }
         }
-    }, [isSignedIn, navigate]);
+    }, [isSignedIn, user, navigate]);
 
     const sendUserDataToBackend = async (
         clerkId: string,
