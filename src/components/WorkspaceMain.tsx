@@ -2,6 +2,7 @@ import axios from "axios";
 import { Info, SendHorizontal, FileText } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import SingleNote from "./ui/SingleNote";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,13 +15,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
+    const [showItems, _] = useState(true);
 
     useEffect(() => {
         fetchWorkspace();
     }, []);
 
     const fetchWorkspace = async () => {
-        
         try {
             const resp = await axios.get(
                 `${API_URL}/api/users/getWorkspace/${workspaceId}`
@@ -31,11 +32,12 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
     };
     return (
-        <div className="flex-1 bg-gray-50 flex flex-col relative">
-            <div className="flex items-center justify-between h-14 border-b border-gray-200 bg-white pl-5 pr-5">
-                <p className=" text-gray-600">
-                    {" "}
-                    {workspaceName !== '' ? workspaceName : "Untitled Workspace"}
+        <div className="h-screen w-[80%] flex flex-col">
+            <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
+                <p className="text-gray-600">
+                    {workspaceName !== ""
+                        ? workspaceName
+                        : "Untitled Workspace"}
                 </p>
                 <img
                     loading="lazy"
@@ -45,7 +47,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 />
             </div>
 
-            <div className="flex-1 p-6">
+            <div className="flex-1 w-full overflow-y-auto p-6 flex-wrap">
                 <div
                     className="flex gap-1 items-center"
                     onClick={handleNewNoteDisplay}
@@ -55,26 +57,34 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                         Add Note
                     </span>
                 </div>
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-                    <h2 className="text-4xl text-gray-700 mb-2">
-                        Your saved work will appear here
-                    </h2>
-                    <p className="text-gray-600 mb-6 w-96 text-center">
-                        Thanks for choosing MetricsLM. Your next steps are to
-                        add integrations or sources in your workspace.
-                    </p>
-                    <div className="flex">
-                        <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                            Add Integrations
-                        </button>
-                        <button className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50">
-                            Add Sources
-                        </button>
+
+                {showItems ? (
+                    <SingleNote />
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+                        <h2 className="text-4xl text-gray-700 mb-2">
+                            Your saved work will appear here
+                        </h2>
+                        <p className="text-gray-600 mb-6 w-96 text-center">
+                            Thanks for choosing MetricsLM. Your next steps are
+                            to add integrations or sources in your workspace.
+                        </p>
+                        <div className="flex">
+                            <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                                Add Integrations
+                            </button>
+                            <button className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50">
+                                Add Sources
+                            </button>
+                        </div>
+                        <a
+                            href="#"
+                            className="text-blue-500 hover:underline mt-4"
+                        >
+                            Learn how
+                        </a>
                     </div>
-                    <a href="#" className="text-blue-500 hover:underline mt-4">
-                        Learn how
-                    </a>
-                </div>
+                )}
             </div>
 
             <div className="w-full h-28">
