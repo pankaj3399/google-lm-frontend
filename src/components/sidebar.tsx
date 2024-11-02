@@ -4,6 +4,7 @@ import IntegrationPopup from "./ui/IntegrationPopup";
 import WorkspacePopup from "./ui/WorkspacePopup";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
+import useUserStore from "../store/userStore";
 
 interface SidebarProps {}
 const API_URL = import.meta.env.VITE_API_URL;
@@ -11,7 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const Sidebar: React.FC<SidebarProps> = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [workspacePopup, setWorkspacePopup] = useState(false);
-    const [workspaces, setWorkspaces] = useState([]);
+    const {workspace, setWorkspace} = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
 
@@ -31,7 +32,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
     const fetchAllWorkspaces = async() => {
         try {
             const resp = await axios.get(`${API_URL}/api/users/getAllWorkspaces/${user?.id}`);
-            setWorkspaces(resp.data.workspaces)
+            setWorkspace(resp.data.workspaces)
         } catch(error) {
             console.log(error);
         }
@@ -53,7 +54,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
             iconSrc:
                 "https://cdn.builder.io/api/v1/image/assets/TEMP/bb8c4a9d007bd61f491d62f7f6828ed33b25aa7b5b1edfaeb9d64afb94ad3535?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
             functionality: handleWorkSpacePopup,
-            previousCreations: workspaces
+            previousCreations: workspace
         },
     ];
 

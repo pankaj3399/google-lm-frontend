@@ -3,7 +3,7 @@ import { X } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useUser } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import useUserStore from "../../store/userStore";
 
 interface WorkspacePopup {
     handleWorkSpacePopup: () => void;
@@ -14,7 +14,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const WorkspacePopup: React.FC<WorkspacePopup> = ({ handleWorkSpacePopup }) => {
     const { user } = useUser();
     const [workspaceName, setWorkSpaceName] = useState("");
-    const navigate = useNavigate();
+    const { addWorkspace } = useUserStore();
 
     const createNewWorkspace = async () => {
         try {
@@ -24,10 +24,10 @@ const WorkspacePopup: React.FC<WorkspacePopup> = ({ handleWorkSpacePopup }) => {
                     workspaceName,
                 }
             );
+            addWorkspace(resp.data.workspace);
             toast.success("Success");
             setWorkSpaceName("");
             handleWorkSpacePopup();
-            navigate(`/workspace/${resp.data.workspace._id}`);
         } catch (error) {
             let errorMessage = "Something went wrong. Please try again later.";
             if (error instanceof Error) {

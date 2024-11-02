@@ -1,31 +1,31 @@
 import { SignUp, useUser, useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import axios from "axios";
+import useUserStore from "../store/userStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SignUpPage() {
     const { isSignedIn } = useAuth();
-    const { user } = useUser();
+    const { user: clerkUser } = useUser();
     const navigate = useNavigate();
-    const hasSentDataRef = useRef(false); 
+    const { user } = useUserStore();
 
     useEffect(() => {
         if (isSignedIn) {
             navigate("/home");
         }
 
-        if (user && !hasSentDataRef.current) {
-            const clerkId = user.id;
-            const email = user.primaryEmailAddress?.emailAddress;
+        if (clerkUser && user) {
+            const clerkId = clerkUser.id;
+            const email = clerkUser.primaryEmailAddress?.emailAddress;
 
             if (clerkId && email) {
                 sendUserDataToBackend(clerkId, email);
-                hasSentDataRef.current = true; 
             }
         }
-    }, [isSignedIn, user, navigate]);
+    }, [isSignedIn, clerkUser]);
 
     const sendUserDataToBackend = async (
         clerkId: string,
@@ -36,7 +36,7 @@ export default function SignUpPage() {
                 email,
                 clerkId,
             });
-            console.log(resp.data.message);
+            console.log(resp);
         } catch (error) {
             console.error("Error sending user data to backend:", error);
         }

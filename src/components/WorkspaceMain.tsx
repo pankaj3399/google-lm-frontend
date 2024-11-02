@@ -3,6 +3,7 @@ import { Info, SendHorizontal, FileText } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
+import useUserStore from "../store/userStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,7 +22,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
-    const [notes, setNotes] = useState([]);
+    const {notes, setNotes} = useUserStore();
 
     useEffect(() => {
         fetchWorkspace();
@@ -66,7 +67,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 />
             </div>
 
-            <div className="flex-1 w-full p-6 ">
+            <div className="flex-1 w-full p-6 overflow-y-auto">
                 <div
                     className="flex gap-1 items-center h-4"
                     onClick={handleNewNoteDisplay}
@@ -78,7 +79,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 </div>
 
                 {notes.length > 0 ? (
-                    <div className="flex mt-2 w-full overflow-y-auto flex-wrap">
+                    <div className="flex mt-2 w-full  flex-wrap">
                         {notes.map((note: Note) => (
                             <SingleNote
                                 key={note?._id}

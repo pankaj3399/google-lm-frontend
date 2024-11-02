@@ -1,15 +1,18 @@
 import React from 'react';
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
+import useUserStore from '../store/userStore';
 
 interface NavigationProps {}
 
 const Navigation: React.FC<NavigationProps> = () => {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const {clearUser} = useUserStore();
 
   const handleLogout = async () => {
-    await signOut();  
+    await signOut(); 
+    clearUser(); 
     navigate("/signup");
 };
 

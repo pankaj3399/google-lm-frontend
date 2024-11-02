@@ -5,6 +5,7 @@ import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import useUserStore from "../../store/userStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,6 +19,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const [value, setValue] = useState("");
     const [heading, setHeading] = useState("");
     const { workspaceId } = useParams();
+    const { addNote } = useUserStore();
 
     const modules = {
         toolbar: [
@@ -47,8 +49,12 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                     content: value,
                 }
             );
-            console.log(resp);
-            toast.success('Created Note');
+            addNote(resp.data);
+            toast.success("Created Note");
+            setValue('');
+            setHeading('');
+            handleNewNoteDisplay();
+
         } catch (err) {
             console.log(err);
         }
