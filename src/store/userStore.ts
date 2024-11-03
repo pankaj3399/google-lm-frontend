@@ -21,6 +21,7 @@ interface Source {
     url: string;
     summary: string;
     name: string;
+    uploadType: string;
 }
 
 interface UserState {
