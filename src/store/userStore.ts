@@ -16,11 +16,19 @@ interface Note {
     content: string;
 }
 
+interface Source {
+    _id: string;
+    url: string;
+    summary: string;
+    name: string;
+}
+
 interface UserState {
     user: User | null;
     workspace: Workspace[];
     notes: Note[];
     selectedNote: number;
+    sources: Source[];
     setSelectedNote: (selectedNote: number) => void;
     setUser: (user: User) => void;
     clearUser: () => void;
@@ -28,6 +36,8 @@ interface UserState {
     setWorkspace: (workspaces: Workspace[]) => void;
     setNotes: (notes: Note[]) => void;
     addNote: (note: Note) => void;
+    setSource: (sources: Source[]) => void;
+    addSource: (source: Source) => void;
 }
 
 const useUserStore = create<UserState>((set) => ({
@@ -35,9 +45,11 @@ const useUserStore = create<UserState>((set) => ({
     workspace: [],
     notes: [],
     selectedNote: -1,
+    sources: [],
+
     setSelectedNote: (selectedNote: number) => set({ selectedNote }),
     setUser: (user: User) => set({ user }),
-    clearUser: () => set({ user: null, workspace: [], notes: [] }),
+    clearUser: () => set({ user: null, workspace: [], notes: [], sources: [] }),
 
     addWorkspace: (workspace: Workspace) =>
         set((state) => ({
@@ -51,6 +63,13 @@ const useUserStore = create<UserState>((set) => ({
     addNote: (note: Note) =>
         set((state) => ({
             notes: [...state.notes, note],
+        })),
+
+    setSource: (sources: Source[]) => set({ sources }),
+
+    addSource: (source: Source) =>
+        set((state) => ({
+            sources: [...state.sources, source],
         })),
 }));
 

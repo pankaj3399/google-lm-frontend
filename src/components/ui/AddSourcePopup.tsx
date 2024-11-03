@@ -1,6 +1,11 @@
 import React, { useState, DragEvent, ChangeEvent, KeyboardEvent } from "react";
 import { Upload, Link, X } from "lucide-react";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import useUserStore from "../../store/userStore";
+import toast from "react-hot-toast";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface AddSourcePopupProps {
     handleAddSourceDisplay: () => void;
 }
@@ -9,6 +14,8 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
     handleAddSourceDisplay,
 }) => {
     const [url, setUrl] = useState<string>("");
+    const { workspaceId } = useParams();
+    const { addSource } = useUserStore();
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -28,8 +35,21 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
         console.log("Files selected:", files);
     };
 
-    const handleUrlSubmit = () => {
-        console.log("URL submitted:", url);
+    const handleUrlSubmit = async () => {
+        try {
+            const resp = await axios.post(
+                `${API_URL}/api/users/createSource/${workspaceId}`,
+                {
+                    url,
+                }
+            );
+            addSource(resp.data);
+            toast.success("Source added");
+            setUrl("");
+            handleAddSourceDisplay();
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {

@@ -23,7 +23,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     };
     return (
         <div
-            className=" w-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl"
+            className=" w-[350px] max-h-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl"
             key={indx}
         >
             <div className="p-5">

@@ -69,13 +69,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 
             <div className="flex-1 w-full p-6 overflow-y-auto">
                 <div
-                    className="flex gap-1 items-center h-4"
+                    className="flex w-full gap-1 items-center h-4"
                     onClick={() => {
                         setSelectedNote(-1);
                         handleNewNoteDisplay();
                     }}
                 >
-                    <FileText className="w-5 h-5 text-gray-600" />
+                    <FileText className=" h-5 text-gray-600" />
                     <span className="text-gray-600 cursor-pointer">
                         Add Note
                     </span>
@@ -85,6 +85,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                     <div className="flex mt-2 w-full  flex-wrap">
                         {notes.map((note: Note, indx) => (
                             <SingleNote
+                                key={note._id}
                                 indx={indx}
                                 heading={note?.heading}
                                 content={note?.content}

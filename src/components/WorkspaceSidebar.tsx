@@ -1,6 +1,10 @@
-import { Info, CirclePlus } from "lucide-react";
-import React from "react";
+import { Info, CirclePlus, Link2 } from "lucide-react";
+import React, { useEffect } from "react";
+import useUserStore from "../store/userStore";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
     handleAddSourceDisplay: () => void;
 }
@@ -8,8 +12,25 @@ interface WorkspaceSidebarProps {
 const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleAddSourceDisplay,
 }) => {
+    const { setSource, sources } = useUserStore();
+    const { workspaceId } = useParams();
+
+    useEffect(() => {
+        fetchAllSources();
+    }, []);
+
+    const fetchAllSources = async () => {
+        try {
+            const resp = await axios.get(
+                `${API_URL}/api/users/getAllSources/${workspaceId}`
+            );
+            setSource(resp.data);
+        } catch (err) {
+            console.log(err);
+        }
+    };
     return (
-        <div className="w-[20%] bg-white border-r border-gray-200 h-screen flex flex-col">
+        <div className="w-[20%] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
             <div className="flex items-center justify-center w-full h-14 border-b border-gray-200 text-xl text-[#1B2559]">
                 <p className="font-bold">Metrics</p>
                 <span>LM</span>
@@ -53,6 +74,26 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             defaultChecked
                         />
                     </label>
+                    {sources.length > 0 && (
+                        <div className="flex flex-col gap-1 mt-3">
+                            {sources.map((source, indx) => (
+                                <div
+                                    key={indx}
+                                    className="flex justify-between"
+                                >
+                                    <div className="flex items-center">
+                                        <Link2 size={17} className="mr-1"/>
+                                        <p>{source.name}</p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        className="rounded text-blue-500"
+                                        defaultChecked
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
