@@ -1,4 +1,4 @@
-import { Info, CirclePlus, Link2 } from "lucide-react";
+import { Info, CirclePlus, Link2, FileText } from "lucide-react";
 import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
 import axios from "axios";
@@ -82,7 +82,14 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     className="flex justify-between"
                                 >
                                     <div className="flex items-center">
-                                        <Link2 size={17} className="mr-1"/>
+                                        {source.uploadType === "file" ? (
+                                            <FileText
+                                                size={17}
+                                                className="mr-1"
+                                            />
+                                        ) : (
+                                            <Link2 size={17} className="mr-1" />
+                                        )}
                                         <p>{source.name}</p>
                                     </div>
                                     <input

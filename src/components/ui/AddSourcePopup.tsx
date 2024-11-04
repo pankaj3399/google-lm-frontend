@@ -4,6 +4,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import useUserStore from "../../store/userStore";
 import toast from "react-hot-toast";
+import { ThreeDot } from "react-loading-indicators";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -15,6 +16,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
     handleAddSourceDisplay,
 }) => {
     const [url, setUrl] = useState<string>("");
+    const [loading, setLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const { workspaceId } = useParams();
     const { addSource } = useUserStore();
@@ -37,7 +39,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
         const file = files[0];
         if (file) {
             setUploadedFile(file);
-            setUrl(""); 
+            setUrl("");
         }
     };
 
@@ -57,13 +59,13 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
     const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => {
         setUrl(e.target.value);
         if (e.target.value) {
-            setUploadedFile(null); 
+            setUploadedFile(null);
         }
     };
 
     const handleUrlSubmit = async () => {
         if (!url && !uploadedFile) return;
-
+        setLoading(true);
         try {
             const formData = new FormData();
 
@@ -90,6 +92,8 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
             handleAddSourceDisplay();
         } catch (err) {
             console.log(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -177,24 +181,33 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
                                     value={url}
                                     onChange={handleUrlChange}
                                     onKeyDown={handleKeyDown}
-                                    disabled={!!uploadedFile} 
+                                    disabled={!!uploadedFile}
                                 />
                             </div>
-                            <button
-                                onClick={handleUrlSubmit}
-                                className="bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors"
-                                disabled={!url && !uploadedFile} 
-                            >
-                                <svg
-                                    viewBox="0 0 24 24"
-                                    className="w-6 h-6 text-gray-600"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
+                            {loading ? (
+                                <ThreeDot
+                                    color="#101210"
+                                    size="medium"
+                                    text=""
+                                    textColor=""
+                                />
+                            ) : (
+                                <button
+                                    onClick={handleUrlSubmit}
+                                    className="bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors"
+                                    disabled={!url && !uploadedFile}
                                 >
-                                    <polyline points="9 18 15 12 9 6" />
-                                </svg>
-                            </button>
+                                    <svg
+                                        viewBox="0 0 24 24"
+                                        className="w-6 h-6 text-gray-600"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                    >
+                                        <polyline points="9 18 15 12 9 6" />
+                                    </svg>
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
