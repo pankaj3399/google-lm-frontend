@@ -7,10 +7,12 @@ import { useParams } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
     handleAddSourceDisplay: () => void;
+    handleCheckboxChange: (indx: number) => void
 }
 
 const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleAddSourceDisplay,
+    handleCheckboxChange,
 }) => {
     const { setSource, sources } = useUserStore();
     const { workspaceId } = useParams();
@@ -96,6 +98,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                         type="checkbox"
                                         className="rounded text-blue-500"
                                         defaultChecked
+                                        onClick={() =>
+                                            handleCheckboxChange(indx)
+                                        }
                                     />
                                 </div>
                             ))}
