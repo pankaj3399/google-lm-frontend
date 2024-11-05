@@ -75,10 +75,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 }
                 return null;
             });
-            if (content === "") {
-                toast.error("Please select some source!!");
-                return;
-            }
             addChat(inputChat, "Me");
             const resp = await axios.post(
                 `${API_URL}/api/users/createConversation`,
