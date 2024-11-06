@@ -78,6 +78,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                 handleNewNoteDisplay();
             }
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };

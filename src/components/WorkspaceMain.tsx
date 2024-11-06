@@ -50,6 +50,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setNotes(resp.data);
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };
@@ -61,6 +62,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setWorkspaceName(resp.data.workspace.name);
         } catch (error) {
+            toast.error("Something went wront please try after some time!!");
             console.log(error);
         }
     };
@@ -91,6 +93,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             setInputChat("");
             addChat(resp.data.message, "GPT");
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };
@@ -107,6 +110,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             addNote(resp.data);
             toast.success("Successfully added");
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };

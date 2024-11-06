@@ -3,18 +3,19 @@ import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
     handleAddSourceDisplay: () => void;
-    handleCheckboxChange: (indx: number) => void
+    handleCheckboxChange: (indx: number) => void;
 }
 
 const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleAddSourceDisplay,
     handleCheckboxChange,
 }) => {
-    const { setSource, sources } = useUserStore();
+    const { sources, setSource } = useUserStore();
     const { workspaceId } = useParams();
 
     useEffect(() => {
@@ -28,6 +29,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             );
             setSource(resp.data);
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };

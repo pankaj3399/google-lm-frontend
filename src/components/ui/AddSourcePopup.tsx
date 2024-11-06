@@ -91,6 +91,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
             setUploadedFile(null);
             handleAddSourceDisplay();
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         } finally {
             setLoading(false);

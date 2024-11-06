@@ -38,6 +38,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             );
             setApiKey(resp.data.api);
         } catch (err) {
+            toast.error("Something went wront please try after some time!!");
             console.log(err);
         }
     };

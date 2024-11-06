@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 import useUserStore from "../store/userStore";
+import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,7 +37,7 @@ export default function SignUpPage() {
                 email,
                 clerkId,
             });
-            console.log(resp);
+            toast.success("Successfully signed up");
         } catch (error) {
             console.error("Error sending user data to backend:", error);
         }
