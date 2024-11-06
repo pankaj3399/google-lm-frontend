@@ -19,7 +19,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const [value, setValue] = useState("");
     const [heading, setHeading] = useState("");
     const { workspaceId } = useParams();
-    const { addNote, selectedNote, notes } = useUserStore();
+    const { addNote, selectedNote, notes, updateNote } = useUserStore();
 
     useEffect(() => {
         if(selectedNote != -1) {
@@ -49,19 +49,34 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
 
     const handleSaveNote = async () => {
         try {
-            const resp = await axios.post(
-                `${API_URL}/api/users/createNewNote/${workspaceId}`,
-                {
-                    heading: heading,
-                    content: value,
-                }
-            );
-            addNote(resp.data);
-            toast.success("Created Note");
-            setValue('');
-            setHeading('');
-            handleNewNoteDisplay();
-
+            if(selectedNote !== -1) {
+                const resp = await axios.put(
+                    `${API_URL}/api/users/updateNote/${notes[selectedNote]._id}`,
+                    {
+                        heading: heading,
+                        content: value,
+                    }
+                );
+                updateNote(selectedNote, resp.data.note);
+                console.log(resp.data.note)
+                toast.success("Updated Note");
+                setValue('');
+                setHeading('');
+                handleNewNoteDisplay();
+            } else {
+                const resp = await axios.post(
+                    `${API_URL}/api/users/createNewNote/${workspaceId}`,
+                    {
+                        heading: heading,
+                        content: value,
+                    }
+                );
+                addNote(resp.data);
+                toast.success("Created Note");
+                setValue('');
+                setHeading('');
+                handleNewNoteDisplay();
+            }
         } catch (err) {
             console.log(err);
         }

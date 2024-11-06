@@ -14,6 +14,8 @@ interface Note {
     _id: string;
     heading: string;
     content: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
 interface Source {
@@ -37,6 +39,7 @@ interface UserState {
     setWorkspace: (workspaces: Workspace[]) => void;
     setNotes: (notes: Note[]) => void;
     addNote: (note: Note) => void;
+    updateNote: (index: number, updatedNote: Note) => void;
     setSource: (sources: Source[]) => void;
     addSource: (source: Source) => void;
 }
@@ -64,6 +67,13 @@ const useUserStore = create<UserState>((set) => ({
     addNote: (note: Note) =>
         set((state) => ({
             notes: [...state.notes, note],
+        })),
+
+    updateNote: (index: number, updatedNote: Note) =>
+        set((state) => ({
+            notes: state.notes.map((note, i) =>
+                i === index ? updatedNote : note
+            ),
         })),
 
     setSource: (sources: Source[]) => set({ sources }),

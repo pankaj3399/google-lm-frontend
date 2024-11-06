@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
+import { Check } from "lucide-react";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface IntegrationPopupProps {
     handlePopup: () => void;
@@ -19,12 +22,25 @@ const integrations: Integration[] = [
     { name: "Hotjar", icon: "+" },
 ];
 
-const API_URL = import.meta.env.VITE_API_URL;
-
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
+
+    useEffect(() => {
+        fetchApiKey();
+    }, []);
+
+    const fetchApiKey = async () => {
+        try {
+            const resp = await axios.get(
+                `${API_URL}/api/users/getAiKey/${user?.id}`
+            );
+            setApiKey(resp.data.api);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -37,6 +53,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
 
             toast.success(response.data.message);
             setApiKey("");
+            handlePopup()
         } catch (error) {
             let errorMessage = "Something went wrong. Please try again later.";
             if (error instanceof Error) {
@@ -91,7 +108,12 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 onClick={() => updateSelectedIntegration(indx)}
                             >
                                 <span className="text-4xl text-gray-400">
-                                    {integration.icon}
+                                    {integration.name === "ChatGPT" &&
+                                    apiKey !== "" ? (
+                                        <Check className="text-green-500" />
+                                    ) : (
+                                        integration.icon
+                                    )}
                                 </span>
                                 <span className="text-[#1a1f36] text-base">
                                     {integration.name}

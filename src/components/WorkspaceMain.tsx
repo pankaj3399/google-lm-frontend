@@ -12,6 +12,8 @@ interface Note {
     _id: string;
     heading: string;
     content: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
 interface WorkspaceMainProps {
@@ -30,9 +32,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
-    const { notes, sources, setNotes, setSelectedNote, addNote } = useUserStore();
+    const { notes, sources, setNotes, setSelectedNote, addNote } =
+        useUserStore();
     const [inputChat, setInputChat] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
+    const [chatSection, setChatSection] = useState(false);
 
     useEffect(() => {
         fetchWorkspace();
@@ -68,6 +72,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const handleChat = async () => {
         if (inputChat == "") return;
         try {
+            setChatSection(true);
             let content = "";
             content += checkedSource.map((isChecked, index) => {
                 if (isChecked) {
@@ -95,7 +100,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             const resp = await axios.post(
                 `${API_URL}/api/users/createNewNote/${workspaceId}`,
                 {
-                    heading: 'Saved Response',
+                    heading: "Saved Response",
                     content: content,
                 }
             );
@@ -109,7 +114,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     return (
         <div className="h-screen w-[80%] flex flex-col">
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-xl">
                     {workspaceName !== ""
                         ? workspaceName
                         : "Untitled Workspace"}
@@ -123,34 +128,45 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             </div>
 
             <div className="flex-1 w-full p-6 overflow-y-auto relative ">
-                {chats.length > 0 ? (
+                {chatSection ? (
                     <>
-                        {chats.map((chat, indx) => (
-                            <div
-                                key={indx}
-                                className={`w-full flex relative ${
-                                    chat.owner === "Me"
-                                        ? "justify-end"
-                                        : "justify-start"
-                                }`}
-                            >
-                                <p
-                                    className={`max-w-10/12 bg-slate-100 p-5 mt-2 rounded-b-md listItem`}
+                        {chats.length > 0 ? (
+                            chats.map((chat, indx) => (
+                                <div
+                                    key={indx}
+                                    className={`w-full flex ${
+                                        chat.owner === "Me"
+                                            ? "justify-end"
+                                            : "justify-start"
+                                    }`}
                                 >
-                                    {chat.message}
-                                </p>
-                                {chat.owner === "GPT" ? (
-                                    <FilePlus
-                                        size={16}
-                                        className="absolute bottom-2 right-2 cursor-pointer"
-                                        onClick={() => handleSaveNote(chat.message)}
-                                    />
-                                ) : null}
+                                    <p
+                                        className={`max-w-10/12 bg-slate-100 p-5 mt-2 rounded-b-md listItem relative`}
+                                    >
+                                        {chat.message}
+                                        {chat.owner === "GPT" ? (
+                                            <FilePlus
+                                                size={16}
+                                                className="absolute bottom-1 right-2 cursor-pointer"
+                                                onClick={() =>
+                                                    handleSaveNote(chat.message)
+                                                }
+                                            />
+                                        ) : null}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <div>
+                                <h1 className="text-2xl text-gray-500">
+                                    Please start conversation
+                                </h1>
                             </div>
-                        ))}
+                        )}
+
                         <X
                             className="absolute right-5 top-1 cursor-pointer"
-                            onClick={() => setChats([])}
+                            onClick={() => setChatSection(false)}
                         />
                     </>
                 ) : (
@@ -176,6 +192,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         indx={indx}
                                         heading={note?.heading}
                                         content={note?.content}
+                                        updatedAt={note?.updatedAt}
+                                        createdAt={note?.createdAt}
                                         handleNewNoteDisplay={
                                             handleNewNoteDisplay
                                         }
@@ -214,8 +232,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 
             <div className="w-full h-28">
                 <div className="flex w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
-                    <div className="flex items-center space-x-2 text-gray-500">
-                        <span>Open chat</span>
+                    <div
+                        className="flex items-center space-x-2 text-gray-500 cursor-pointer"
+                        onClick={() => setChatSection(true)}
+                    >
+                        <span className="text-blue-500">Open chat</span>
                         <Info className="w-4 h-4" />
                     </div>
                     <div className="flex-1 mx-4 relative">

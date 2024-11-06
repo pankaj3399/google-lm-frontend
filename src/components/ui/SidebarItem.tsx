@@ -56,7 +56,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                             previousCreations.map((previousCreation) => (
                                 <div
                                     key={previousCreation._id}
-                                    className="flex flex-col h-52 w-52 rounded-lg justify-center items-center border border-gray-300 bg-white shadow-md cursor-pointer transition-transform duration-300 transform hover:scale-105 hover:shadow-lg"
+                                    className="flex flex-col items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200"
                                     onClick={() =>
                                         navigate(
                                             `/workspace/${previousCreation._id}`
