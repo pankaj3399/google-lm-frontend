@@ -1,5 +1,14 @@
 import axios from "axios";
-import { Info, SendHorizontal, FileText, X, FilePlus } from "lucide-react";
+import {
+    Info,
+    SendHorizontal,
+    FileText,
+    X,
+    Copy,
+    Pin,
+    ThumbsUp,
+    ThumbsDown,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
@@ -145,17 +154,39 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                     }`}
                                 >
                                     <p
-                                        className={`max-w-10/12 bg-slate-100 p-5 mt-2 rounded-b-md listItem relative`}
+                                        className={`max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg`}
                                     >
                                         {chat.message}
                                         {chat.owner === "GPT" ? (
-                                            <FilePlus
-                                                size={16}
-                                                className="absolute bottom-1 right-2 cursor-pointer"
-                                                onClick={() =>
-                                                    handleSaveNote(chat.message)
-                                                }
-                                            />
+                                            <div className="flex justify-between pt-2 items-center">
+                                                <div className="flex gap-1">
+                                                    <Copy
+                                                        size={15}
+                                                        className="cursor-pointer"
+                                                    />
+                                                    <ThumbsUp
+                                                        size={15}
+                                                        className="cursor-pointer"
+                                                    />
+                                                    <ThumbsDown
+                                                        size={15}
+                                                        className="cursor-pointer"
+                                                    />
+                                                </div>
+                                                <div
+                                                    className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
+                                                    onClick={() =>
+                                                        handleSaveNote(
+                                                            chat.message
+                                                        )
+                                                    }
+                                                >
+                                                    <Pin size={16} />
+                                                    <span>
+                                                        Save to Workspace
+                                                    </span>
+                                                </div>
+                                            </div>
                                         ) : null}
                                     </p>
                                 </div>

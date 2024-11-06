@@ -37,6 +37,7 @@ export default function SignUpPage() {
                 email,
                 clerkId,
             });
+            console.log(resp)
             toast.success("Successfully signed up");
         } catch (error) {
             console.error("Error sending user data to backend:", error);
