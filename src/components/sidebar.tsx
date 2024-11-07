@@ -5,7 +5,6 @@ import WorkspacePopup from "./ui/WorkspacePopup";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import useUserStore from "../store/userStore";
-import toast from "react-hot-toast";
 
 interface SidebarProps {}
 const API_URL = import.meta.env.VITE_API_URL;
@@ -37,7 +36,6 @@ const Sidebar: React.FC<SidebarProps> = () => {
             );
             setWorkspace(resp.data.workspaces);
         } catch (error) {
-            toast.error("Something went wront please try after some time!!");
             console.log(error);
         }
     };

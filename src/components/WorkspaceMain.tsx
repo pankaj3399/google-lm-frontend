@@ -9,7 +9,7 @@ import {
     ThumbsUp,
     ThumbsDown,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
@@ -46,11 +46,18 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [inputChat, setInputChat] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         fetchWorkspace();
         fetchAllNotes();
     }, []);
+
+    useEffect(() => {
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
+    }, [chats]);
 
     const fetchAllNotes = async () => {
         try {
@@ -140,7 +147,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 />
             </div>
 
-            <div className="flex-1 w-full p-6 overflow-y-auto relative ">
+            <div className="flex-1 w-full p-6 overflow-y-auto relative" ref={containerRef}>
                 {chatSection ? (
                     <>
                         {chats.length > 0 ? (
@@ -200,7 +207,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                         )}
 
                         <X
-                            className="absolute right-5 top-1 cursor-pointer"
+                            className="fixed right-5 top-16 cursor-pointer"
                             onClick={() => setChatSection(false)}
                         />
                     </>
