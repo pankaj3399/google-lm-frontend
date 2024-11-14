@@ -122,12 +122,12 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
     };
 
-    const handleSaveNote = async (content: string) => {
+    const handleSaveNote = async (content: string, indx: number) => {
         try {
             const resp = await axios.post(
                 `${API_URL}/api/users/createNewNote/${workspaceId}`,
                 {
-                    heading: "Saved Response",
+                    heading: chats[indx - 1].message,
                     content: content,
                 }
             );
@@ -190,7 +190,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                                     className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
                                                     onClick={() =>
                                                         handleSaveNote(
-                                                            chat.message
+                                                            chat.message,
+                                                            indx
                                                         )
                                                     }
                                                 >

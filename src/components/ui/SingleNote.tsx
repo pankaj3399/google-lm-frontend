@@ -36,7 +36,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2">
                         <BarChart3 className="w-6 h-6" />
-                        <h4 className="">Google Analytics</h4>
+                        <h4 className="">Saved Note</h4>
                         <span className="text-sm text-gray-500">
                             {moment(createdAt).format(" Do MMM")}
                         </span>
@@ -55,8 +55,8 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 </div>
 
                 {/* Title */}
-                <h3 className="mb-5">
-                    {heading}{" "}
+                <h3 className="mb-5 font-bold">
+                    {heading.substring(0, 20)}{".. "}
                     <span className="text-gray-500 ml-2">
                         {moment(updatedAt).format("MMMM Do YYYY")}
                     </span>
@@ -64,7 +64,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 
                 {/* Content */}
                 <div className="space-y-6 tracking-wide">
-                    <p className="text-gray-700">{getPlainText(content)}</p>
+                    <p className="text-gray-700">{getPlainText(content).substring(0, 300) + (content.length > 300 ? '...' : '')}</p>
                 </div>
             </div>
         </div>
