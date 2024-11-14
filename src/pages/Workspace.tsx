@@ -1,22 +1,23 @@
-import { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import WorkspaceSidebar from "../components/WorkspaceSidebar";
 import WorkspaceMain from "../components/WorkspaceMain";
 import NewNotePopup from "../components/ui/NewNotePopup";
 import AddSourcePopup from "../components/ui/AddSourcePopup";
 import useUserStore from "../store/userStore";
+import IntegrationPopup from "../components/ui/IntegrationPopup.tsx";
 
 function Workspace() {
-    const [openNewNote, setOpenNewNote] = useState(false);
+    // const [openNewNote, setOpenNewNote] = useState(false);
     const [openSourceAdd, setOpenSourceAdd] = useState(false);
     const [checkedSource, setCheckedSource] = useState<boolean[]>([]);
-    const { sources } = useUserStore();
+    const { sources, integrationPopup, sourcePopup, setIntegrationPopup, setSourcePopup } = useUserStore();
 
     useEffect(() => {
         setCheckedSource(Array(sources.length).fill(true));
     }, [sources]);
 
     const handleNewNoteDisplay = () => {
-        setOpenNewNote((prev) => !prev);
+        setSourcePopup();
     };
 
     const handleAddSourceDisplay = () => {
@@ -31,11 +32,15 @@ function Workspace() {
         });
     };
 
+    const handlePopup = () => {
+        setIntegrationPopup();
+    };
+
     return (
         <main className="flex w-screen h-screen relative">
             <WorkspaceSidebar handleAddSourceDisplay={handleAddSourceDisplay} handleCheckboxChange={handleCheckboxChange}/>
             <WorkspaceMain handleNewNoteDisplay={handleNewNoteDisplay} checkedSource={checkedSource}/>
-            {openNewNote && (
+            {sourcePopup && (
                 <NewNotePopup handleNewNoteDisplay={handleNewNoteDisplay} />
             )}
             {openSourceAdd && (
@@ -43,6 +48,7 @@ function Workspace() {
                     handleAddSourceDisplay={handleAddSourceDisplay}
                 />
             )}
+            {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
         </main>
     );
 }

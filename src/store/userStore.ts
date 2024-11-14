@@ -31,7 +31,11 @@ interface UserState {
     workspace: Workspace[];
     notes: Note[];
     selectedNote: number;
+    integrationPopup: boolean;
+    sourcePopup: boolean;
     sources: Source[];
+    setIntegrationPopup: () => void;
+    setSourcePopup: () => void;
     setSelectedNote: (selectedNote: number) => void;
     setUser: (user: User) => void;
     clearUser: () => void;
@@ -45,16 +49,26 @@ interface UserState {
 }
 
 const useUserStore = create<UserState>((set) => ({
-    user: null,
+    user: localStorage.getItem("user")
+        ? JSON.parse(localStorage.getItem("user") as string)
+        : null,
     workspace: [],
     notes: [],
     selectedNote: -1,
     sources: [],
-
+    integrationPopup: false,
+    sourcePopup: false,
+    setIntegrationPopup: () =>
+        set((state) => ({
+            integrationPopup: !state.integrationPopup,
+        })),
+    setSourcePopup: () =>
+        set((state) => ({
+            sourcePopup: !state.sourcePopup,
+        })),
     setSelectedNote: (selectedNote: number) => set({ selectedNote }),
     setUser: (user: User) => set({ user }),
     clearUser: () => set({ user: null, workspace: [], notes: [], sources: [] }),
-
     addWorkspace: (workspace: Workspace) =>
         set((state) => ({
             workspace: [...state.workspace, workspace],

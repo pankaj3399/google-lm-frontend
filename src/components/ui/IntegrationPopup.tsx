@@ -24,6 +24,7 @@ const integrations: Integration[] = [
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
+    const [fetchedApiKey, setFetchedApiKey] = useState("");
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
 
@@ -36,7 +37,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             const resp = await axios.get(
                 `${API_URL}/api/users/getAiKey/${user?.id}`
             );
-            setApiKey(resp.data.api);
+            setFetchedApiKey(resp.data.api);
         } catch (err) {
             toast.error("Something went wront please try after some time!!");
             console.log(err);
@@ -110,7 +111,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                             >
                                 <span className="text-4xl text-gray-400">
                                     {integration.name === "ChatGPT" &&
-                                    apiKey !== "" ? (
+                                    fetchedApiKey !== "" ? (
                                         <Check className="text-green-500" />
                                     ) : (
                                         integration.icon

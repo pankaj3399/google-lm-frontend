@@ -1,18 +1,20 @@
 import { SignUp, useUser, useAuth } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
 import useUserStore from "../store/userStore";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SignUpPage() {
     const { isSignedIn } = useAuth();
     const { user: clerkUser } = useUser();
+    const { setUser, user } = useUserStore();
     const navigate = useNavigate();
-    const { user } = useUserStore();
 
     useEffect(() => {
+        if(isSignedIn === null) return;
+
         if (isSignedIn) {
             navigate("/home");
         }
@@ -36,7 +38,13 @@ export default function SignUpPage() {
                 email,
                 clerkId,
             });
-            console.log(resp)
+            const userData = {
+                userId: resp.data.clerkId,
+                email: resp.data.email,
+                openAikey: resp.data.openAikey,
+            };
+            // localStorage.setItem("user", JSON.stringify(userData));
+            setUser(userData);
         } catch (error) {
             console.error("Error sending user data to backend:", error);
         }
@@ -44,7 +52,7 @@ export default function SignUpPage() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignUp />
+            <SignUp afterSignUpUrl={import.meta.env.CLERK_SIGN_UP_FORCE_REDIRECT_URL} />;
         </div>
     );
 }

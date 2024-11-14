@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import SidebarItem from "./ui/SidebarItem";
 import IntegrationPopup from "./ui/IntegrationPopup";
 import WorkspacePopup from "./ui/WorkspacePopup";
@@ -6,22 +6,22 @@ import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import useUserStore from "../store/userStore";
 
-interface SidebarProps {}
 const API_URL = import.meta.env.VITE_API_URL;
 
-const Sidebar: React.FC<SidebarProps> = () => {
-    const [isPopupOpen, setIsPopupOpen] = useState(false);
+const Sidebar = () => {
     const [workspacePopup, setWorkspacePopup] = useState(false);
-    const { workspace, setWorkspace } = useUserStore();
+    const { workspace, integrationPopup, setWorkspace, setIntegrationPopup } =
+        useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
 
     useEffect(() => {
+        if (!user?.id) return;
         fetchAllWorkspaces();
-    }, []);
+    }, [user?.id]);
 
     const handlePopup = () => {
-        setIsPopupOpen((prev) => !prev);
+        setIntegrationPopup();
         setIntegrations([]);
     };
 
@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = () => {
                 <SidebarItem key={index} {...item} />
             ))}
             {/* {PopupSection &&  Integrations*/}
-            {isPopupOpen && <IntegrationPopup handlePopup={handlePopup} />}
+            {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
             {workspacePopup && (
                 <WorkspacePopup handleWorkSpacePopup={handleWorkSpacePopup} />
             )}

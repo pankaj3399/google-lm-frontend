@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
 import toast from "react-hot-toast";
+import { UserButton } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,8 +42,15 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
-    const { notes, sources, setNotes, setSelectedNote, addNote } =
-        useUserStore();
+    const {
+        notes,
+        sources,
+        setNotes,
+        setSelectedNote,
+        addNote,
+        setIntegrationPopup,
+        setSourcePopup,
+    } = useUserStore();
     const [inputChat, setInputChat] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
@@ -139,15 +147,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                         ? workspaceName
                         : "Untitled Workspace"}
                 </p>
-                <img
-                    loading="lazy"
-                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/10323ea2395e338a2e439eb5aa8707c2b16f628adc554e198cd7d75a66167836?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
-                    alt=""
-                    className="object-contain shrink-0 w-8 aspect-square"
-                />
+                <UserButton />
             </div>
 
-            <div className="flex-1 w-full p-6 overflow-y-auto relative" ref={containerRef}>
+            <div
+                className="flex-1 w-full p-6 overflow-y-auto relative"
+                ref={containerRef}
+            >
                 {chatSection ? (
                     <>
                         {chats.length > 0 ? (
@@ -253,10 +259,16 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                     your workspace.
                                 </p>
                                 <div className="flex">
-                                    <button className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                                    <button
+                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                        onClick={setIntegrationPopup}
+                                    >
                                         Add Integrations
                                     </button>
-                                    <button className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50">
+                                    <button
+                                        className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50"
+                                        onClick={setSourcePopup}
+                                    >
                                         Add Sources
                                     </button>
                                 </div>

@@ -2,7 +2,7 @@ import { Info, CirclePlus, Link2, FileText } from "lucide-react";
 import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -15,8 +15,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleAddSourceDisplay,
     handleCheckboxChange,
 }) => {
-    const { sources, setSource } = useUserStore();
+    const { sources, setSource, setIntegrationPopup } = useUserStore();
     const { workspaceId } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchAllSources();
@@ -29,15 +30,17 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             );
             setSource(resp.data);
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong please try after some time!!");
             console.log(err);
         }
     };
     return (
         <div className="w-[20%] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
-            <div className="flex items-center justify-center w-full h-14 border-b border-gray-200 text-xl text-[#1B2559]">
+            <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 " >
+               <div className='flex cursor-pointer text-2xl text-[#1B2559]' onClick={() => navigate('/home')}>
                 <p className="font-bold">Metrics</p>
                 <span>LM</span>
+               </div>
             </div>
 
             <div className="p-4 flex-1">
@@ -47,7 +50,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             <span className="font-medium">Integrations</span>
                             <Info className="w-4 h-4 text-gray-400" />
                         </div>
-                        <CirclePlus className="w-4 h-4 text-gray-400" />
+                        <CirclePlus className="w-4 h-4 text-gray-400 cursor-pointer" onClick={setIntegrationPopup}/>
                     </div>
                     <label className="flex items-center justify-between space-x-2 text-sm text-gray-600">
                         <span>Select all integrations</span>

@@ -14,7 +14,7 @@ if(!clerk_key){
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ClerkProvider publishableKey={clerk_key}>
+    <ClerkProvider publishableKey={clerk_key} afterSignOutUrl="/">
       <App />
       <Toaster/>
     </ClerkProvider>
