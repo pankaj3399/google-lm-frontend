@@ -61,7 +61,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="flex flex-col items-start mt-14 ml-14 max-w-full text-2xl w-[220px] max-md:mt-10 max-md:ml-2.5">
+        <aside className="flex flex-col items-start mt-14 pl-5">
             {sidebarItems.map((item, index) => (
                 <SidebarItem key={index} {...item} />
             ))}

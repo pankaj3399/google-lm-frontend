@@ -1,22 +1,19 @@
 import { UserButton } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
+    const navigate = useNavigate();
     return (
-        <header
-            data-layername="navV3Jira"
-            className="flex flex-col pt-4 w-full text-2xl font-bold bg-white max-md:max-w-full"
-        >
-            <nav className="flex flex-wrap gap-5 justify-between self-center ml-3.5 w-full max-w-[1364px] max-md:max-w-full">
-                <div data-layername="metricsLm">
-                    Metrics<span>LM</span>
-                </div>
-                <UserButton />
-            </nav>
+        <nav className="flex p-4 w-screen justify-between">
             <div
-                data-layername="shadow"
-                className="flex mt-4 w-full min-h-[4px] max-md:max-w-full"
-            />
-        </header>
+                className="flex cursor-pointer text-2xl text-[#1B2559]"
+                onClick={() => navigate("/")}
+            >
+                <p className="font-bold">Metrics</p>
+                <span>LM</span>
+            </div>
+            <UserButton />
+        </nav>
     );
 };
 

@@ -1,45 +1,62 @@
 import { useEffect } from "react";
-import Login from "./pages/login";
-import SignUpPage from "./pages/signup";
-import LandingPage from "./pages/landingPage";
-import Home from "./pages/home";
 import {
     BrowserRouter as Router,
     Routes,
     Route,
     Navigate,
 } from "react-router-dom";
-import Workspace from "./pages/Workspace";
-import useUserStore from "./store/userStore";
 import { useUser } from "@clerk/clerk-react";
+
+import Login from "./pages/login";
+import SignUpPage from "./pages/signup";
+import LandingPage from "./pages/landingPage";
+import Home from "./pages/home";
+import Workspace from "./pages/Workspace";
 import PageNotFound from "./pages/PageNotFound";
+
+import useUserStore from "./store/userStore";
+
+const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
+    const { user } = useUserStore();
+    return user ? children : <Navigate to="/signup" />;
+};
+
 const App = () => {
     const { user, setUser } = useUserStore();
     const { user: clerkUser } = useUser();
 
     useEffect(() => {
-        if (!user) {
+        if (clerkUser && !user) {
             setUser({
-                userId: clerkUser?.id as string,
-                email: clerkUser?.primaryEmailAddress?.emailAddress as string,
+                userId: clerkUser.id,
+                email: clerkUser.primaryEmailAddress?.emailAddress || "",
             });
         }
-    }, [user]);
+    }, [clerkUser, user, setUser]);
 
     return (
         <Router>
             <Routes>
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUpPage />} />
+                <Route path="/" element={<LandingPage />} />
+
                 <Route
                     path="home"
-                    element={user ? <Home /> : <Navigate to="/signup" />}
+                    element={
+                        <ProtectedRoute>
+                            <Home />
+                        </ProtectedRoute>
+                    }
                 />
                 <Route
                     path="workspace/:workspaceId"
-                    element={user ? <Workspace /> : <Navigate to="/signup" />}
+                    element={
+                        <ProtectedRoute>
+                            <Workspace />
+                        </ProtectedRoute>
+                    }
                 />
-                <Route path="/" element={<LandingPage />} />
                 <Route path="*" element={<PageNotFound />} />
             </Routes>
         </Router>

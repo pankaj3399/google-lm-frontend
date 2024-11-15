@@ -27,15 +27,18 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
     const navigate = useNavigate();
 
     return (
-        <>
-            <h2 data-layername={title.toLowerCase()}>{title}</h2>
+        <div>
+            <h2 className="text-start text-2xl">
+                {title}
+            </h2>
             {type === "icon" && (
                 <div className="flex shrink-0 mt-7 rounded-3xl border border-gray-300 border-solid h-[110px] w-[110px]" />
             )}
             {type === "button" && (
-                <div className="flex h-60 items-center gap-2">
+                <div className="flex gap-2 w-screen p-5">
+                    {/* Button */}
                     <button
-                        className="flex flex-col items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200"
+                        className="flex flex-col items-center justify-center min-w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200"
                         onClick={() => functionality()}
                     >
                         <img
@@ -51,7 +54,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                             {buttonText}
                         </span>
                     </button>
-                    <div className="flex w-screen flex-wrap gap-4">
+                    <div className="flex flex-wrap w-screen gap-2">
+                        {/* Previous Creations */}
                         {previousCreations.length > 0 &&
                             previousCreations.map((previousCreation) => (
                                 <div
@@ -71,7 +75,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 

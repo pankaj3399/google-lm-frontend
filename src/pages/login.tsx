@@ -1,4 +1,4 @@
-import {SignIn, useUser} from "@clerk/clerk-react";
+import { SignIn, useUser } from "@clerk/clerk-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -24,18 +24,19 @@ export default function Login() {
                 getUser();
             }
         }
-    }, [isSignedIn, navigate]);
+    }, [isSignedIn, clerkUser]);
 
     const getUser = async (): Promise<void> => {
         try {
-            const resp = await axios.get(`${API_URL}/api/users/getUser/${clerkUser?.id}`);
+            const resp = await axios.get(
+                `${API_URL}/api/users/getUser/${clerkUser?.id}`
+            );
             const userData = {
                 userId: resp.data.clerkId,
                 email: resp.data.email,
                 openAikey: resp.data.openAikey,
             };
-            // localStorage.setItem("user", JSON.stringify(userData));
-            setUser(userData)
+            setUser(userData);
         } catch (error) {
             console.error("Error sending user data to backend:", error);
         }
@@ -43,7 +44,7 @@ export default function Login() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignIn afterSignInUrl={import.meta.env.CLERK_SIGN_IN_FORCE_REDIRECT_URL}/>
+            <SignIn />
         </div>
     );
 }

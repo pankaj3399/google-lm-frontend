@@ -289,9 +289,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 <div className="flex w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
                     <div
                         className="flex items-center space-x-2 text-gray-500 cursor-pointer"
-                        onClick={() => setChatSection(true)}
+                        onClick={() => setChatSection((prev) => !prev)}
                     >
-                        <span className="text-blue-500">Open chat</span>
+                        <span className="text-blue-500">
+                            {chatSection ? "Close chat" : "Open chat"}
+                        </span>
                         <Info className="w-4 h-4" />
                     </div>
                     <div className="flex-1 mx-4 relative">

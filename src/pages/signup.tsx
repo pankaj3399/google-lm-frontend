@@ -13,7 +13,7 @@ export default function SignUpPage() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(isSignedIn === null) return;
+        if (isSignedIn === null) return;
 
         if (isSignedIn) {
             navigate("/home");
@@ -43,7 +43,6 @@ export default function SignUpPage() {
                 email: resp.data.email,
                 openAikey: resp.data.openAikey,
             };
-            // localStorage.setItem("user", JSON.stringify(userData));
             setUser(userData);
         } catch (error) {
             console.error("Error sending user data to backend:", error);
@@ -52,7 +51,7 @@ export default function SignUpPage() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignUp afterSignUpUrl={import.meta.env.CLERK_SIGN_UP_FORCE_REDIRECT_URL} />;
+            <SignUp />;
         </div>
     );
 }
