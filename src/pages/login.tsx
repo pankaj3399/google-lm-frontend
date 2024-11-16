@@ -14,22 +14,21 @@ export default function Login() {
     const { setUser } = useUserStore();
 
     useEffect(() => {
-        if (isSignedIn) {
-            navigate("/home");
-        } else {
-            const clerkId = clerkUser?.id;
-            const email = clerkUser?.primaryEmailAddress?.emailAddress;
+        if (isSignedIn === null || !clerkUser) return;
 
-            if (clerkId && email) {
-                getUser();
-            }
+        const clerkId = clerkUser?.id;
+        const email = clerkUser?.primaryEmailAddress?.emailAddress;
+
+        if (clerkId && email) {
+            getUser(clerkId);
+            navigate("/home");
         }
     }, [isSignedIn, clerkUser]);
 
-    const getUser = async (): Promise<void> => {
+    const getUser = async (clerkId: string): Promise<void> => {
         try {
             const resp = await axios.get(
-                `${API_URL}/api/users/getUser/${clerkUser?.id}`
+                `${API_URL}/api/users/getUser/${clerkId}`
             );
             const userData = {
                 userId: resp.data.clerkId,

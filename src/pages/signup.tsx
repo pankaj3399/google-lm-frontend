@@ -9,23 +9,18 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function SignUpPage() {
     const { isSignedIn } = useAuth();
     const { user: clerkUser } = useUser();
-    const { setUser, user } = useUserStore();
+    const { setUser } = useUserStore();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (isSignedIn === null) return;
+        if (isSignedIn === null || !clerkUser) return;
 
-        if (isSignedIn) {
+        const clerkId = clerkUser.id;
+        const email = clerkUser.primaryEmailAddress?.emailAddress;
+
+        if (isSignedIn && clerkId && email) {
+            sendUserDataToBackend(clerkId, email);
             navigate("/home");
-        }
-
-        if (clerkUser && user) {
-            const clerkId = clerkUser.id;
-            const email = clerkUser.primaryEmailAddress?.emailAddress;
-
-            if (clerkId && email) {
-                sendUserDataToBackend(clerkId, email);
-            }
         }
     }, [isSignedIn, clerkUser]);
 
@@ -51,7 +46,7 @@ export default function SignUpPage() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignUp />;
+            <SignUp forceRedirectUrl='/home'/>
         </div>
     );
 }

@@ -37,12 +37,11 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="login" element={<Login />} />
-                <Route path="signup" element={<SignUpPage />} />
                 <Route path="/" element={<LandingPage />} />
-
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUpPage />} />
                 <Route
-                    path="home"
+                    path="/home"
                     element={
                         <ProtectedRoute>
                             <Home />
@@ -50,7 +49,7 @@ const App = () => {
                     }
                 />
                 <Route
-                    path="workspace/:workspaceId"
+                    path="/workspace/:workspaceId"
                     element={
                         <ProtectedRoute>
                             <Workspace />
