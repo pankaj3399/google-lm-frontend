@@ -1,10 +1,11 @@
 import React, { useState, DragEvent, ChangeEvent, KeyboardEvent } from "react";
 import { Upload, Link, X, FileCheck, Lock } from "lucide-react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import useUserStore from "../../store/userStore";
 import toast from "react-hot-toast";
 import { ThreeDot } from "react-loading-indicators";
+import apiClient, { setAuthToken } from "../../api/axiosClient";
+import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const { workspaceId } = useParams();
     const { addSource } = useUserStore();
+    const { getToken } = useAuth();
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -67,8 +69,11 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
         if (!url && !uploadedFile) return;
         setLoading(true);
         try {
+            const token = await getToken();
+            setAuthToken(token);
+    
             const formData = new FormData();
-
+    
             if (uploadedFile) {
                 formData.append("file", uploadedFile);
                 formData.append("uploadType", "file");
@@ -76,27 +81,28 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
                 formData.append("url", url);
                 formData.append("uploadType", "url");
             }
-
-            const resp = await axios.post(
+    
+            const resp = await apiClient.post(
                 `${API_URL}/api/users/createSource/${workspaceId}`,
                 formData,
                 {
                     headers: { "Content-Type": "multipart/form-data" },
                 }
             );
-
+    
             addSource(resp.data);
             toast.success("Source added");
             setUrl("");
             setUploadedFile(null);
             handleAddSourceDisplay();
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         } finally {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className="min-h-screen bg-gray-100">

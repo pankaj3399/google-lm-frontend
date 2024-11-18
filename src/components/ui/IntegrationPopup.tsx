@@ -3,6 +3,8 @@ import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { Check } from "lucide-react";
+import apiClient, { setAuthToken } from "../../api/axiosClient";
+import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,6 +29,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [fetchedApiKey, setFetchedApiKey] = useState("");
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
+    const { getToken } = useAuth();
 
     useEffect(() => {
         fetchApiKey();
@@ -34,28 +37,30 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
 
     const fetchApiKey = async () => {
         try {
-            const resp = await axios.get(
-                `${API_URL}/api/users/getAiKey/${user?.id}`
-            );
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.get(`${API_URL}/api/users/getAiKey/${user?.id}`);
             setFetchedApiKey(resp.data.api);
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
-            const response = await axios.post(
-                `${API_URL}/api/users/saveApiKey/${clerkId}`,
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const response = await apiClient.post(`${API_URL}/api/users/saveApiKey/${clerkId}`,
                 {
                     api_key: apiKey,
-                }
-            );
-
+                });
+    
             toast.success(response.data.message);
             setApiKey("");
-            handlePopup()
+            handlePopup();
         } catch (error) {
             let errorMessage = "Something went wrong. Please try again later.";
             if (error instanceof Error) {
@@ -66,11 +71,13 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             ) {
                 errorMessage = error.response.data.message;
             }
-
+    
             toast.error(`Error saving settings: ${errorMessage}`);
             console.error(error);
         }
     };
+    
+    
 
     return (
         <div>

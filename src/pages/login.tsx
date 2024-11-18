@@ -2,16 +2,16 @@ import { SignIn, useUser } from "@clerk/clerk-react";
 import { useAuth } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import axios from "axios";
 import useUserStore from "../store/userStore.ts";
+import apiClient, { setAuthToken } from "../api/axiosClient";
 
-const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
     const { isSignedIn } = useAuth();
     const navigate = useNavigate();
     const { user: clerkUser } = useUser();
     const { setUser } = useUserStore();
+    const { getToken } = useAuth();
 
     useEffect(() => {
         if (isSignedIn === null || !clerkUser) return;
@@ -27,8 +27,10 @@ export default function Login() {
 
     const getUser = async (clerkId: string): Promise<void> => {
         try {
-            const resp = await axios.get(
-                `${API_URL}/api/users/getUser/${clerkId}`
+            const token = await getToken();
+            setAuthToken(token);
+            const resp = await apiClient.get(
+                `/api/users/getUser/${clerkId}`
             );
             const userData = {
                 userId: resp.data.clerkId,

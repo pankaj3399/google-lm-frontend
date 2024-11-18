@@ -2,10 +2,11 @@ import { useEffect, useState } from "react";
 import { Minimize2, Pen } from "lucide-react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import useUserStore from "../../store/userStore";
+import apiClient, { setAuthToken } from "../../api/axiosClient";
+import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -20,6 +21,8 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const [heading, setHeading] = useState("");
     const { workspaceId } = useParams();
     const { addNote, selectedNote, notes, updateNote } = useUserStore();
+    const { getToken } = useAuth();
+
 
     useEffect(() => {
         if(selectedNote != -1) {
@@ -49,8 +52,11 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
 
     const handleSaveNote = async () => {
         try {
-            if(selectedNote !== -1) {
-                const resp = await axios.put(
+            const token = await getToken();
+            setAuthToken(token);
+    
+            if (selectedNote !== -1) {
+                const resp = await apiClient.put(
                     `${API_URL}/api/users/updateNote/${notes[selectedNote]._id}`,
                     {
                         heading: heading,
@@ -58,13 +64,12 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                     }
                 );
                 updateNote(selectedNote, resp.data.note);
-                console.log(resp.data.note)
                 toast.success("Updated Note");
                 setValue('');
                 setHeading('');
                 handleNewNoteDisplay();
             } else {
-                const resp = await axios.post(
+                const resp = await apiClient.post(
                     `${API_URL}/api/users/createNewNote/${workspaceId}`,
                     {
                         heading: heading,
@@ -78,10 +83,11 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                 handleNewNoteDisplay();
             }
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
+    
 
     return (
         <div className="absolute w-screen h-screen flex justify-center items-center backdrop-blur-sm">

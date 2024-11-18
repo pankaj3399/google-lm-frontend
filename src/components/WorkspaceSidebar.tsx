@@ -1,9 +1,10 @@
 import { Info, CirclePlus, Link2, FileText } from "lucide-react";
 import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
-import axios from "axios";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import apiClient, { setAuthToken } from "../api/axiosClient";
+import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -18,6 +19,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     const { sources, setSource, setIntegrationPopup } = useUserStore();
     const { workspaceId } = useParams();
     const navigate = useNavigate();
+    const { getToken } = useAuth();
 
     useEffect(() => {
         fetchAllSources();
@@ -25,22 +27,27 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
 
     const fetchAllSources = async () => {
         try {
-            const resp = await axios.get(
-                `${API_URL}/api/users/getAllSources/${workspaceId}`
-            );
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.get(`${API_URL}/api/users/getAllSources/${workspaceId}`);
             setSource(resp.data);
         } catch (err) {
-            toast.error("Something went wrong please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
+    
     return (
         <div className="w-[20%] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
-            <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 " >
-               <div className='flex cursor-pointer text-2xl text-[#1B2559]' onClick={() => navigate('/home')}>
-                <p className="font-bold">Metrics</p>
-                <span>LM</span>
-               </div>
+            <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
+                <div
+                    className="flex cursor-pointer text-2xl text-[#1B2559]"
+                    onClick={() => navigate("/home")}
+                >
+                    <p className="font-bold">Metrics</p>
+                    <span>LM</span>
+                </div>
             </div>
 
             <div className="p-4 flex-1">
@@ -50,7 +57,10 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             <span className="font-medium">Integrations</span>
                             <Info className="w-4 h-4 text-gray-400" />
                         </div>
-                        <CirclePlus className="w-4 h-4 text-gray-400 cursor-pointer" onClick={setIntegrationPopup}/>
+                        <CirclePlus
+                            className="w-4 h-4 text-gray-400 cursor-pointer"
+                            onClick={setIntegrationPopup}
+                        />
                     </div>
                     <label className="flex items-center justify-between space-x-2 text-sm text-gray-600">
                         <span>Select all integrations</span>

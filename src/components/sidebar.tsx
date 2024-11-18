@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import SidebarItem from "./ui/SidebarItem";
 import IntegrationPopup from "./ui/IntegrationPopup";
 import WorkspacePopup from "./ui/WorkspacePopup";
-import axios from "axios";
-import { useUser } from "@clerk/clerk-react";
+import { useUser, useAuth } from "@clerk/clerk-react";
 import useUserStore from "../store/userStore";
+import apiClient, { setAuthToken } from "../api/axiosClient";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,6 +14,7 @@ const Sidebar = () => {
         useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
+    const { getToken } = useAuth();
 
     useEffect(() => {
         if (!user?.id) return;
@@ -31,7 +32,10 @@ const Sidebar = () => {
 
     const fetchAllWorkspaces = async () => {
         try {
-            const resp = await axios.get(
+            const token = await getToken();
+            setAuthToken(token);
+
+            const resp = await apiClient.get(
                 `${API_URL}/api/users/getAllWorkspaces/${user?.id}`
             );
             setWorkspace(resp.data.workspaces);

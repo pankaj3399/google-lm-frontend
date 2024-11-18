@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
     Info,
     SendHorizontal,
@@ -15,6 +14,8 @@ import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
 import toast from "react-hot-toast";
 import { UserButton } from "@clerk/clerk-react";
+import apiClient, { setAuthToken } from "../api/axiosClient";
+import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -55,6 +56,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const { getToken } = useAuth();
 
     useEffect(() => {
         fetchWorkspace();
@@ -69,34 +71,36 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 
     const fetchAllNotes = async () => {
         try {
-            const resp = await axios.get(
-                `${API_URL}/api/users/getAllNotes/${workspaceId}`
-            );
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.get(`${API_URL}/api/users/getAllNotes/${workspaceId}`);
             setNotes(resp.data);
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
-
+    
     const fetchWorkspace = async () => {
         try {
-            const resp = await axios.get(
-                `${API_URL}/api/users/getWorkspace/${workspaceId}`
-            );
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.get(`${API_URL}/api/users/getWorkspace/${workspaceId}`);
             setWorkspaceName(resp.data.workspace.name);
         } catch (error) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(error);
         }
     };
-
+    
     function addChat(message: string, owner: string) {
         setChats((prevChats) => [...prevChats, { message, owner }]);
     }
-
+    
     const handleChat = async () => {
-        if (inputChat == "") return;
+        if (inputChat === "") return;
         try {
             setChatSection(true);
             let content = "";
@@ -107,7 +111,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 return null;
             });
             addChat(inputChat, "Me");
-            const resp = await axios.post(
+    
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.post(
                 `${API_URL}/api/users/createConversation`,
                 {
                     question: inputChat,
@@ -117,27 +125,28 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             setInputChat("");
             addChat(resp.data.message, "GPT");
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
-
+    
     const handleSaveNote = async (content: string, indx: number) => {
         try {
-            const resp = await axios.post(
-                `${API_URL}/api/users/createNewNote/${workspaceId}`,
-                {
-                    heading: chats[indx - 1].message,
-                    content: content,
-                }
-            );
+            const token = await getToken();
+            setAuthToken(token);
+    
+            const resp = await apiClient.post(`${API_URL}/api/users/createNewNote/${workspaceId}`, {
+                heading: chats[indx - 1].message,
+                content: content,
+            });
             addNote(resp.data);
             toast.success("Successfully added");
         } catch (err) {
-            toast.error("Something went wront please try after some time!!");
+            toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
+    
 
     return (
         <div className="h-screen w-[80%] flex flex-col">
