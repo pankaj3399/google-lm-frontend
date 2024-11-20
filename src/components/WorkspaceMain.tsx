@@ -40,6 +40,14 @@ interface Chat {
     owner: string;
 }
 
+const suggestions = [
+    "Summarise",
+    "Help me understand",
+    "critique",
+    "Key insights",
+    "Audit",
+];
+
 const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     handleNewNoteDisplay,
     checkedSource,
@@ -318,34 +326,48 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             </div>
 
             <div className="w-full h-28">
-                <div className="flex w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
-                    <div
-                        className="flex items-center space-x-2 text-gray-500 cursor-pointer"
-                        onClick={() => setChatSection((prev) => !prev)}
-                    >
-                        <span className="text-blue-500">
-                            {chatSection ? "Close chat" : "Open chat"}
-                        </span>
-                        <Info className="w-4 h-4" />
+                <div className="flex flex-col w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
+                    <div className="flex gap-2">
+                        {suggestions.map((suggestion) => {
+                            return (
+                                <div className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer" onClick={() => setInputChat(prev => prev + suggestion)}>
+                                    {suggestion}
+                                </div>
+                            );
+                        })}
                     </div>
-                    <div className="flex-1 mx-4 relative">
-                        <input
-                            type="text"
-                            placeholder="Add an integration or a source to get started"
-                            className="w-full rounded-md outline-none border-2 p-2 text-gray-700"
-                            value={inputChat}
-                            onChange={(e) => setInputChat(e.target.value)}
-                        />
+                    <div className="flex w-full mt-2">
                         <div
-                            className="p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
-                            onClick={handleChat}
+                            className="flex items-center space-x-2 text-gray-500 cursor-pointer"
+                            onClick={() => setChatSection((prev) => !prev)}
                         >
-                            <SendHorizontal className="w-5 h-5" color="black" />
+                            <span className="text-blue-500">
+                                {chatSection ? "Close chat" : "Open chat"}
+                            </span>
+                            <Info className="w-4 h-4" />
                         </div>
-                    </div>
-                    <div className="flex flex-col">
-                        <button className="text-blue-500">Pull data</button>
-                        <button className="text-blue-500">Generate</button>
+                        <div className="flex-1 mx-4 relative">
+                            <input
+                                type="text"
+                                placeholder="Add an integration or a source to get started"
+                                className="w-full rounded-md outline-none border-2 p-2 text-gray-700"
+                                value={inputChat}
+                                onChange={(e) => setInputChat(e.target.value)}
+                            />
+                            <div
+                                className="p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
+                                onClick={handleChat}
+                            >
+                                <SendHorizontal
+                                    className="w-5 h-5"
+                                    color="black"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex flex-col">
+                            <button className="text-blue-500">Pull data</button>
+                            <button className="text-blue-500">Generate</button>
+                        </div>
                     </div>
                 </div>
             </div>

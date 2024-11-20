@@ -1,20 +1,21 @@
 import { useState, useEffect } from "react";
 import SidebarItem from "./ui/SidebarItem";
 import IntegrationPopup from "./ui/IntegrationPopup";
-import WorkspacePopup from "./ui/WorkspacePopup";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import useUserStore from "../store/userStore";
 import apiClient, { setAuthToken } from "../api/axiosClient";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Sidebar = () => {
-    const [workspacePopup, setWorkspacePopup] = useState(false);
-    const { workspace, integrationPopup, setWorkspace, setIntegrationPopup } =
+    const { workspace, integrationPopup, setWorkspace, setIntegrationPopup, addWorkspace } =
         useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
     const { getToken } = useAuth();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!user?.id) return;
@@ -26,8 +27,27 @@ const Sidebar = () => {
         setIntegrations([]);
     };
 
-    const handleWorkSpacePopup = () => {
-        setWorkspacePopup((prev) => !prev);
+    const createNewWorkspace = async () => {
+        try {
+
+            const token = await getToken();
+            setAuthToken(token);
+
+            const resp = await apiClient.post(
+                `${API_URL}/api/users/createNewWorkspace/${user?.id}`,
+                { workspaceName: 'New Workspace' }
+            );
+            addWorkspace(resp.data.workspace);
+            toast.success("Workspace created successfully!");
+            navigate(`/workspace/${resp.data.workspace._id}`);
+        } catch (error) {
+            const errorMessage =
+                error instanceof Error
+                    ? error.message
+                    : "Something went wrong. Please try again later.";
+            toast.error(`Error creating workspace: ${errorMessage}`);
+            console.error(error);
+        } 
     };
 
     const fetchAllWorkspaces = async () => {
@@ -59,7 +79,7 @@ const Sidebar = () => {
             buttonText: "New Workspaces",
             iconSrc:
                 "https://cdn.builder.io/api/v1/image/assets/TEMP/bb8c4a9d007bd61f491d62f7f6828ed33b25aa7b5b1edfaeb9d64afb94ad3535?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
-            functionality: handleWorkSpacePopup,
+            functionality: createNewWorkspace,
             previousCreations: workspace,
         },
     ];
@@ -71,9 +91,6 @@ const Sidebar = () => {
             ))}
             {/* {PopupSection &&  Integrations*/}
             {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
-            {workspacePopup && (
-                <WorkspacePopup handleWorkSpacePopup={handleWorkSpacePopup} />
-            )}
         </aside>
     );
 };

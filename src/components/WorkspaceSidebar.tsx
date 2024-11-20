@@ -99,7 +99,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         />
                     </label>
                     {(fetchedApiKey || fetchedAnalyticsKey) && (
-                        <div className="mt-3 mb-3 p-3">
+                        <div className="mt-3 mb-3 p-3 pr-0">
                             {fetchedApiKey && (
                                 <div className="flex justify-between">
                                     <div className="flex gap-2">
@@ -110,6 +110,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                         type="checkbox"
                                         className="rounded text-blue-500"
                                         defaultChecked
+                                        disabled
                                     />
                                 </div>
                             )}
@@ -123,6 +124,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                         type="checkbox"
                                         className="rounded text-blue-500"
                                         defaultChecked
+                                        disabled
                                     />
                                 </div>
                             )}
