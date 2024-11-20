@@ -45,7 +45,10 @@ export default function Login() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignIn />
+            <SignIn 
+                signUpUrl="/signup"
+                forceRedirectUrl={'/home'}
+            />
         </div>
     );
 }

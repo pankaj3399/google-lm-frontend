@@ -24,6 +24,13 @@ export default function SignUpPage() {
         }
     }, [isSignedIn, clerkUser]);
 
+    useEffect(() => {
+        if (isSignedIn === null) return;
+        if (isSignedIn) 
+        navigate('/home');
+
+    }, [isSignedIn]);
+
     const sendUserDataToBackend = async (
         clerkId: string,
         email: string
@@ -46,7 +53,11 @@ export default function SignUpPage() {
 
     return (
         <div className="flex items-center justify-center w-screen h-screen">
-            <SignUp forceRedirectUrl='/home'/>
+            <SignUp
+                signInUrl="/login"
+                forceRedirectUrl={'/home'}
+                signInForceRedirectUrl={'/home'}
+            />
         </div>
     );
 }
