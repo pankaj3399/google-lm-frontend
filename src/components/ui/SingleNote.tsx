@@ -1,4 +1,4 @@
-import { BarChart3, Pencil } from "lucide-react";
+import { BarChart3, Pencil, Pen, MessageSquare } from "lucide-react";
 import React from "react";
 import useUserStore from "../../store/userStore";
 import moment from "moment";
@@ -9,6 +9,7 @@ interface SingleNoteProps {
     indx: number;
     updatedAt: string;
     createdAt: string;
+    type: string;
     handleNewNoteDisplay: () => void;
 }
 
@@ -19,13 +20,24 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     indx,
     updatedAt,
     createdAt,
+    type,
 }) => {
     const { setSelectedNote } = useUserStore();
     const getPlainText = (html: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         return doc.body.textContent || "";
+        
     };
+
+    function getIcon(iconType: string) {
+        switch(iconType) {
+            case 'Written Note': return Pen;
+            case 'Saved': return MessageSquare;
+            default: return BarChart3;
+        }
+    }
+    const IconComponent = getIcon(type);
     return (
         <div
             className=" w-[350px] max-h-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl"
@@ -35,8 +47,8 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2">
-                        <BarChart3 className="w-6 h-6" />
-                        <h4 className="">Saved Note</h4>
+                        <IconComponent className="w-6 h-6" />
+                        <h4 className="">{type}</h4>
                         <span className="text-sm text-gray-500">
                             {moment(createdAt).format(" Do MMM")}
                         </span>

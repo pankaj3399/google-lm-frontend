@@ -26,7 +26,8 @@ const integrations: Integration[] = [
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
-    const [fetchedApiKey, setFetchedApiKey] = useState("");
+    const [fetchedApiKey, setFetchedApiKey] = useState(false);
+    const [fetchedAnalyticsKey, setFetchedAnalyticsKey] = useState(false);
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
     const { getToken } = useAuth();
@@ -39,9 +40,12 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const resp = await apiClient.get(`${API_URL}/api/users/getAiKey/${user?.id}`);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getAiKey/${user?.id}`
+            );
             setFetchedApiKey(resp.data.api);
+            setFetchedAnalyticsKey(resp.data.googleAnalytics);
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
@@ -52,12 +56,14 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const response = await apiClient.post(`${API_URL}/api/users/saveApiKey/${clerkId}`,
+
+            const response = await apiClient.post(
+                `${API_URL}/api/users/saveApiKey/${clerkId}`,
                 {
                     api_key: apiKey,
-                });
-    
+                }
+            );
+
             toast.success(response.data.message);
             setApiKey("");
             handlePopup();
@@ -71,13 +77,39 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             ) {
                 errorMessage = error.response.data.message;
             }
-    
+
             toast.error(`Error saving settings: ${errorMessage}`);
             console.error(error);
         }
     };
-    
-    
+
+    const startGoogleAnalyticsOAuth = () => {
+        const clientId = import.meta.env.VITE_API_CLIENT_ID;
+        const redirectUri = `${API_URL}/api/users/oauth/google-analytics/callback`;
+        const scope = "https://www.googleapis.com/auth/analytics.readonly";
+        const state = {
+            clerkId: user?.id, // Send Clerk ID to the backend
+        };
+        const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&access_type=offline&prompt=consent`;
+
+        window.location.href = `${authUrl}&state=${encodeURIComponent(
+            JSON.stringify(state)
+        )}`;
+    };
+
+    const handleCheck = async (indx: number) => {
+        try {
+            switch (indx) {
+                case 1: {
+                    startGoogleAnalyticsOAuth();
+                    break;
+                }
+            }
+        } catch (err) {
+            toast.error("Something went wrong....");
+            console.log(err);
+        }
+    };
 
     return (
         <div>
@@ -114,11 +146,16 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 }
                                         
                                 `}
-                                onClick={() => updateSelectedIntegration(indx)}
+                                onClick={() => {
+                                    updateSelectedIntegration(indx);
+                                    handleCheck(indx);
+                                }}
                             >
                                 <span className="text-4xl text-gray-400">
-                                    {integration.name === "ChatGPT" &&
-                                    fetchedApiKey !== "" ? (
+                                    {(integration.name === "ChatGPT" &&
+                                        fetchedApiKey) ||
+                                    (integration.name === "Google Analytics" &&
+                                        fetchedAnalyticsKey) ? (
                                         <Check className="text-green-500" />
                                     ) : (
                                         integration.icon

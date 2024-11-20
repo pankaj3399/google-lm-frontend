@@ -16,6 +16,7 @@ interface Note {
     content: string;
     updatedAt: string;
     createdAt: string;
+    type: string;
 }
 
 interface Source {

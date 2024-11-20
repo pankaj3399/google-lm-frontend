@@ -51,6 +51,10 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     ];
 
     const handleSaveNote = async () => {
+        if(heading === '' || value=== '') {
+            toast.error('Please fill the heading and description');
+            return;
+        }
         try {
             const token = await getToken();
             setAuthToken(token);
@@ -61,6 +65,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                     {
                         heading: heading,
                         content: value,
+                        type: 'Written Note'
                     }
                 );
                 updateNote(selectedNote, resp.data.note);
@@ -74,6 +79,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                     {
                         heading: heading,
                         content: value,
+                        type: 'Written Note'
                     }
                 );
                 addNote(resp.data);

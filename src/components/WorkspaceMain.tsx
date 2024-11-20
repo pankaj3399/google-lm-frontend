@@ -25,6 +25,7 @@ interface Note {
     content: string;
     updatedAt: string;
     createdAt: string;
+    type: string;
 }
 
 interface WorkspaceMainProps {
@@ -138,6 +139,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             const resp = await apiClient.post(`${API_URL}/api/users/createNewNote/${workspaceId}`, {
                 heading: chats[indx - 1].message,
                 content: content,
+                type: 'Saved'
             });
             addNote(resp.data);
             toast.success("Successfully added");
@@ -250,6 +252,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         indx={indx}
                                         heading={note?.heading}
                                         content={note?.content}
+                                        type={note?.type}
                                         updatedAt={note?.updatedAt}
                                         createdAt={note?.createdAt}
                                         handleNewNoteDisplay={

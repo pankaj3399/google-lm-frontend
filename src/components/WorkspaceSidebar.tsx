@@ -1,10 +1,11 @@
 import { Info, CirclePlus, Link2, FileText } from "lucide-react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import { Brain, ChartNoAxesColumnIncreasing } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -20,24 +21,46 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     const { workspaceId } = useParams();
     const navigate = useNavigate();
     const { getToken } = useAuth();
+    const [fetchedApiKey, setFetchedApiKey] = useState(false);
+    const [fetchedAnalyticsKey, setFetchedAnalyticsKey] = useState(false);
+    const { user } = useUser();
 
     useEffect(() => {
         fetchAllSources();
+        fetchApiKey();
     }, []);
+
+    const fetchApiKey = async () => {
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getAiKey/${user?.id}`
+            );
+            setFetchedApiKey(resp.data.api);
+            setFetchedAnalyticsKey(resp.data.googleAnalytics);
+        } catch (err) {
+            toast.error("Something went wrong, please try again later!");
+            console.log(err);
+        }
+    };
 
     const fetchAllSources = async () => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const resp = await apiClient.get(`${API_URL}/api/users/getAllSources/${workspaceId}`);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getAllSources/${workspaceId}`
+            );
             setSource(resp.data);
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
-    
+
     return (
         <div className="w-[20%] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
             <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
@@ -70,6 +93,36 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             defaultChecked
                         />
                     </label>
+                    {(fetchedApiKey || fetchedAnalyticsKey) && (
+                        <div className="mt-3 mb-3 p-3">
+                            {fetchedApiKey && (
+                                <div className="flex justify-between">
+                                    <div className="flex gap-2">
+                                        <Brain />
+                                        <p>ChatGpt</p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        className="rounded text-blue-500"
+                                        defaultChecked
+                                    />
+                                </div>
+                            )}
+                            {fetchedAnalyticsKey && (
+                                <div className="flex justify-between mt-3">
+                                    <div className="flex">
+                                        <ChartNoAxesColumnIncreasing />
+                                        <p>Google Analytics</p>
+                                    </div>
+                                    <input
+                                        type="checkbox"
+                                        className="rounded text-blue-500"
+                                        defaultChecked
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div>
