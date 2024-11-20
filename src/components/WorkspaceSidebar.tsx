@@ -5,7 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import { Brain, ChartNoAxesColumnIncreasing } from "lucide-react";
+import {
+    Brain,
+    ChartNoAxesColumnIncreasing,
+    Trash,
+    Pencil,
+} from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -151,7 +156,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     key={indx}
                                     className="flex justify-between"
                                 >
-                                    <div className="flex items-center">
+                                    <div className="flex items-center relative cursor-pointer group">
                                         {source.uploadType === "file" ? (
                                             <FileText
                                                 size={17}
@@ -161,6 +166,26 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             <Link2 size={17} className="mr-1" />
                                         )}
                                         <p>{source.name}</p>
+                                        <div
+                                            className="flex flex-col gap-2 absolute bg-slate-100 p-3 top-[20px] left-0 
+                    opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto 
+                    shadow-md rounded-md z-10 transition-opacity duration-200"
+                                        >
+                                            <div
+                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                // onClick={() => handleRemoveItem(source.id)}
+                                            >
+                                                <Trash size={25} />
+                                                <p>Remove Item</p>
+                                            </div>
+                                            <div
+                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                // onClick={() => handleRenameSource(source.id)}
+                                            >
+                                                <Pencil size={25} />
+                                                <p>Rename Source</p>
+                                            </div>
+                                        </div>
                                     </div>
                                     <input
                                         type="checkbox"

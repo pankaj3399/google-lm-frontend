@@ -7,6 +7,8 @@ import {
     Pin,
     ThumbsUp,
     ThumbsDown,
+    Trash,
+    Check,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -74,32 +76,36 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const resp = await apiClient.get(`${API_URL}/api/users/getAllNotes/${workspaceId}`);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getAllNotes/${workspaceId}`
+            );
             setNotes(resp.data);
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
     };
-    
+
     const fetchWorkspace = async () => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const resp = await apiClient.get(`${API_URL}/api/users/getWorkspace/${workspaceId}`);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getWorkspace/${workspaceId}`
+            );
             setWorkspaceName(resp.data.workspace.name);
         } catch (error) {
             toast.error("Something went wrong, please try again later!");
             console.log(error);
         }
     };
-    
+
     function addChat(message: string, owner: string) {
         setChats((prevChats) => [...prevChats, { message, owner }]);
     }
-    
+
     const handleChat = async () => {
         if (inputChat === "") return;
         try {
@@ -112,10 +118,10 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 return null;
             });
             addChat(inputChat, "Me");
-    
+
             const token = await getToken();
             setAuthToken(token);
-    
+
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createConversation`,
                 {
@@ -130,17 +136,20 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             console.log(err);
         }
     };
-    
+
     const handleSaveNote = async (content: string, indx: number) => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const resp = await apiClient.post(`${API_URL}/api/users/createNewNote/${workspaceId}`, {
-                heading: chats[indx - 1].message,
-                content: content,
-                type: 'Saved'
-            });
+
+            const resp = await apiClient.post(
+                `${API_URL}/api/users/createNewNote/${workspaceId}`,
+                {
+                    heading: chats[indx - 1].message,
+                    content: content,
+                    type: "Saved",
+                }
+            );
             addNote(resp.data);
             toast.success("Successfully added");
         } catch (err) {
@@ -148,7 +157,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             console.log(err);
         }
     };
-    
 
     return (
         <div className="h-screen w-[80%] flex flex-col">
@@ -231,17 +239,29 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                     </>
                 ) : (
                     <>
-                        <div
-                            className="flex w-full gap-1 items-center h-4"
-                            onClick={() => {
-                                setSelectedNote(-1);
-                                handleNewNoteDisplay();
-                            }}
-                        >
-                            <FileText className=" h-5 text-gray-600" />
-                            <span className="text-gray-600 cursor-pointer">
-                                Add Note
-                            </span>
+                        <div className="flex w-full gap-5  h-4">
+                            <div
+                                className="flex items-center cursor-pointer"
+                                onClick={() => {
+                                    setSelectedNote(-1);
+                                    handleNewNoteDisplay();
+                                }}
+                            >
+                                <FileText className="h-5 text-gray-600" />
+                                <span className="text-gray-600">Add Note</span>
+                            </div>
+                            <div className="flex items-center cursor-pointer">
+                                <Trash className="h-5 text-gray-600" />
+                                <span>Delete</span>
+                            </div>
+                            <div className="flex items-center cursor-pointer">
+                                <Check className="h-5 text-gray-600" />
+                                <span>Select all</span>
+                            </div>
+                            <div className="flex items-center cursor-pointer">
+                                <X className="h-5 text-gray-600" />
+                                <span>Deselect all</span>
+                            </div>
                         </div>
 
                         {notes.length > 0 ? (
