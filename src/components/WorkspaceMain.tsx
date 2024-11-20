@@ -258,18 +258,22 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                 <FileText className="h-5 text-gray-600" />
                                 <span className="text-gray-600">Add Note</span>
                             </div>
-                            <div className="flex items-center cursor-pointer">
-                                <Trash className="h-5 text-gray-600" />
-                                <span>Delete</span>
-                            </div>
-                            <div className="flex items-center cursor-pointer">
-                                <Check className="h-5 text-gray-600" />
-                                <span>Select all</span>
-                            </div>
-                            <div className="flex items-center cursor-pointer">
-                                <X className="h-5 text-gray-600" />
-                                <span>Deselect all</span>
-                            </div>
+                            {notes.length > 0 && (
+                                <>
+                                    <div className="flex items-center cursor-pointer">
+                                        <Trash className="h-5 text-gray-600" />
+                                        <span>Delete</span>
+                                    </div>
+                                    <div className="flex items-center cursor-pointer">
+                                        <Check className="h-5 text-gray-600" />
+                                        <span>Select all</span>
+                                    </div>
+                                    <div className="flex items-center cursor-pointer">
+                                        <X className="h-5 text-gray-600" />
+                                        <span>Deselect all</span>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         {notes.length > 0 ? (
@@ -330,7 +334,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                     <div className="flex gap-2">
                         {suggestions.map((suggestion) => {
                             return (
-                                <div className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer" onClick={() => setInputChat(prev => prev + suggestion)}>
+                                <div
+                                    className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer"
+                                    onClick={() =>
+                                        setInputChat(
+                                            (prev) => prev + suggestion
+                                        )
+                                    }
+                                >
                                     {suggestion}
                                 </div>
                             );
