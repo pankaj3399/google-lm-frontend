@@ -1,6 +1,6 @@
-import { BarChart3, Pencil, Pen, MessageSquare } from "lucide-react";
+import { BarChart3, Pen, MessageSquare } from "lucide-react";
 import React from "react";
-import useUserStore from "../../store/userStore";
+// import useUserStore from "../../store/userStore";
 import moment from "moment";
 
 interface SingleNoteProps {
@@ -16,13 +16,13 @@ interface SingleNoteProps {
 const SingleNote: React.FC<SingleNoteProps> = ({
     heading,
     content,
-    handleNewNoteDisplay,
+    // handleNewNoteDisplay,
     indx,
     updatedAt,
     createdAt,
     type,
 }) => {
-    const { setSelectedNote } = useUserStore();
+    // const { setSelectedNote } = useUserStore();
     const getPlainText = (html: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
@@ -54,14 +54,14 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                         </span>
                     </div>
                     <div className="flex gap-2">
-                        <Pencil
+                        {/* <Pencil
                             size={15}
                             className="cursor-pointer"
                             onClick={() => {
                                 handleNewNoteDisplay();
                                 setSelectedNote(indx);
                             }}
-                        />
+                        /> */}
                         <input type="checkbox" />
                     </div>
                 </div>
