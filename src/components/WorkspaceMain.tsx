@@ -67,18 +67,26 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
-    // const [chosenNotes, updateChosenNotes] = useState([]);
     const { getToken } = useAuth();
+    const [selectedNotes, setSelectedNotes] = useState<boolean[]>(
+        new Array(notes.length).fill(false)
+    );
+    const handleSelectAll = () => {
+        setSelectedNotes(new Array(notes.length).fill(true));
+    };
+    const handleDeselectAll = () => {
+        setSelectedNotes(new Array(notes.length).fill(false));
+    };
+    const handleToggleNote = (index: number) => {
+        setSelectedNotes((prev) =>
+            prev.map((selected, i) => (i === index ? !selected : selected))
+        );
+    };
 
     useEffect(() => {
         fetchWorkspace();
         fetchAllNotes();
     }, []);
-
-    // useEffect(() => {
-    //     updateChosenNotes(notes.size())
-    // }, [notes]);
-
 
     useEffect(() => {
         if (containerRef.current) {
@@ -171,6 +179,30 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             console.log(err);
         }
     };
+
+    // const handleDeleteSelected = async () => {
+    //     const noteIdsToDelete = notes
+    //         .filter((_, index) => selectedNotes[index])
+    //         .map((note) => note._id);
+
+    //     if (noteIdsToDelete.length === 0) {
+    //         alert("No notes selected for deletion.");
+    //         return;
+    //     }
+
+    //     try {
+    //         await deleteNotes(noteIdsToDelete);
+
+    //         const updatedNotes = notes.filter(
+    //             (note) => !noteIdsToDelete.includes(note._id)
+    //         );
+    //         setNotes(updatedNotes);
+    //         setSelectedNotes(new Array(updatedNotes.length).fill(false));
+    //     } catch (error) {
+    //         toast.error("Failed to delete selected notes.");
+    //         console.log(error);
+    //     }
+    // };
 
     return (
         <div className="h-screen w-[80%] flex flex-col">
@@ -270,11 +302,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         <Trash className="h-5 text-gray-600" />
                                         <span>Delete</span>
                                     </div>
-                                    <div className="flex items-center cursor-pointer">
+                                    <div className="flex items-center cursor-pointer" onClick={handleSelectAll}>
                                         <Check className="h-5 text-gray-600" />
                                         <span>Select all</span>
                                     </div>
-                                    <div className="flex items-center cursor-pointer">
+                                    <div className="flex items-center cursor-pointer" onClick={handleDeselectAll}>
                                         <X className="h-5 text-gray-600" />
                                         <span>Deselect all</span>
                                     </div>
@@ -293,6 +325,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         type={note?.type}
                                         updatedAt={note?.updatedAt}
                                         createdAt={note?.createdAt}
+                                        selectedNotes={selectedNotes}
+                                        handleToggleNote={handleToggleNote}
                                         handleNewNoteDisplay={
                                             handleNewNoteDisplay
                                         }

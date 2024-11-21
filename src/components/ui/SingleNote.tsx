@@ -10,7 +10,9 @@ interface SingleNoteProps {
     updatedAt: string;
     createdAt: string;
     type: string;
+    selectedNotes: boolean[];
     handleNewNoteDisplay: () => void;
+    handleToggleNote: (indx: number)=> void;
 }
 
 const SingleNote: React.FC<SingleNoteProps> = ({
@@ -21,6 +23,8 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     updatedAt,
     createdAt,
     type,
+    selectedNotes,
+    handleToggleNote
 }) => {
     // const { setSelectedNote } = useUserStore();
     const getPlainText = (html: string): string => {
@@ -54,7 +58,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                         </span>
                     </div>
                     <div className="flex gap-2">
-                        <input type="checkbox" />
+                        <input type="checkbox" checked={selectedNotes[indx]} onClick={() => handleToggleNote(indx)}/>
                     </div>
                 </div>
 
