@@ -54,14 +54,6 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                         </span>
                     </div>
                     <div className="flex gap-2">
-                        {/* <Pencil
-                            size={15}
-                            className="cursor-pointer"
-                            onClick={() => {
-                                handleNewNoteDisplay();
-                                setSelectedNote(indx);
-                            }}
-                        /> */}
                         <input type="checkbox" />
                     </div>
                 </div>

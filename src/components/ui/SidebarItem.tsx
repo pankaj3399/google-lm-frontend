@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import useUserStore from "../../store/userStore";
+import { Check } from "lucide-react";
 
 interface PreviousCreations {
     _id: string;
@@ -25,12 +27,11 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
     previousCreations,
 }) => {
     const navigate = useNavigate();
+    const { googleAnalytics, openAiKey } = useUserStore();
 
     return (
         <div>
-            <h2 className="text-start text-2xl">
-                {title}
-            </h2>
+            <h2 className="text-start text-2xl">{title}</h2>
             {type === "icon" && (
                 <div className="flex shrink-0 mt-7 rounded-3xl border border-gray-300 border-solid h-[110px] w-[110px]" />
             )}
@@ -72,6 +73,18 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                                     </span>
                                 </div>
                             ))}
+                        {openAiKey && title === "Integrations" && (
+                            <div className="flex items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
+                                <span>ChatGpt</span>
+                                <Check className="text-green-500" />
+                            </div>
+                        )}
+                        {googleAnalytics && title === "Integrations" && (
+                            <div className="flex items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
+                                <span>Analytics</span>
+                                <Check className="text-green-500" />
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

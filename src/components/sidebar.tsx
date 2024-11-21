@@ -10,8 +10,15 @@ import { useNavigate } from "react-router-dom";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Sidebar = () => {
-    const { workspace, integrationPopup, setWorkspace, setIntegrationPopup, addWorkspace } =
-        useUserStore();
+    const {
+        workspace,
+        integrationPopup,
+        setWorkspace,
+        setIntegrationPopup,
+        addWorkspace,
+        setOpenAiKey,
+        setGoogleAnalytics,
+    } = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
     const { getToken } = useAuth();
@@ -20,7 +27,24 @@ const Sidebar = () => {
     useEffect(() => {
         if (!user?.id) return;
         fetchAllWorkspaces();
+        fetchApiKey();
     }, [user?.id]);
+
+    const fetchApiKey = async () => {
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+
+            const resp = await apiClient.get(
+                `${API_URL}/api/users/getAiKey/${user?.id}`
+            );
+            setOpenAiKey(resp.data.api);
+            setGoogleAnalytics(resp.data.googleAnalytics);
+        } catch (err) {
+            toast.error("Something went wrong, please try again later!");
+            console.log(err);
+        }
+    };
 
     const handlePopup = () => {
         setIntegrationPopup();
@@ -29,13 +53,12 @@ const Sidebar = () => {
 
     const createNewWorkspace = async () => {
         try {
-
             const token = await getToken();
             setAuthToken(token);
 
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createNewWorkspace/${user?.id}`,
-                { workspaceName: 'New Workspace' }
+                { workspaceName: "New Workspace" }
             );
             addWorkspace(resp.data.workspace);
             toast.success("Workspace created successfully!");
@@ -47,7 +70,7 @@ const Sidebar = () => {
                     : "Something went wrong. Please try again later.";
             toast.error(`Error creating workspace: ${errorMessage}`);
             console.error(error);
-        } 
+        }
     };
 
     const fetchAllWorkspaces = async () => {

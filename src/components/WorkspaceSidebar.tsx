@@ -1,10 +1,10 @@
 import { Info, CirclePlus, Link2, FileText } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth } from "@clerk/clerk-react";
 import {
     Brain,
     ChartNoAxesColumnIncreasing,
@@ -22,34 +22,20 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleAddSourceDisplay,
     handleCheckboxChange,
 }) => {
-    const { sources, setSource, setIntegrationPopup } = useUserStore();
+    const {
+        sources,
+        setSource,
+        setIntegrationPopup,
+        googleAnalytics,
+        openAiKey,
+    } = useUserStore();
     const { workspaceId } = useParams();
     const navigate = useNavigate();
     const { getToken } = useAuth();
-    const [fetchedApiKey, setFetchedApiKey] = useState(false);
-    const [fetchedAnalyticsKey, setFetchedAnalyticsKey] = useState(false);
-    const { user } = useUser();
 
     useEffect(() => {
         fetchAllSources();
-        fetchApiKey();
     }, []);
-
-    const fetchApiKey = async () => {
-        try {
-            const token = await getToken();
-            setAuthToken(token);
-
-            const resp = await apiClient.get(
-                `${API_URL}/api/users/getAiKey/${user?.id}`
-            );
-            setFetchedApiKey(resp.data.api);
-            setFetchedAnalyticsKey(resp.data.googleAnalytics);
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
-        }
-    };
 
     const fetchAllSources = async () => {
         try {
@@ -98,9 +84,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             defaultChecked
                         />
                     </label>
-                    {(fetchedApiKey || fetchedAnalyticsKey) && (
+                    {(openAiKey || googleAnalytics) && (
                         <div className="mt-3 mb-3 p-3 pr-0">
-                            {fetchedApiKey && (
+                            {openAiKey && (
                                 <div className="flex justify-between">
                                     <div className="flex gap-2">
                                         <Brain />
@@ -114,7 +100,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     />
                                 </div>
                             )}
-                            {fetchedAnalyticsKey && (
+                            {googleAnalytics && (
                                 <div className="flex justify-between mt-3">
                                     <div className="flex">
                                         <ChartNoAxesColumnIncreasing />

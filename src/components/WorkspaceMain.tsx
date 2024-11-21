@@ -67,12 +67,18 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    // const [chosenNotes, updateChosenNotes] = useState([]);
     const { getToken } = useAuth();
 
     useEffect(() => {
         fetchWorkspace();
         fetchAllNotes();
     }, []);
+
+    // useEffect(() => {
+    //     updateChosenNotes(notes.size())
+    // }, [notes]);
+
 
     useEffect(() => {
         if (containerRef.current) {

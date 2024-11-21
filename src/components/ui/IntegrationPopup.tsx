@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { Check } from "lucide-react";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
+import useUserStore from "../../store/userStore";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,31 +27,17 @@ const integrations: Integration[] = [
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
-    const [fetchedApiKey, setFetchedApiKey] = useState(false);
-    const [fetchedAnalyticsKey, setFetchedAnalyticsKey] = useState(false);
+    const {
+        googleAnalytics,
+        openAiKey,
+        setOpenAiKey,
+        setGoogleAnalytics,
+    } = useUserStore();
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
     const { getToken } = useAuth();
 
-    useEffect(() => {
-        fetchApiKey();
-    }, []);
-
-    const fetchApiKey = async () => {
-        try {
-            const token = await getToken();
-            setAuthToken(token);
-
-            const resp = await apiClient.get(
-                `${API_URL}/api/users/getAiKey/${user?.id}`
-            );
-            setFetchedApiKey(resp.data.api);
-            setFetchedAnalyticsKey(resp.data.googleAnalytics);
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
-        }
-    };
+    
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -65,6 +52,8 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             );
 
             toast.success(response.data.message);
+            setOpenAiKey(response.data.api);
+            setGoogleAnalytics(response.data.googleAnalytics);
             setApiKey("");
             handlePopup();
         } catch (error) {
@@ -88,7 +77,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         const redirectUri = `${API_URL}/api/users/oauth/google-analytics/callback`;
         const scope = "https://www.googleapis.com/auth/analytics.readonly";
         const state = {
-            clerkId: user?.id, // Send Clerk ID to the backend
+            clerkId: user?.id,
         };
         const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}&access_type=offline&prompt=consent`;
 
@@ -153,9 +142,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                             >
                                 <span className="text-4xl text-gray-400">
                                     {(integration.name === "ChatGPT" &&
-                                        fetchedApiKey) ||
+                                        openAiKey) ||
                                     (integration.name === "Google Analytics" &&
-                                        fetchedAnalyticsKey) ? (
+                                        googleAnalytics) ? (
                                         <Check className="text-green-500" />
                                     ) : (
                                         integration.icon
