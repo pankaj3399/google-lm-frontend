@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useUserStore from "../store/userStore.ts";
 import apiClient, { setAuthToken } from "../api/axiosClient";
+import { useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
+
 
 
 export default function Login() {
@@ -12,6 +15,11 @@ export default function Login() {
     const { user: clerkUser } = useUser();
     const { setUser } = useUserStore();
     const { getToken } = useAuth();
+    const location = useLocation();
+
+    useEffect(() => {
+        ReactGA.send({ hitType: "pageview", page: location.pathname });
+    }, [location]);
 
     useEffect(() => {
         if (isSignedIn === null || !clerkUser) return;

@@ -32,7 +32,7 @@ const App = () => {
                 email: clerkUser.primaryEmailAddress?.emailAddress || "",
             });
         }
-    }, [clerkUser, user, setUser]);
+    }, [clerkUser]);
 
     return (
         <Router>

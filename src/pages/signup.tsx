@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import useUserStore from "../store/userStore";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,6 +13,11 @@ export default function SignUpPage() {
     const { user: clerkUser } = useUser();
     const { setUser } = useUserStore();
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        ReactGA.send({ hitType: "pageview", page: location.pathname });
+    }, [location]);
 
     useEffect(() => {
         if (isSignedIn === null || !clerkUser) return;

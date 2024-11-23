@@ -1,4 +1,4 @@
-import { Info, CirclePlus, Link2, FileText } from "lucide-react";
+import { Info, CirclePlus, Link2, FileText, MessageSquare, Eye } from "lucide-react";
 import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -172,6 +172,20 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             >
                                                 <Pencil size={25} />
                                                 <p>Rename Source</p>
+                                            </div>
+                                            <div
+                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                // onClick={() => handleRenameSource(source.id)}
+                                            >
+                                                <MessageSquare size={25} />
+                                                <p>View Summary</p>
+                                            </div>
+                                            <div
+                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                // onClick={() => handleRenameSource(source.id)}
+                                            >
+                                                <Eye size={25} />
+                                                <p>View</p>
                                             </div>
                                         </div>
                                     </div>

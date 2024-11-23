@@ -1,10 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import ReactGA from 'react-ga4';
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSignupClick = () => {
+    ReactGA.event({
+      category: 'User',
+      action: 'Clicked Submit Button',
+      label: 'Submit Form',
+    });
     navigate('/signup');
   };
   

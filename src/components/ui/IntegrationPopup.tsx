@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
@@ -18,6 +18,11 @@ interface Integration {
     icon: string;
 }
 
+interface Account {
+    id: string;
+    name: string;
+}
+
 const integrations: Integration[] = [
     { name: "ChatGPT", icon: "+" },
     { name: "Google Analytics", icon: "+" },
@@ -27,17 +32,38 @@ const integrations: Integration[] = [
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
-    const {
-        googleAnalytics,
-        openAiKey,
-        setOpenAiKey,
-        setGoogleAnalytics,
-    } = useUserStore();
+    const { googleAnalytics, openAiKey, setOpenAiKey, setGoogleAnalytics } =
+        useUserStore();
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
     const { getToken } = useAuth();
+    const [accounts, setAccounts] = useState<Account[]>([]);
 
-    
+    useEffect(() => {
+        fetchAccounts();
+    }, []);
+
+    const fetchAccounts = async () => {
+        try {
+            const response = await axios.get(
+                `${API_URL}/api/users/analytics/accounts`,
+                {
+                    params: { clerkId: user?.id },
+                }
+            );
+            const filtered: Account[] = response.data.map(
+                ({ name, displayName }: { name: string; displayName: string }) => ({
+                    id: name,
+                    name: displayName,
+                })
+            );
+            console.log(response.data);
+            setAccounts(filtered);
+        } catch (error) {
+            console.error("Error fetching accounts:", error);
+        }
+    };
+
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -90,13 +116,27 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         try {
             switch (indx) {
                 case 1: {
-                    startGoogleAnalyticsOAuth();
+                    if (!googleAnalytics) startGoogleAnalyticsOAuth();
                     break;
                 }
             }
         } catch (err) {
             toast.error("Something went wrong....");
             console.log(err);
+        }
+    };
+
+    const fetchReport = async (accountId: string) => {
+        try {
+            const response = await axios.get(
+                `${API_URL}/api/users/analytics/report`,
+                {
+                    params: { accountId, clerkId: user?.id },
+                }
+            );
+            console.log(response);
+        } catch (error) {
+            console.error("Error fetching report:", error);
         }
     };
 
@@ -156,6 +196,34 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                             </button>
                         ))}
                     </div>
+
+                    {selectedIntegration === 1 && googleAnalytics && (
+                        <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
+                            <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
+                                Select an Account
+                            </h2>
+                            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                                {accounts.length > 0 ? (
+                                    accounts.map((account, indx) => (
+                                        <p
+                                            key={indx}
+                                            className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
+                                            onClick={() =>
+                                                fetchReport(account.id)
+                                            }
+                                        >
+                                            {account.name}
+                                        </p>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-center">
+                                        Please link your Google Analytics
+                                        account first.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {selectedIntegration === 0 && (
                         <div className="flex flex-col lg:flex-row gap-8 border-t-2 pt-10">

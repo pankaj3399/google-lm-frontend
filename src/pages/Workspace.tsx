@@ -5,12 +5,19 @@ import NewNotePopup from "../components/ui/NewNotePopup";
 import AddSourcePopup from "../components/ui/AddSourcePopup";
 import useUserStore from "../store/userStore";
 import IntegrationPopup from "../components/ui/IntegrationPopup.tsx";
+import { useLocation } from "react-router-dom";
+import ReactGA from "react-ga4";
 
 function Workspace() {
     // const [openNewNote, setOpenNewNote] = useState(false);
     const [openSourceAdd, setOpenSourceAdd] = useState(false);
     const [checkedSource, setCheckedSource] = useState<boolean[]>([]);
     const { sources, integrationPopup, sourcePopup, setIntegrationPopup, setSourcePopup } = useUserStore();
+    const location = useLocation();
+
+    useEffect(() => {
+        ReactGA.send({ hitType: "pageview", page: location.pathname });
+    }, [location]);
 
     useEffect(() => {
         setCheckedSource(Array(sources.length).fill(true));

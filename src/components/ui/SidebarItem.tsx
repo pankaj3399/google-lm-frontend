@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import useUserStore from "../../store/userStore";
 import { Check } from "lucide-react";
+import ReactGA from "react-ga4";
 
 interface PreviousCreations {
     _id: string;
@@ -27,7 +28,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
     previousCreations,
 }) => {
     const navigate = useNavigate();
-    const { googleAnalytics, openAiKey } = useUserStore();
+    const { openAiKey, googleAnalytics } = useUserStore();
 
     return (
         <div>
@@ -62,11 +63,16 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                                 <div
                                     key={previousCreation._id}
                                     className="flex flex-col items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer"
-                                    onClick={() =>
+                                    onClick={() => {
+                                        ReactGA.event({
+                                            category: "User",
+                                            action: "Clicked Submit Button",
+                                            label: "Submit Form",
+                                        });
                                         navigate(
                                             `/workspace/${previousCreation._id}`
-                                        )
-                                    }
+                                        );
+                                    }}
                                 >
                                     <span className="text-gray-700 font-semibold text-center">
                                         {previousCreation.name}
