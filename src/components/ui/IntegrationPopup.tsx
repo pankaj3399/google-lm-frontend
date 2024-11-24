@@ -57,7 +57,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     name: displayName,
                 })
             );
-            console.log(response.data);
             setAccounts(filtered);
         } catch (error) {
             console.error("Error fetching accounts:", error);
