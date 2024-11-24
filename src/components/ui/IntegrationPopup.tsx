@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { Check } from "lucide-react";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import useUserStore from "../../store/userStore";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +23,19 @@ interface Account {
     name: string;
 }
 
+interface Property {
+    account: string;
+    createTime: string;
+    currencyCode: string;
+    displayName: string;
+    name: string;
+    parent: string;
+    propertyType: string;
+    serviceLevel: string;
+    timeZone: string;
+    updateTime: string;
+}
+
 const integrations: Integration[] = [
     { name: "ChatGPT", icon: "+" },
     { name: "Google Analytics", icon: "+" },
@@ -38,6 +51,8 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const { user } = useUser();
     const { getToken } = useAuth();
     const [accounts, setAccounts] = useState<Account[]>([]);
+    const [properties, setProperties] = useState<Property[]>([]);
+    const [showProperty, setShowProperty] = useState(false);
 
     useEffect(() => {
         fetchAccounts();
@@ -45,14 +60,22 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
 
     const fetchAccounts = async () => {
         try {
-            const response = await axios.get(
+            const token = await getToken();
+            setAuthToken(token);
+            const response = await apiClient.get(
                 `${API_URL}/api/users/analytics/accounts`,
                 {
                     params: { clerkId: user?.id },
                 }
             );
             const filtered: Account[] = response.data.map(
-                ({ name, displayName }: { name: string; displayName: string }) => ({
+                ({
+                    name,
+                    displayName,
+                }: {
+                    name: string;
+                    displayName: string;
+                }) => ({
                     id: name,
                     name: displayName,
                 })
@@ -62,7 +85,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             console.error("Error fetching accounts:", error);
         }
     };
-
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -125,19 +147,38 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         }
     };
 
-    const fetchReport = async (accountId: string) => {
+    const fetchProperties = async (accountId: string) => {
         try {
-            const response = await axios.get(
-                `${API_URL}/api/users/analytics/report`,
+            const token = await getToken();
+            setAuthToken(token);
+            const response = await apiClient.get(
+                `${API_URL}/api/users/analytics/properties`,
                 {
                     params: { accountId, clerkId: user?.id },
                 }
             );
-            console.log(response);
+            setShowProperty(true);
+            setProperties(response.data.properties);
         } catch (error) {
             console.error("Error fetching report:", error);
         }
     };
+
+    const fetchReport = async(propertyId: string) => {
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+            const response = await apiClient.get(
+                `${API_URL}/api/users/analytics/report`,
+                {
+                    params: { propertyId, clerkId: user?.id },
+                }
+            );
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error fetching report:", error);
+        }
+    }
 
     return (
         <div>
@@ -197,30 +238,60 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     </div>
 
                     {selectedIntegration === 1 && googleAnalytics && (
-                        <div className="bg-white shadow-xl rounded-lg p-6 w-full max-w-md flex flex-col gap-4">
-                            <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
-                                Select an Account
-                            </h2>
-                            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                                {accounts.length > 0 ? (
-                                    accounts.map((account, indx) => (
-                                        <p
-                                            key={indx}
-                                            className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
-                                            onClick={() =>
-                                                fetchReport(account.id)
-                                            }
-                                        >
-                                            {account.name}
+                        <div className="flex">
+                            <div className="bg-white shadow-xl rounded-lg p-6 w-1/2 flex flex-col gap-4">
+                                <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
+                                    Select an Account
+                                </h2>
+                                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                                    {accounts.length > 0 ? (
+                                        accounts.map((account, indx) => (
+                                            <p
+                                                key={indx}
+                                                className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
+                                                onClick={() =>
+                                                    fetchProperties(account.id)
+                                                }
+                                            >
+                                                {account.name}
+                                            </p>
+                                        ))
+                                    ) : (
+                                        <p className="text-gray-500 text-center">
+                                            Please link your Google Analytics
+                                            account first.
                                         </p>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500 text-center">
-                                        Please link your Google Analytics
-                                        account first.
-                                    </p>
-                                )}
+                                    )}
+                                </div>
                             </div>
+                            {showProperty && (
+                                <div className="bg-white shadow-xl rounded-lg p-6 w-1/2 flex flex-col gap-4">
+                                    <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
+                                        Select the application
+                                    </h2>
+                                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                                        {properties.length > 0 ? (
+                                            properties.map((property, indx) => (
+                                                <p
+                                                    key={indx}
+                                                    className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
+                                                    onClick={() =>
+                                                        fetchReport(
+                                                            property.name
+                                                        )
+                                                    }
+                                                >
+                                                    {property.displayName}
+                                                </p>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 text-center">
+                                                Please add any application
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 

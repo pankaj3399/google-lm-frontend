@@ -18,6 +18,7 @@ import toast from "react-hot-toast";
 import { UserButton } from "@clerk/clerk-react";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
+import { jsPDF } from "jspdf";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -54,6 +55,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
 }) => {
     const { workspaceId } = useParams();
     const [workspaceName, setWorkspaceName] = useState("");
+    const [newWorkspaceName, setNewWorkspaceName] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
     const {
         notes,
         sources,
@@ -62,12 +65,15 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         addNote,
         setIntegrationPopup,
         setSourcePopup,
+        deleteNote,
     } = useUserStore();
     const [inputChat, setInputChat] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { getToken } = useAuth();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [selectedNotes, setSelectedNotes] = useState<boolean[]>(
         new Array(notes.length).fill(false)
     );
@@ -83,6 +89,25 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         );
     };
 
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedSummary(null);
+    };
+
+    useEffect(() => {
+        setSelectedNotes((prevSelected) => {
+            const newSelected = new Array(notes.length).fill(false);
+            for (
+                let i = 0;
+                i < Math.min(prevSelected.length, newSelected.length);
+                i++
+            ) {
+                newSelected[i] = prevSelected[i];
+            }
+            return newSelected;
+        });
+    }, [notes]);
+
     useEffect(() => {
         fetchWorkspace();
         fetchAllNotes();
@@ -93,6 +118,38 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
     }, [chats]);
+
+    const deleteSelectedNotes = async () => {
+        const selectedIds = notes
+            .filter((_, index) => selectedNotes[index])
+            .map((note) => note._id);
+
+        if (selectedIds.length === 0) {
+            console.log("No notes selected for deletion.");
+            return;
+        }
+        const token = await getToken();
+        setAuthToken(token);
+
+        try {
+            const response = await apiClient.delete(
+                `${API_URL}/api/users/deleteNotes`,
+                {
+                    data: { noteIds: selectedIds, workspaceId },
+                }
+            );
+
+            if (response.status === 200) {
+                console.log(
+                    "Notes deleted successfully:",
+                    response.data.message
+                );
+                deleteNote(selectedIds);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const fetchAllNotes = async () => {
         try {
@@ -118,6 +175,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 `${API_URL}/api/users/getWorkspace/${workspaceId}`
             );
             setWorkspaceName(resp.data.workspace.name);
+            setNewWorkspaceName(resp.data.workspace.name);
         } catch (error) {
             toast.error("Something went wrong, please try again later!");
             console.log(error);
@@ -180,38 +238,143 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
     };
 
-    // const handleDeleteSelected = async () => {
-    //     const noteIdsToDelete = notes
-    //         .filter((_, index) => selectedNotes[index])
-    //         .map((note) => note._id);
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewWorkspaceName(e.target.value);
+    };
 
-    //     if (noteIdsToDelete.length === 0) {
-    //         alert("No notes selected for deletion.");
-    //         return;
-    //     }
+    const handleSaveName = async () => {
+        if (newWorkspaceName.trim() === "") {
+            toast.error("Workspace name cannot be empty.");
+            setNewWorkspaceName(workspaceName);
+            setIsEditing(false);
+            return;
+        }
 
-    //     try {
-    //         await deleteNotes(noteIdsToDelete);
+        try {
+            const token = await getToken();
+            setAuthToken(token);
 
-    //         const updatedNotes = notes.filter(
-    //             (note) => !noteIdsToDelete.includes(note._id)
-    //         );
-    //         setNotes(updatedNotes);
-    //         setSelectedNotes(new Array(updatedNotes.length).fill(false));
-    //     } catch (error) {
-    //         toast.error("Failed to delete selected notes.");
-    //         console.log(error);
-    //     }
-    // };
+            const resp = await apiClient.put(
+                `${API_URL}/api/users/rename-workspace`,
+                {
+                    _id: workspaceId,
+                    name: newWorkspaceName,
+                }
+            );
+
+            if (resp.status === 200) {
+                setWorkspaceName(newWorkspaceName);
+                toast.success("Workspace name updated successfully!");
+            }
+        } catch (error) {
+            toast.error("Failed to update the workspace name.");
+            console.error(error);
+        } finally {
+            setIsEditing(false);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            handleSaveName();
+        } else if (e.key === "Escape") {
+            setNewWorkspaceName(workspaceName);
+            setIsEditing(false);
+        }
+    };
+
+    const handleBlur = () => {
+        setNewWorkspaceName(workspaceName);
+        setIsEditing(false);
+    };
+
+    const handleGenerateReport = async () => {
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+
+            const data = await apiClient.get(
+                `${API_URL}/api/users/getWorkspace-report/${workspaceId}`
+            );
+            console.log(data.data);
+            setSelectedSummary(data.data.summary);
+            setIsModalOpen(true);
+            // if (data.data.summary) {
+            //     const blob = new Blob([data.data.summary], { type: "text/plain" });
+            //     const url = window.URL.createObjectURL(blob);
+
+            //     const link = document.createElement("a");
+            //     link.href = url;
+            //     link.download = `Workspace_${workspaceId}_Summary.pdf`;
+            //     document.body.appendChild(link);
+            //     link.click();
+            //     document.body.removeChild(link);
+
+            //     window.URL.revokeObjectURL(url);
+            // } else {
+            //     alert("Failed to generate summary.");
+            // }
+        } catch (error) {
+            console.error("Error generating report:", error);
+            alert("An error occurred while generating the summary.");
+        }
+    };
+
+    const handleSaveReport = async () => {
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+
+            const resp = await apiClient.post(
+                `${API_URL}/api/users/createNewNote/${workspaceId}`,
+                {
+                    heading: "Report",
+                    content: selectedSummary,
+                    type: "Report",
+                }
+            );
+            addNote(resp.data);
+            toast.success("Successfully added");
+            setIsModalOpen(false);
+        } catch (err) {
+            toast.error("Something went wrong, please try again later!");
+            console.log(err);
+        }
+    };
+
+    const handleDownload = () => {
+        const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth(); // Get page width
+    const margin = 10; // Define a margin
+    const textWidth = pageWidth - 2 * margin; // Calculate usable text width
+
+    // Split text to fit within page width
+    const lines = doc.splitTextToSize(selectedSummary as string, textWidth);
+
+    doc.text(lines, margin, margin); // Add wrapped text to the document
+    doc.save("download.pdf"); // Save the PDF
+    };
 
     return (
         <div className="h-screen w-[80%] flex flex-col">
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
-                <p className="text-gray-600 text-xl">
-                    {workspaceName !== ""
-                        ? workspaceName
-                        : "Untitled Workspace"}
-                </p>
+                {isEditing ? (
+                    <input
+                        className="text-gray-600 text-xl outline-none px-2 py-1"
+                        value={newWorkspaceName}
+                        onChange={handleNameChange}
+                        onKeyDown={handleKeyDown}
+                        onBlur={handleBlur}
+                        autoFocus
+                    />
+                ) : (
+                    <p
+                        className="text-gray-600 text-xl cursor-pointer"
+                        onClick={() => setIsEditing(true)}
+                    >
+                        {workspaceName || "Untitled Workspace"}
+                    </p>
+                )}
                 <UserButton />
             </div>
 
@@ -298,15 +461,24 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                             </div>
                             {notes.length > 0 && (
                                 <>
-                                    <div className="flex items-center cursor-pointer">
+                                    <div
+                                        className="flex items-center cursor-pointer"
+                                        onClick={deleteSelectedNotes}
+                                    >
                                         <Trash className="h-5 text-gray-600" />
                                         <span>Delete</span>
                                     </div>
-                                    <div className="flex items-center cursor-pointer" onClick={handleSelectAll}>
+                                    <div
+                                        className="flex items-center cursor-pointer"
+                                        onClick={handleSelectAll}
+                                    >
                                         <Check className="h-5 text-gray-600" />
                                         <span>Select all</span>
                                     </div>
-                                    <div className="flex items-center cursor-pointer" onClick={handleDeselectAll}>
+                                    <div
+                                        className="flex items-center cursor-pointer"
+                                        onClick={handleDeselectAll}
+                                    >
                                         <X className="h-5 text-gray-600" />
                                         <span>Deselect all</span>
                                     </div>
@@ -369,10 +541,10 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 )}
             </div>
 
-            <div className="w-full h-28">
+            <div className="w-full h-32">
                 <div className="flex flex-col w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
                     <div className="flex gap-2">
-                        {suggestions.map((suggestion) => {
+                        {suggestions.map((suggestion, indx) => {
                             return (
                                 <div
                                     className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer"
@@ -381,13 +553,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                             (prev) => prev + suggestion
                                         )
                                     }
+                                    key={indx}
                                 >
                                     {suggestion}
                                 </div>
                             );
                         })}
                     </div>
-                    <div className="flex w-full mt-2">
+                    <div className="flex w-full mt-2 mb-2">
                         <div
                             className="flex items-center space-x-2 text-gray-500 cursor-pointer"
                             onClick={() => setChatSection((prev) => !prev)}
@@ -417,11 +590,50 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                         </div>
                         <div className="flex flex-col">
                             <button className="text-blue-500">Pull data</button>
-                            <button className="text-blue-500">Generate</button>
+                            <button
+                                className="text-blue-500"
+                                onClick={handleGenerateReport}
+                            >
+                                Generate
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
+            {isModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+                    onClick={closeModal}
+                >
+                    <div
+                        className="bg-white p-5 rounded-lg shadow-lg w-4/5 relative"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <button
+                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                            onClick={closeModal}
+                        >
+                            &times;
+                        </button>
+                        <h2 className="text-lg font-bold mb-4">Summary</h2>
+                        <p className="text-gray-700 w-full">
+                            {selectedSummary}
+                        </p>
+                        <button
+                            onClick={handleSaveReport}
+                            className="mt-3 p-2 bg-slate-200 rounded-md"
+                        >
+                            Save to Note
+                        </button>
+                        <button
+                            className="mt-3 p-2 bg-slate-200 rounded-md ml-3"
+                            onClick={handleDownload}
+                        >
+                            Download PDF
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

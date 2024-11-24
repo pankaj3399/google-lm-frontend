@@ -17,9 +17,10 @@ interface Note {
     updatedAt: string;
     createdAt: string;
     type: string;
+    jsonDate: string
 }
 
-interface Source {
+export interface Source {
     _id: string;
     url: string;
     summary: string;
@@ -51,6 +52,10 @@ interface UserState {
     updateNote: (index: number, updatedNote: Note) => void;
     setSource: (sources: Source[]) => void;
     addSource: (source: Source) => void;
+    deleteNote: (ids: string[]) => void;
+    deleteSource: (id: string) => void;
+    updateWorkspaceName: (id: string, name: string) => void;
+    updateSourceName: (id: string, name: string) => void;
 }
 
 const useUserStore = create<UserState>((set) => ({
@@ -104,6 +109,26 @@ const useUserStore = create<UserState>((set) => ({
     addSource: (source: Source) =>
         set((state) => ({
             sources: [...state.sources, source],
+        })),
+    deleteNote: (ids: string[]) =>
+        set((state) => ({
+            notes: state.notes.filter((note) => !ids.includes(note._id)),
+        })),
+    deleteSource: (id: string) =>
+        set((state) => ({
+            sources: state.sources.filter((source) => source._id !== id),
+        })),
+    updateWorkspaceName: (id: string, name: string) =>
+        set((state) => ({
+            workspace: state.workspace.map((ws) =>
+                ws._id === id ? { ...ws, name } : ws
+            ),
+        })),
+    updateSourceName: (id: string, name: string) =>
+        set((state) => ({
+            sources: state.sources.map((source) =>
+                source._id === id ? { ...source, name } : source
+            ),
         })),
 }));
 

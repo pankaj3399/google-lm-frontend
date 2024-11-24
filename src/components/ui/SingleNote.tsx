@@ -1,4 +1,4 @@
-import { BarChart3, Pen, MessageSquare } from "lucide-react";
+import { BarChart3, Pen, MessageSquare, NotepadText } from "lucide-react";
 import React from "react";
 // import useUserStore from "../../store/userStore";
 import moment from "moment";
@@ -38,6 +38,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
         switch(iconType) {
             case 'Written Note': return Pen;
             case 'Saved': return MessageSquare;
+            case 'Report': return NotepadText;
             default: return BarChart3;
         }
     }
