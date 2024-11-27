@@ -9,18 +9,14 @@ import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-interface AddSourcePopupProps {
-    handleAddSourceDisplay: () => void;
-}
 
-const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
-    handleAddSourceDisplay,
-}) => {
+
+const AddSourcePopup = () => {
     const [url, setUrl] = useState<string>("");
     const [loading, setLoading] = useState(false);
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const { workspaceId } = useParams();
-    const { addSource } = useUserStore();
+    const { addSource, setSourcePopup } = useUserStore();
     const { getToken } = useAuth();
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
@@ -94,7 +90,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
             toast.success("Source added");
             setUrl("");
             setUploadedFile(null);
-            handleAddSourceDisplay();
+            setSourcePopup();
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
@@ -116,7 +112,7 @@ const AddSourcePopup: React.FC<AddSourcePopupProps> = ({
                             </h2>
                         </div>
                         <button
-                            onClick={handleAddSourceDisplay}
+                            onClick={setSourcePopup}
                             className="text-gray-400 hover:text-gray-500 transition-colors"
                         >
                             <X className="w-6 h-6" />

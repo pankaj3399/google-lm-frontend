@@ -26,6 +26,8 @@ export interface Source {
     summary: string;
     name: string;
     uploadType: string;
+    updatedAt: string;
+    createdAt: string;
 }
 
 interface UserState {

@@ -18,7 +18,16 @@ import toast from "react-hot-toast";
 import { UserButton } from "@clerk/clerk-react";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
-import { jsPDF } from "jspdf";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "./ui/sheet";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import dayjs from "dayjs";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -29,6 +38,11 @@ interface Note {
     updatedAt: string;
     createdAt: string;
     type: string;
+}
+
+interface DateRange {
+    startDate: Date | null;
+    endDate: Date | null;
 }
 
 interface WorkspaceMainProps {
@@ -72,8 +86,12 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { getToken } = useAuth();
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
+    const [firstScreen, setFirstScreen] = useState(false);
+    const [dates, setDates] = useState<DateRange>({
+        startDate: null,
+        endDate: null,
+    });
     const [selectedNotes, setSelectedNotes] = useState<boolean[]>(
         new Array(notes.length).fill(false)
     );
@@ -87,11 +105,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         setSelectedNotes((prev) =>
             prev.map((selected, i) => (i === index ? !selected : selected))
         );
-    };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedSummary(null);
     };
 
     useEffect(() => {
@@ -289,16 +302,27 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     };
 
     const handleGenerateReport = async () => {
+        const { startDate, endDate } = dates;
+
+        if (!startDate || !endDate) {
+            alert("Please select both start and end dates.");
+            return;
+        }
+
+        const data = {
+            startDate: dayjs(startDate).format("YYYY-MM-DD"),
+            endDate: dayjs(endDate).format("YYYY-MM-DD"),
+        };
         try {
             const token = await getToken();
             setAuthToken(token);
 
-            const data = await apiClient.get(
-                `${API_URL}/api/users/getWorkspace-report/${workspaceId}`
+            const resp = await apiClient.post(
+                `${API_URL}/api/users/getWorkspace-report/${workspaceId}`,
+                data
             );
-            console.log(data.data);
-            setSelectedSummary(data.data.summary);
-            setIsModalOpen(true);
+            setSelectedSummary(resp.data.summary);
+            setFirstScreen(true);
             // if (data.data.summary) {
             //     const blob = new Blob([data.data.summary], { type: "text/plain" });
             //     const url = window.URL.createObjectURL(blob);
@@ -335,24 +359,10 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             addNote(resp.data);
             toast.success("Successfully added");
-            setIsModalOpen(false);
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
-    };
-
-    const handleDownload = () => {
-        const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth(); // Get page width
-    const margin = 10; // Define a margin
-    const textWidth = pageWidth - 2 * margin; // Calculate usable text width
-
-    // Split text to fit within page width
-    const lines = doc.splitTextToSize(selectedSummary as string, textWidth);
-
-    doc.text(lines, margin, margin); // Add wrapped text to the document
-    doc.save("download.pdf"); // Save the PDF
     };
 
     return (
@@ -590,50 +600,89 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                         </div>
                         <div className="flex flex-col">
                             <button className="text-blue-500">Pull data</button>
-                            <button
-                                className="text-blue-500"
-                                onClick={handleGenerateReport}
-                            >
-                                Generate
-                            </button>
+                            <Sheet>
+                                <SheetTrigger>
+                                    <button className="text-blue-500">
+                                        Generate
+                                    </button>
+                                </SheetTrigger>
+                                <SheetContent className="w-[40rem] flex flex-col items-center">
+                                    <SheetHeader className="mb-3 border-b-2">
+                                        <SheetTitle>Report</SheetTitle>
+                                    </SheetHeader>
+                                    <div className="flex gap-2 mt-5 justify-center">
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-gray-600">
+                                                Start Date
+                                            </label>
+                                            <DatePicker
+                                                selected={dates.startDate}
+                                                onChange={(date) =>
+                                                    setDates((prev) => ({
+                                                        ...prev,
+                                                        startDate: date,
+                                                    }))
+                                                }
+                                                selectsStart
+                                                startDate={
+                                                    dates.startDate as Date
+                                                }
+                                                endDate={dates.endDate as Date}
+                                                className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-sm font-medium text-gray-600">
+                                                End Date
+                                            </label>
+                                            <DatePicker
+                                                selected={dates.endDate}
+                                                onChange={(date) =>
+                                                    setDates((prev) => ({
+                                                        ...prev,
+                                                        endDate: date,
+                                                    }))
+                                                }
+                                                selectsEnd
+                                                startDate={
+                                                    dates.startDate as Date
+                                                }
+                                                endDate={dates.endDate as Date}
+                                                minDate={
+                                                    dates.startDate as Date
+                                                }
+                                                className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        onClick={handleGenerateReport}
+                                    >
+                                        Generate Report
+                                    </button>
+                                </SheetContent>
+                            </Sheet>
                         </div>
                     </div>
                 </div>
             </div>
-            {isModalOpen && (
-                <div
-                    className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
-                    onClick={closeModal}
-                >
-                    <div
-                        className="bg-white p-5 rounded-lg shadow-lg w-4/5 relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
-                            onClick={closeModal}
-                        >
-                            &times;
-                        </button>
-                        <h2 className="text-lg font-bold mb-4">Summary</h2>
-                        <p className="text-gray-700 w-full">
-                            {selectedSummary}
+            <Sheet
+                open={firstScreen}
+                onOpenChange={() => setFirstScreen(false)}
+            >
+                <SheetContent side={"left"} className="w-[40rem] p-5">
+                    <SheetHeader>
+                        <SheetTitle>Report Summary</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-5">
+                        <p className="text-gray-700 whitespace-pre-line">
+                            {selectedSummary || "No summary available."}
                         </p>
-                        <button
-                            onClick={handleSaveReport}
-                            className="mt-3 p-2 bg-slate-200 rounded-md"
-                        >
-                            Save to Note
-                        </button>
-                        <button
-                            className="mt-3 p-2 bg-slate-200 rounded-md ml-3"
-                            onClick={handleDownload}
-                        >
-                            Download PDF
-                        </button>
                     </div>
-                </div>
-            )}
+                </SheetContent>
+            </Sheet>
         </div>
     );
 };

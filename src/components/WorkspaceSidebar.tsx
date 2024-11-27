@@ -7,22 +7,33 @@ import {
     Eye,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import useUserStore, { Source } from "../store/userStore";
+import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import { Brain, ChartNoAxesColumnIncreasing, Trash } from "lucide-react";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "../components/ui/sheet";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
-    handleAddSourceDisplay: () => void;
     handleCheckboxChange: (indx: number) => void;
+    checkAllSources: () => void;
+    uncheckAllSources: () => void;
+    checkedSource: boolean[]
 }
 
 const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
-    handleAddSourceDisplay,
     handleCheckboxChange,
+    checkAllSources,
+    uncheckAllSources,
+    checkedSource
 }) => {
     const {
         sources,
@@ -32,6 +43,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         openAiKey,
         deleteSource,
         updateSourceName,
+        setSourcePopup,
     } = useUserStore();
     const { workspaceId } = useParams();
     const navigate = useNavigate();
@@ -40,11 +52,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [editingSourceId, setEditingSourceId] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>("");
-
-    const openSummaryModal = (summary: string) => {
-        setSelectedSummary(summary);
-        setIsModalOpen(true);
-    };
+    const [allSources, setAllSources] = useState(true);
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -54,6 +62,14 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     useEffect(() => {
         fetchAllSources();
     }, []);
+
+    useEffect(() => {
+        if(!allSources) {
+            uncheckAllSources()
+        } else {
+            checkAllSources();
+        }
+    }, [allSources]);
 
     const fetchAllSources = async () => {
         try {
@@ -68,10 +84,6 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             toast.error("Something went wrong, please try again later!");
             console.log(err);
         }
-    };
-
-    const handleViewClick = (source: Source) => {
-        window.open(source.url, "_blank");
     };
 
     const handleDeleteScource = async (id: string) => {
@@ -197,7 +209,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         </div>
                         <CirclePlus
                             className="w-4 h-4 text-gray-400 cursor-pointer"
-                            onClick={handleAddSourceDisplay}
+                            onClick={setSourcePopup}
                         />
                     </div>
                     <label className="flex items-center space-x-2 text-sm text-gray-600 justify-between">
@@ -205,7 +217,8 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         <input
                             type="checkbox"
                             className="rounded text-blue-500"
-                            defaultChecked
+                            checked={allSources}
+                            onClick={() => setAllSources(prev => !prev)}
                         />
                     </label>
                     {sources.length > 0 && (
@@ -271,32 +284,102 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                 <Trash size={20} />
                                                 <p>Remove Item</p>
                                             </div>
-                                            <div
-                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
-                                                onClick={() =>
-                                                    openSummaryModal(
-                                                        source.summary
-                                                    )
-                                                }
-                                            >
-                                                <MessageSquare size={20} />
-                                                <p>View Summary</p>
-                                            </div>
-                                            <div
-                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
-                                                onClick={() =>
-                                                    handleViewClick(source)
-                                                }
-                                            >
-                                                <Eye size={20} />
-                                                <p>View</p>
-                                            </div>
+                                            <Sheet>
+                                                <SheetTrigger asChild>
+                                                    <div className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer">
+                                                        <MessageSquare
+                                                            size={20}
+                                                        />
+                                                        <p>View Summary</p>
+                                                    </div>
+                                                </SheetTrigger>
+                                                <SheetContent
+                                                    side="left"
+                                                    className="h-screen w-[40rem] overflow-y-auto p-6 bg-gray-50 text-gray-800"
+                                                >
+                                                    <SheetHeader className="mb-4 border-b pb-4">
+                                                        <SheetTitle className="text-2xl font-semibold text-gray-900">
+                                                            Summary
+                                                        </SheetTitle>
+                                                    </SheetHeader>
+                                                    <div className="space-y-4">
+                                                        {source.summary ? (
+                                                            source.summary
+                                                                .split("\n")
+                                                                .map(
+                                                                    (
+                                                                        paragraph,
+                                                                        index
+                                                                    ) => (
+                                                                        <p
+                                                                            key={
+                                                                                index
+                                                                            }
+                                                                            className="text-base leading-7 text-gray-700"
+                                                                        >
+                                                                            {
+                                                                                paragraph
+                                                                            }
+                                                                        </p>
+                                                                    )
+                                                                )
+                                                        ) : (
+                                                            <p className="text-gray-500 italic">
+                                                                No summary
+                                                                available for
+                                                                this source.
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </SheetContent>
+                                            </Sheet>
+                                            <Sheet>
+                                                <SheetTrigger asChild>
+                                                    <div
+                                                        className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                        onClick={() => {
+                                                            if (
+                                                                source.uploadType !==
+                                                                "file"
+                                                            ) {
+                                                                window.open(
+                                                                    source.url,
+                                                                    "_blank",
+                                                                    "noopener,noreferrer"
+                                                                );
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Eye size={20} />
+                                                        <p>View</p>
+                                                    </div>
+                                                </SheetTrigger>
+                                                {source.uploadType ===
+                                                    "file" && (
+                                                    <SheetContent
+                                                        className="w-[50rem] overflow-y-auto h-screen absolute"
+                                                        side={"left"}
+                                                    >
+                                                        <SheetHeader>
+                                                            <SheetTitle>
+                                                                Source View
+                                                            </SheetTitle>
+                                                        </SheetHeader>
+                                                        <iframe
+                                                            src={`${source.url}`}
+                                                            height={630}
+                                                            width={700}
+                                                            className="w-full h-full"
+                                                        ></iframe>
+                                                    </SheetContent>
+                                                )}
+                                            </Sheet>
                                         </div>
                                     </div>
                                     <input
                                         type="checkbox"
                                         className="rounded text-blue-500"
-                                        defaultChecked
+                                        checked={checkedSource[indx]}
                                         onClick={() =>
                                             handleCheckboxChange(indx)
                                         }

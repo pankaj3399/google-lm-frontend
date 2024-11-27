@@ -9,11 +9,10 @@ import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 
 function Workspace() {
-    // const [openNewNote, setOpenNewNote] = useState(false);
-    const [openSourceAdd, setOpenSourceAdd] = useState(false);
     const [checkedSource, setCheckedSource] = useState<boolean[]>([]);
-    const { sources, integrationPopup, sourcePopup, setIntegrationPopup, setSourcePopup } = useUserStore();
+    const { sources, integrationPopup, sourcePopup, setIntegrationPopup } = useUserStore();
     const location = useLocation();
+    const [notesPopup, setNotesPopup] = useState(false);
 
     useEffect(() => {
         ReactGA.send({ hitType: "pageview", page: location.pathname });
@@ -23,13 +22,12 @@ function Workspace() {
         setCheckedSource(Array(sources.length).fill(true));
     }, [sources]);
 
-    const handleNewNoteDisplay = () => {
-        setSourcePopup();
-    };
-
-    const handleAddSourceDisplay = () => {
-        setOpenSourceAdd((prev) => !prev);
-    };
+    const checkAllSources = () => {
+        setCheckedSource(Array(sources.length).fill(true));
+    }
+    const uncheckAllSources = () => {
+        setCheckedSource(Array(sources.length).fill(false));
+    }
 
     const handleCheckboxChange = (index: number) => {
         setCheckedSource((prevCheckedSource) => {
@@ -39,21 +37,23 @@ function Workspace() {
         });
     };
 
+    const handleNotesPopup = () => {
+        setNotesPopup(prev => !prev);
+    } 
+
     const handlePopup = () => {
         setIntegrationPopup();
     };
 
     return (
         <main className="flex w-screen h-screen relative">
-            <WorkspaceSidebar handleAddSourceDisplay={handleAddSourceDisplay} handleCheckboxChange={handleCheckboxChange}/>
-            <WorkspaceMain handleNewNoteDisplay={handleNewNoteDisplay} checkedSource={checkedSource}/>
-            {sourcePopup && (
-                <NewNotePopup handleNewNoteDisplay={handleNewNoteDisplay} />
+            <WorkspaceSidebar handleCheckboxChange={handleCheckboxChange} checkedSource={checkedSource} checkAllSources={checkAllSources} uncheckAllSources={uncheckAllSources}/>
+            <WorkspaceMain handleNewNoteDisplay={handleNotesPopup} checkedSource={checkedSource}/>
+            {notesPopup && (
+                <NewNotePopup handleNewNoteDisplay={handleNotesPopup} />
             )}
-            {openSourceAdd && (
-                <AddSourcePopup
-                    handleAddSourceDisplay={handleAddSourceDisplay}
-                />
+            {sourcePopup && (
+                <AddSourcePopup/>
             )}
             {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
         </main>
