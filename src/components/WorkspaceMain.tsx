@@ -28,6 +28,9 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
+import MarkdownIt from "markdown-it";
+
+const md = new MarkdownIt();
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -141,7 +144,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
-    const [pullDataResponse, setPullDataResponse] = useState('');
+    const [pullDataResponse, setPullDataResponse] = useState("");
     const [dataToShowOnPull, setDataToShowOnPull] = useState(pullData);
     const [dates, setDates] = useState<DateRange>({
         startDate: null,
@@ -384,7 +387,11 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
     };
 
-    const handleSaveReport = async (content: string, heading: string, type: string) => {
+    const handleSaveReport = async (
+        content: string,
+        heading: string,
+        type: string
+    ) => {
         try {
             const token = await getToken();
             setAuthToken(token);
@@ -427,8 +434,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             return;
         }
 
-        if(selectedMetrics.length > 10) {
-            toast.error('Please select only 10 metrics at a time');
+        if (selectedMetrics.length > 10) {
+            toast.error("Please select only 10 metrics at a time");
             return;
         }
 
@@ -581,7 +588,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                 </>
                             )}
                         </div>
-
                         {notes.length > 0 ? (
                             <div className="flex mt-2 w-full  flex-wrap">
                                 {notes.map((note: Note, indx) => (
@@ -851,18 +857,30 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 open={firstScreen}
                 onOpenChange={() => setFirstScreen(false)}
             >
-                <SheetContent side={"left"} className="w-[40rem] p-5 overflow-y-auto">
+                <SheetContent
+                    side={"left"}
+                    className="w-[40rem] p-5 overflow-y-auto"
+                >
                     <SheetHeader>
                         <SheetTitle>Report Summary</SheetTitle>
                     </SheetHeader>
                     <div className="mt-5">
                         <p className="text-gray-700 whitespace-pre-line">
-                            {selectedSummary || "No summary available."}
+                            {md
+                                .render(selectedSummary || '')
+                                .replace(/<\/?[^>]+(>|$)/g, "")
+                                .trim() || "No summary available."}
                         </p>
                     </div>
                     <button
                         className="p-3 bg-slate-200 rounded-md"
-                        onClick={() => handleSaveReport(selectedSummary as string, 'Report', 'Report')}
+                        onClick={() =>
+                            handleSaveReport(
+                                selectedSummary as string,
+                                "Report",
+                                "Report"
+                            )
+                        }
                     >
                         Save As Note
                     </button>
@@ -872,18 +890,30 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 open={secondScreen}
                 onOpenChange={() => setSecondScreen(false)}
             >
-                <SheetContent side={"left"} className="w-[40rem] p-5 overflow-y-auto">
+                <SheetContent
+                    side={"left"}
+                    className="w-[40rem] p-5 overflow-y-auto"
+                >
                     <SheetHeader>
                         <SheetTitle>Pulled Data</SheetTitle>
                     </SheetHeader>
                     <div className="mt-5">
                         <p className="text-gray-700 whitespace-pre-line">
-                            {pullDataResponse || "No Data Available."}
+                            {md
+                                .render(pullDataResponse)
+                                .replace(/<\/?[^>]+(>|$)/g, "")
+                                .trim() || "No Data Available."}
                         </p>
                     </div>
                     <button
                         className="p-3 bg-slate-200 rounded-md"
-                        onClick={() => handleSaveReport(pullDataResponse, 'Analitics', 'Analitics')}
+                        onClick={() =>
+                            handleSaveReport(
+                                pullDataResponse,
+                                "Analitics",
+                                "Analitics"
+                            )
+                        }
                     >
                         Save As Note
                     </button>

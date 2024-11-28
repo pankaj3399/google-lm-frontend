@@ -9,8 +9,6 @@ import { useAuth } from "@clerk/clerk-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-
-
 const AddSourcePopup = () => {
     const [url, setUrl] = useState<string>("");
     const [loading, setLoading] = useState(false);
