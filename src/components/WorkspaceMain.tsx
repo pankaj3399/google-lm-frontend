@@ -15,7 +15,7 @@ import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
 import toast from "react-hot-toast";
-import { UserButton } from "@clerk/clerk-react";
+import { UserButton, useUser } from "@clerk/clerk-react";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import {
@@ -63,6 +63,57 @@ const suggestions = [
     "Audit",
 ];
 
+const pullData = [
+    {
+        type: "activeUsers",
+        isChecked: false,
+    },
+    {
+        type: "eventCount",
+        isChecked: false,
+    },
+    {
+        type: "userEngagementDuration",
+        isChecked: false,
+    },
+    {
+        type: "sessions",
+        isChecked: false,
+    },
+    {
+        type: "newUsers",
+        isChecked: false,
+    },
+    {
+        type: "totalUsers",
+        isChecked: false,
+    },
+    {
+        type: "screenPageViews",
+        isChecked: false,
+    },
+    {
+        type: "bounceRate",
+        isChecked: false,
+    },
+    {
+        type: "averageSessionDuration",
+        isChecked: false,
+    },
+    {
+        type: "transactions",
+        isChecked: false,
+    },
+    {
+        type: "totalRevenue",
+        isChecked: false,
+    },
+    {
+        type: "itemListClickThroughRate",
+        isChecked: false,
+    },
+];
+
 const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     handleNewNoteDisplay,
     checkedSource,
@@ -86,8 +137,12 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { getToken } = useAuth();
+    const { user } = useUser();
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
+    const [secondScreen, setSecondScreen] = useState(false);
+    const [pullDataResponse, setPullDataResponse] = useState('');
+    const [dataToShowOnPull, setDataToShowOnPull] = useState(pullData);
     const [dates, setDates] = useState<DateRange>({
         startDate: null,
         endDate: null,
@@ -344,7 +399,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
     };
 
-    const handleSaveReport = async () => {
+    const handleSaveReport = async (content: string, heading: string, type: string) => {
         try {
             const token = await getToken();
             setAuthToken(token);
@@ -352,9 +407,9 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createNewNote/${workspaceId}`,
                 {
-                    heading: "Report",
-                    content: selectedSummary,
-                    type: "Report",
+                    heading: heading,
+                    content: content,
+                    type: type,
                 }
             );
             addNote(resp.data);
@@ -362,6 +417,52 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         } catch (err) {
             toast.error("Something went wrong, please try again later!");
             console.log(err);
+        }
+    };
+
+    const handlePullDataCheck = (index: number) => {
+        setDataToShowOnPull((prev) =>
+            prev.map((item, i) =>
+                i === index ? { ...item, isChecked: !item.isChecked } : item
+            )
+        );
+    };
+
+    const handlePullData = async () => {
+        const selectedMetrics = dataToShowOnPull
+            .filter((item) => item.isChecked)
+            .map((item) => item.type);
+
+        if (
+            !dates.startDate ||
+            !dates.endDate ||
+            selectedMetrics.length === 0
+        ) {
+            toast.error("Please select a date range and at least one metric.");
+            return;
+        }
+
+        if(selectedMetrics.length > 10) {
+            toast.error('Please select only 10 metrics at a time');
+            return;
+        }
+
+        try {
+            const token = await getToken();
+            setAuthToken(token);
+            const response = await apiClient.post(
+                `${API_URL}/api/users/analytics/report-for-workspace`,
+                {
+                    clerkId: user?.id,
+                    startDate: dates.startDate.toISOString().split("T")[0],
+                    endDate: dates.endDate.toISOString().split("T")[0],
+                    metrics: selectedMetrics,
+                }
+            );
+            setSecondScreen(true);
+            setPullDataResponse(response.data);
+        } catch (error) {
+            console.error("Error pulling data:", error);
         }
     };
 
@@ -599,14 +700,107 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                             </div>
                         </div>
                         <div className="flex flex-col">
-                            <button className="text-blue-500">Pull data</button>
+                            <Sheet>
+                                <SheetTrigger>
+                                    <button className="text-blue-500">
+                                        Pull data
+                                    </button>
+                                </SheetTrigger>
+                                <SheetContent
+                                    side={"right"}
+                                    className="w-[500px] overflow-y-auto"
+                                >
+                                    <SheetHeader>
+                                        <SheetTitle className="border-b-2">
+                                            Pull Data
+                                        </SheetTitle>
+                                    </SheetHeader>
+                                    <div className="mt-5">
+                                        <h3>Select data from analytics</h3>
+                                        <div className="flex gap-2 mt-5 justify-center">
+                                            <div className="space-y-2">
+                                                <label className="block text-sm font-medium text-gray-600">
+                                                    Start Date
+                                                </label>
+                                                <DatePicker
+                                                    selected={dates.startDate}
+                                                    onChange={(date) =>
+                                                        setDates((prev) => ({
+                                                            ...prev,
+                                                            startDate: date,
+                                                        }))
+                                                    }
+                                                    selectsStart
+                                                    startDate={
+                                                        dates.startDate as Date
+                                                    }
+                                                    endDate={
+                                                        dates.endDate as Date
+                                                    }
+                                                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                />
+                                            </div>
+                                            <div className="space-y-2 mb-5">
+                                                <label className="block text-sm font-medium text-gray-600">
+                                                    End Date
+                                                </label>
+                                                <DatePicker
+                                                    selected={dates.endDate}
+                                                    onChange={(date) =>
+                                                        setDates((prev) => ({
+                                                            ...prev,
+                                                            endDate: date,
+                                                        }))
+                                                    }
+                                                    selectsEnd
+                                                    startDate={
+                                                        dates.startDate as Date
+                                                    }
+                                                    endDate={
+                                                        dates.endDate as Date
+                                                    }
+                                                    minDate={
+                                                        dates.startDate as Date
+                                                    }
+                                                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                        {dataToShowOnPull.map((data, indx) => {
+                                            return (
+                                                <div
+                                                    className="flex gap-2 pt-2"
+                                                    key={indx}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={data.isChecked}
+                                                        onClick={() =>
+                                                            handlePullDataCheck(
+                                                                indx
+                                                            )
+                                                        }
+                                                    />
+                                                    <p>{data.type}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <button
+                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        onClick={handlePullData}
+                                    >
+                                        Pull Data
+                                    </button>
+                                </SheetContent>
+                            </Sheet>
                             <Sheet>
                                 <SheetTrigger>
                                     <button className="text-blue-500">
                                         Generate
                                     </button>
                                 </SheetTrigger>
-                                <SheetContent className="w-[40rem] flex flex-col items-center">
+                                <SheetContent className="w-[40rem] flex flex-col items-center overflow-y-auto">
                                     <SheetHeader className="mb-3 border-b-2">
                                         <SheetTitle>Report</SheetTitle>
                                     </SheetHeader>
@@ -672,7 +866,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 open={firstScreen}
                 onOpenChange={() => setFirstScreen(false)}
             >
-                <SheetContent side={"left"} className="w-[40rem] p-5">
+                <SheetContent side={"left"} className="w-[40rem] p-5 overflow-y-auto">
                     <SheetHeader>
                         <SheetTitle>Report Summary</SheetTitle>
                     </SheetHeader>
@@ -681,6 +875,33 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                             {selectedSummary || "No summary available."}
                         </p>
                     </div>
+                    <button
+                        className="p-3 bg-slate-200 rounded-md"
+                        onClick={() => handleSaveReport(selectedSummary as string, 'Report', 'Report')}
+                    >
+                        Save As Note
+                    </button>
+                </SheetContent>
+            </Sheet>
+            <Sheet
+                open={secondScreen}
+                onOpenChange={() => setSecondScreen(false)}
+            >
+                <SheetContent side={"left"} className="w-[40rem] p-5 overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>Pulled Data</SheetTitle>
+                    </SheetHeader>
+                    <div className="mt-5">
+                        <p className="text-gray-700 whitespace-pre-line">
+                            {pullDataResponse || "No Data Available."}
+                        </p>
+                    </div>
+                    <button
+                        className="p-3 bg-slate-200 rounded-md"
+                        onClick={() => handleSaveReport(pullDataResponse, 'Analitics', 'Analitics')}
+                    >
+                        Save As Note
+                    </button>
                 </SheetContent>
             </Sheet>
         </div>

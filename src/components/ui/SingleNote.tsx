@@ -1,6 +1,5 @@
-import { BarChart3, Pen, MessageSquare, NotepadText } from "lucide-react";
+import { BarChart3, Pen, MessageSquare, NotepadText, ChartNoAxesColumnIncreasing } from "lucide-react";
 import React from "react";
-// import useUserStore from "../../store/userStore";
 import moment from "moment";
 
 interface SingleNoteProps {
@@ -18,7 +17,6 @@ interface SingleNoteProps {
 const SingleNote: React.FC<SingleNoteProps> = ({
     heading,
     content,
-    // handleNewNoteDisplay,
     indx,
     updatedAt,
     createdAt,
@@ -26,7 +24,6 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     selectedNotes,
     handleToggleNote
 }) => {
-    // const { setSelectedNote } = useUserStore();
     const getPlainText = (html: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
@@ -39,6 +36,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
             case 'Written Note': return Pen;
             case 'Saved': return MessageSquare;
             case 'Report': return NotepadText;
+            case 'Analytics': return ChartNoAxesColumnIncreasing;
             default: return BarChart3;
         }
     }
