@@ -378,21 +378,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setSelectedSummary(resp.data.summary);
             setFirstScreen(true);
-            // if (data.data.summary) {
-            //     const blob = new Blob([data.data.summary], { type: "text/plain" });
-            //     const url = window.URL.createObjectURL(blob);
-
-            //     const link = document.createElement("a");
-            //     link.href = url;
-            //     link.download = `Workspace_${workspaceId}_Summary.pdf`;
-            //     document.body.appendChild(link);
-            //     link.click();
-            //     document.body.removeChild(link);
-
-            //     window.URL.revokeObjectURL(url);
-            // } else {
-            //     alert("Failed to generate summary.");
-            // }
         } catch (error) {
             console.error("Error generating report:", error);
             alert("An error occurred while generating the summary.");
@@ -800,7 +785,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         Generate
                                     </button>
                                 </SheetTrigger>
-                                <SheetContent className="w-[40rem] flex flex-col items-center overflow-y-auto">
+                                <SheetContent className="w-[30rem] flex flex-col items-center overflow-y-auto">
                                     <SheetHeader className="mb-3 border-b-2">
                                         <SheetTitle>Report</SheetTitle>
                                     </SheetHeader>

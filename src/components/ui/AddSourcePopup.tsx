@@ -1,4 +1,4 @@
-import React, { useState, DragEvent, ChangeEvent, KeyboardEvent } from "react";
+import { useState, DragEvent, ChangeEvent, KeyboardEvent } from "react";
 import { Upload, Link, X, FileCheck, Lock } from "lucide-react";
 import { useParams } from "react-router-dom";
 import useUserStore from "../../store/userStore";
