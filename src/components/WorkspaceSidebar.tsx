@@ -20,20 +20,21 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "../components/ui/sheet";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
     handleCheckboxChange: (indx: number) => void;
     checkAllSources: () => void;
     uncheckAllSources: () => void;
-    checkedSource: boolean[]
+    checkedSource: boolean[];
 }
 
 const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     handleCheckboxChange,
     checkAllSources,
     uncheckAllSources,
-    checkedSource
+    checkedSource,
 }) => {
     const {
         sources,
@@ -64,8 +65,8 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     }, []);
 
     useEffect(() => {
-        if(!allSources) {
-            uncheckAllSources()
+        if (!allSources) {
+            uncheckAllSources();
         } else {
             checkAllSources();
         }
@@ -80,9 +81,14 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 `${API_URL}/api/users/getAllSources/${workspaceId}`
             );
             setSource(resp.data);
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -103,7 +109,13 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             console.log(resp.data);
             if (resp.status === 200) deleteSource(id);
         } catch (error) {
-            console.log(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -125,7 +137,13 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 setEditingSourceId(null);
             }
         } catch (error) {
-            console.log("Error updating source name", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -218,11 +236,11 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             type="checkbox"
                             className="rounded text-blue-500"
                             checked={allSources}
-                            onClick={() => setAllSources(prev => !prev)}
+                            onClick={() => setAllSources((prev) => !prev)}
                         />
                     </label>
                     {sources.length > 0 && (
-                        <div className="flex flex-col gap-1 mt-3">
+                        <div className="flex flex-col gap-2 mt-3">
                             {sources.map((source, indx) => (
                                 <div
                                     key={indx}

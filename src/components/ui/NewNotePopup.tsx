@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import useUserStore from "../../store/userStore";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -88,9 +89,14 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                 setHeading('');
                 handleNewNoteDisplay();
             }
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
     

@@ -33,9 +33,7 @@ export default function SignUpPage() {
 
     useEffect(() => {
         if (isSignedIn === null) return;
-        if (isSignedIn) 
-        navigate('/home');
-
+        if (isSignedIn) navigate("/home");
     }, [isSignedIn]);
 
     const sendUserDataToBackend = async (
@@ -54,7 +52,12 @@ export default function SignUpPage() {
             };
             setUser(userData);
         } catch (error) {
-            console.error("Error sending user data to backend:", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -62,8 +65,8 @@ export default function SignUpPage() {
         <div className="flex items-center justify-center w-screen h-screen">
             <SignUp
                 signInUrl="/login"
-                forceRedirectUrl={'/home'}
-                signInForceRedirectUrl={'/home'}
+                forceRedirectUrl={"/home"}
+                signInForceRedirectUrl={"/home"}
             />
         </div>
     );

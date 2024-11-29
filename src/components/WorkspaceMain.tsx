@@ -29,6 +29,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import MarkdownIt from "markdown-it";
+import axios from "axios";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogClose,
+    DialogContent,
+} from "../components/ui/dialog";
 
 const md = new MarkdownIt();
 
@@ -61,7 +68,7 @@ interface Chat {
 const suggestions = [
     "Summarise",
     "Help me understand",
-    "critique",
+    "Critique",
     "Key insights",
     "Audit",
 ];
@@ -125,6 +132,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [workspaceName, setWorkspaceName] = useState("");
     const [newWorkspaceName, setNewWorkspaceName] = useState("");
     const [isEditing, setIsEditing] = useState(false);
+    const [generateReportText, setGenerateReportText] = useState("");
     const {
         notes,
         sources,
@@ -196,7 +204,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             .map((note) => note._id);
 
         if (selectedIds.length === 0) {
-            console.log("No notes selected for deletion.");
+            toast.error("No notes selected for deletion.");
             return;
         }
         const token = await getToken();
@@ -211,14 +219,17 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
 
             if (response.status === 200) {
-                console.log(
-                    "Notes deleted successfully:",
-                    response.data.message
-                );
+                toast.success(response.data.message);
                 deleteNote(selectedIds);
             }
         } catch (error) {
-            console.log(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -231,9 +242,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 `${API_URL}/api/users/getAllNotes/${workspaceId}`
             );
             setNotes(resp.data);
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -248,8 +264,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             setWorkspaceName(resp.data.workspace.name);
             setNewWorkspaceName(resp.data.workspace.name);
         } catch (error) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -258,13 +279,22 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     }
 
     const handleChat = async () => {
-        if (inputChat === "") return;
+        if (inputChat === "") {
+            toast.error("Please provide some context");
+            return;
+        }
         try {
             setChatSection(true);
             let content = "";
             content += checkedSource.map((isChecked, index) => {
                 if (isChecked) {
                     return sources[index].summary;
+                }
+                return null;
+            });
+            content += selectedNotes.map((isChecked, index) => {
+                if (isChecked) {
+                    return notes[index].content;
                 }
                 return null;
             });
@@ -282,9 +312,80 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setInputChat("");
             addChat(resp.data.message, "GPT");
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
+        }
+    };
+
+    function getContext(content: string, Word: string) {
+        switch (Word) {
+            case "Summarise":
+                return `Summarise the information in Title with this content ${content}.
+Make sure that it’s easy to understand and contains the primary information in bullet points.`;
+            case "Help me understand":
+                return `Help me understand the Title information from the following data ${content}. Give simple examples which make sense in this case.`;
+            case "Combine":
+                return `Combine the following information into one easy-to-understand content.Use the following: ${content}`;
+            case "Critique":
+                return `Critique the content provided below and see if there is something we can improve.Title Content: ${content}`;
+            case "Key insights":
+                return `Provide the key insights for the data below. Title ${content}`;
+            case "Audit":
+                return `Audit the content and help me understand the Title data provided here: ${content}`;
+            default:
+                return "";
+        }
+    }
+
+    const handleChatWithSuggestion = async (Word: string) => {
+        try {
+            setChatSection(true);
+            let content = "";
+            content += checkedSource.map((isChecked, index) => {
+                if (isChecked) {
+                    return sources[index].summary;
+                }
+                return null;
+            });
+            content += selectedNotes.map((isChecked, index) => {
+                if (isChecked) {
+                    return notes[index].content;
+                }
+                return null;
+            });
+            if (content === "") {
+                toast.error("Please select some context");
+                return;
+            }
+            addChat(Word, "Me");
+
+            const token = await getToken();
+            setAuthToken(token);
+
+            const questions = getContext(content, Word);
+
+            const resp = await apiClient.post(
+                `${API_URL}/api/users/createConversation/suggestion`,
+                {
+                    question: questions,
+                }
+            );
+            setInputChat("");
+            addChat(resp.data.message, "GPT");
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -303,9 +404,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             addNote(resp.data);
             toast.success("Successfully added");
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -338,8 +444,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 toast.success("Workspace name updated successfully!");
             }
         } catch (error) {
-            toast.error("Failed to update the workspace name.");
-            console.error(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         } finally {
             setIsEditing(false);
         }
@@ -370,6 +481,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         const data = {
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
+            generateReportText
         };
         try {
             const token = await getToken();
@@ -381,9 +493,19 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setSelectedSummary(resp.data.summary);
             setFirstScreen(true);
+            setGenerateReportText('');
+            setDates({
+                startDate: null,
+                endDate: null,
+            });
         } catch (error) {
-            console.error("Error generating report:", error);
-            alert("An error occurred while generating the summary.");
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -406,9 +528,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             addNote(resp.data);
             toast.success("Successfully added");
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -454,7 +581,13 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             setSecondScreen(true);
             setPullDataResponse(response.data);
         } catch (error) {
-            console.error("Error pulling data:", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -564,13 +697,30 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                             </div>
                             {notes.length > 0 && (
                                 <>
-                                    <div
-                                        className="flex items-center cursor-pointer"
-                                        onClick={deleteSelectedNotes}
-                                    >
-                                        <Trash className="h-5 text-gray-600" />
-                                        <span>Delete</span>
-                                    </div>
+                                    <Dialog>
+                                        <DialogTrigger className="flex items-center">
+                                            <div className="flex items-center cursor-pointer">
+                                                <Trash className="h-5 text-gray-600" />
+                                                <span>Delete</span>
+                                            </div>
+                                        </DialogTrigger>
+                                        <DialogContent className="flex flex-col">
+                                            <h3>Want to delete..</h3>
+                                            <DialogClose className="flex gap-2">
+                                                <button className="p-3 bg-slate-200 hover:bg-slate-400 rounded-md">
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="p-3 bg-red-500 hover:bg-red-600 rounded"
+                                                    onClick={
+                                                        deleteSelectedNotes
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </DialogClose>
+                                        </DialogContent>
+                                    </Dialog>
                                     <div
                                         className="flex items-center cursor-pointer"
                                         onClick={handleSelectAll}
@@ -651,9 +801,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                 <div
                                     className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer"
                                     onClick={() =>
-                                        setInputChat(
-                                            (prev) => prev + suggestion
-                                        )
+                                        handleChatWithSuggestion(suggestion)
                                     }
                                     key={indx}
                                 >
@@ -841,6 +989,18 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                                         </div>
                                     </div>
 
+                                    <textarea
+                                        className="shadow-lg w-4/5 border-2 rounded-md h-20 outline-none mt-5"
+                                        style={{ resize: "none" }}
+                                        placeholder="Querry about report"
+                                        value={generateReportText}
+                                        onChange={(e) =>
+                                            setGenerateReportText(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
+
                                     <button
                                         className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
                                         onClick={handleGenerateReport}
@@ -867,7 +1027,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                     <div className="mt-5">
                         <p className="text-gray-700 whitespace-pre-line">
                             {md
-                                .render(selectedSummary || '')
+                                .render(selectedSummary || "")
                                 .replace(/<\/?[^>]+(>|$)/g, "")
                                 .trim() || "No summary available."}
                         </p>

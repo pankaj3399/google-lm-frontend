@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { ThreeDot } from "react-loading-indicators";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -65,9 +66,9 @@ const AddSourcePopup = () => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
+
             const formData = new FormData();
-    
+
             if (uploadedFile) {
                 formData.append("file", uploadedFile);
                 formData.append("uploadType", "file");
@@ -75,7 +76,7 @@ const AddSourcePopup = () => {
                 formData.append("url", url);
                 formData.append("uploadType", "url");
             }
-    
+
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createSource/${workspaceId}`,
                 formData,
@@ -83,20 +84,24 @@ const AddSourcePopup = () => {
                     headers: { "Content-Type": "multipart/form-data" },
                 }
             );
-    
+
             addSource(resp.data);
             toast.success("Source added");
             setUrl("");
             setUploadedFile(null);
             setSourcePopup();
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         } finally {
             setLoading(false);
         }
     };
-    
 
     return (
         <div className="min-h-screen bg-gray-100">

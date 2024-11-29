@@ -4,16 +4,19 @@ import toast from "react-hot-toast";
 import { useUser, useAuth } from "@clerk/clerk-react";
 import useUserStore from "../../store/userStore";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
+import axios from "axios";
 
 interface WorkspacePopupProps {
-    handleWorkSpacePopup: () => void; 
+    handleWorkSpacePopup: () => void;
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const WorkspacePopup: React.FC<WorkspacePopupProps> = ({ handleWorkSpacePopup }) => {
+const WorkspacePopup: React.FC<WorkspacePopupProps> = ({
+    handleWorkSpacePopup,
+}) => {
     const { user } = useUser();
-    const { getToken } = useAuth(); 
+    const { getToken } = useAuth();
     const [workspaceName, setWorkspaceName] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const { addWorkspace } = useUserStore();
@@ -37,17 +40,18 @@ const WorkspacePopup: React.FC<WorkspacePopupProps> = ({ handleWorkSpacePopup })
 
             addWorkspace(resp.data.workspace);
             toast.success("Workspace created successfully!");
-            setWorkspaceName(""); 
-            handleWorkSpacePopup(); 
+            setWorkspaceName("");
+            handleWorkSpacePopup();
         } catch (error) {
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Something went wrong. Please try again later.";
-            toast.error(`Error creating workspace: ${errorMessage}`);
-            console.error(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         } finally {
-            setIsLoading(false); 
+            setIsLoading(false);
         }
     };
 

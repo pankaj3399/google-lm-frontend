@@ -82,7 +82,13 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             );
             setAccounts(filtered);
         } catch (error) {
-            console.error("Error fetching accounts:", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -104,18 +110,13 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             setApiKey("");
             handlePopup();
         } catch (error) {
-            let errorMessage = "Something went wrong. Please try again later.";
-            if (error instanceof Error) {
-                errorMessage = error.message;
-            } else if (
-                axios.isAxiosError(error) &&
-                error.response?.data?.message
-            ) {
-                errorMessage = error.response.data.message;
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
             }
-
-            toast.error(`Error saving settings: ${errorMessage}`);
-            console.error(error);
         }
     };
 
@@ -141,9 +142,14 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     break;
                 }
             }
-        } catch (err) {
-            toast.error("Something went wrong....");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
@@ -160,11 +166,17 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             setShowProperty(true);
             setProperties(response.data.properties);
         } catch (error) {
-            console.error("Error fetching report:", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
     };
 
-    const fetchReport = async(propertyId: string) => {
+    const fetchReport = async (propertyId: string) => {
         try {
             const token = await getToken();
             setAuthToken(token);
@@ -176,9 +188,15 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             );
             console.log(response.data);
         } catch (error) {
-            console.error("Error fetching report:", error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(error.response?.data.message);
+            } else {
+                console.error(error);
+            }
         }
-    }
+    };
 
     return (
         <div>

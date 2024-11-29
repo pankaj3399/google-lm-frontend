@@ -6,6 +6,7 @@ import useUserStore from "../store/userStore";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,9 +41,14 @@ const Sidebar = () => {
             );
             setOpenAiKey(resp.data.api);
             setGoogleAnalytics(resp.data.googleAnalytics);
-        } catch (err) {
-            toast.error("Something went wrong, please try again later!");
-            console.log(err);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error.status)
+                console.error(error.response);
+                toast.error(error.response?.data.error)
+              } else {
+                console.error(error);
+              }
         }
     };
 
@@ -64,12 +70,13 @@ const Sidebar = () => {
             toast.success("Workspace created successfully!");
             navigate(`/workspace/${resp.data.workspace._id}`);
         } catch (error) {
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : "Something went wrong. Please try again later.";
-            toast.error(`Error creating workspace: ${errorMessage}`);
-            console.error(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status)
+                console.error(error.response);
+                toast.error(error.response?.data.error)
+              } else {
+                console.error(error);
+              }
         }
     };
 
@@ -83,7 +90,13 @@ const Sidebar = () => {
             );
             setWorkspace(resp.data.workspaces);
         } catch (error) {
-            console.log(error);
+            if (axios.isAxiosError(error)) {
+                console.log(error.status)
+                console.error(error.response);
+                toast.error(error.response?.data.error)
+              } else {
+                console.error(error);
+              }
         }
     };
 
