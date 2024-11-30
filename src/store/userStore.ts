@@ -40,6 +40,8 @@ interface UserState {
     sources: Source[];
     openAiKey: boolean;
     googleAnalytics: boolean;
+    propertyId: boolean;
+    setPropertyId: (propertyId: boolean) => void;
     setOpenAiKey: (openAiKey: boolean) => void;
     setGoogleAnalytics: (googleAnalytics: boolean) => void;
     setIntegrationPopup: () => void;
@@ -72,6 +74,8 @@ const useUserStore = create<UserState>((set) => ({
     sourcePopup: false,
     openAiKey: false,
     googleAnalytics: false,
+    propertyId: false,
+    setPropertyId: (propertyId) => set(() => ({ propertyId })),
     setOpenAiKey: (openAiKey) => set(() => ({ openAiKey })),
     setGoogleAnalytics: (googleAnalytics) => set(() => ({ googleAnalytics })),
     setIntegrationPopup: () =>

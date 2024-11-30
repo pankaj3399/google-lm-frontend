@@ -19,6 +19,7 @@ const Sidebar = () => {
         addWorkspace,
         setOpenAiKey,
         setGoogleAnalytics,
+        setPropertyId
     } = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
@@ -41,14 +42,15 @@ const Sidebar = () => {
             );
             setOpenAiKey(resp.data.api);
             setGoogleAnalytics(resp.data.googleAnalytics);
+            setPropertyId(resp.data.propertyId);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log(error.status)
+                console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error)
-              } else {
+                toast.error(error.response?.data.error);
+            } else {
                 console.error(error);
-              }
+            }
         }
     };
 
@@ -71,12 +73,12 @@ const Sidebar = () => {
             navigate(`/workspace/${resp.data.workspace._id}`);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log(error.status)
+                console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error)
-              } else {
+                toast.error(error.response?.data.error);
+            } else {
                 console.error(error);
-              }
+            }
         }
     };
 
@@ -91,12 +93,12 @@ const Sidebar = () => {
             setWorkspace(resp.data.workspaces);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log(error.status)
+                console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error)
-              } else {
+                toast.error(error.response?.data.error);
+            } else {
                 console.error(error);
-              }
+            }
         }
     };
 

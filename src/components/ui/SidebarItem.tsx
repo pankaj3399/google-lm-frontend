@@ -28,7 +28,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
     previousCreations,
 }) => {
     const navigate = useNavigate();
-    const { openAiKey, googleAnalytics } = useUserStore();
+    const { openAiKey, propertyId } = useUserStore();
 
     return (
         <div>
@@ -85,7 +85,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                                 <Check className="text-green-500" />
                             </div>
                         )}
-                        {googleAnalytics && title === "Integrations" && (
+                        {propertyId && title === "Integrations" && (
                             <div className="flex items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
                                 <span>Analytics</span>
                                 <Check className="text-green-500" />

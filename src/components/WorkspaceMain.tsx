@@ -136,12 +136,15 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const {
         notes,
         sources,
+        propertyId,
         setNotes,
         setSelectedNote,
         addNote,
         setIntegrationPopup,
         setSourcePopup,
         deleteNote,
+        setGoogleAnalytics,
+        setPropertyId,
     } = useUserStore();
     const [inputChat, setInputChat] = useState("");
     const [chats, setChats] = useState<Chat[]>([]);
@@ -481,7 +484,7 @@ Make sure that it’s easy to understand and contains the primary information in
         const data = {
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
-            generateReportText
+            generateReportText,
         };
         try {
             const token = await getToken();
@@ -493,7 +496,7 @@ Make sure that it’s easy to understand and contains the primary information in
             );
             setSelectedSummary(resp.data.summary);
             setFirstScreen(true);
-            setGenerateReportText('');
+            setGenerateReportText("");
             setDates({
                 startDate: null,
                 endDate: null,
@@ -548,6 +551,11 @@ Make sure that it’s easy to understand and contains the primary information in
     };
 
     const handlePullData = async () => {
+        if (!propertyId) {
+            toast.error("Please link your Google Analytics account.");
+            return;
+        }
+
         const selectedMetrics = dataToShowOnPull
             .filter((item) => item.isChecked)
             .map((item) => item.type);
@@ -562,13 +570,14 @@ Make sure that it’s easy to understand and contains the primary information in
         }
 
         if (selectedMetrics.length > 10) {
-            toast.error("Please select only 10 metrics at a time");
+            toast.error("Please select only 10 metrics at a time.");
             return;
         }
 
         try {
             const token = await getToken();
             setAuthToken(token);
+
             const response = await apiClient.post(
                 `${API_URL}/api/users/analytics/report-for-workspace`,
                 {
@@ -578,15 +587,28 @@ Make sure that it’s easy to understand and contains the primary information in
                     metrics: selectedMetrics,
                 }
             );
+
             setSecondScreen(true);
             setPullDataResponse(response.data);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log(error.status);
-                console.error(error.response);
-                toast.error(error.response?.data.message);
+                const statusCode = error.response?.status;
+
+                if (statusCode === 410) {
+                    toast.error(
+                        "Your Google Analytics token has expired. Please re-link your account."
+                    );
+                    setGoogleAnalytics(false);
+                    setPropertyId(false);
+                } else {
+                    toast.error(
+                        error.response?.data?.message ||
+                            "An error occurred while fetching the report."
+                    );
+                }
             } else {
                 console.error(error);
+                toast.error("An unexpected error occurred.");
             }
         }
     };
@@ -704,14 +726,14 @@ Make sure that it’s easy to understand and contains the primary information in
                                                 <span>Delete</span>
                                             </div>
                                         </DialogTrigger>
-                                        <DialogContent className="flex flex-col">
-                                            <h3>Want to delete..</h3>
+                                        <DialogContent className="flex flex-col w-60">
+                                            <h3>Delete Selected Notes</h3>
                                             <DialogClose className="flex gap-2">
-                                                <button className="p-3 bg-slate-200 hover:bg-slate-400 rounded-md">
+                                                <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
                                                     Cancel
                                                 </button>
                                                 <button
-                                                    className="p-3 bg-red-500 hover:bg-red-600 rounded"
+                                                    className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
                                                     onClick={
                                                         deleteSelectedNotes
                                                     }
@@ -796,8 +818,9 @@ Make sure that it’s easy to understand and contains the primary information in
             <div className="w-full h-32">
                 <div className="flex flex-col w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
                     <div className="flex gap-2">
-                        {suggestions.map((suggestion, indx) => {
-                            return (
+                        {(selectedNotes.some(Boolean) ||
+                            checkedSource.some(Boolean)) &&
+                            suggestions.map((suggestion, indx) => (
                                 <div
                                     className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer"
                                     onClick={() =>
@@ -807,8 +830,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                 >
                                     {suggestion}
                                 </div>
-                            );
-                        })}
+                            ))}
                     </div>
                     <div className="flex w-full mt-2 mb-2">
                         <div

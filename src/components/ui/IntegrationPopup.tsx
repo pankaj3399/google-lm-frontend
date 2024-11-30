@@ -45,7 +45,7 @@ const integrations: Integration[] = [
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
-    const { googleAnalytics, openAiKey, setOpenAiKey, setGoogleAnalytics } =
+    const { googleAnalytics, openAiKey, propertyId, setOpenAiKey, setGoogleAnalytics, setPropertyId, setWorkspace } =
         useUserStore();
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
@@ -59,38 +59,42 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     }, []);
 
     const fetchAccounts = async () => {
+        if (!googleAnalytics) {
+            return;
+        }
         try {
             const token = await getToken();
             setAuthToken(token);
-            const response = await apiClient.get(
-                `${API_URL}/api/users/analytics/accounts`,
-                {
-                    params: { clerkId: user?.id },
-                }
-            );
+    
+            const response = await apiClient.get(`${API_URL}/api/users/analytics/accounts`, {
+                params: { clerkId: user?.id },
+            });
+    
             const filtered: Account[] = response.data.map(
-                ({
-                    name,
-                    displayName,
-                }: {
-                    name: string;
-                    displayName: string;
-                }) => ({
+                ({ name, displayName }: { name: string; displayName: string }) => ({
                     id: name,
                     name: displayName,
                 })
             );
+    
             setAccounts(filtered);
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log(error.status);
-                console.error(error.response);
-                toast.error(error.response?.data.message);
+                const statusCode = error.response?.status;
+                if (statusCode === 410) {
+                    toast.error("Your Google Analytics token has expired. Please link your account again.");
+                    setGoogleAnalytics(false);
+                    setPropertyId(false);
+                } else {
+                    toast.error(error.response?.data?.message || "An error occurred while fetching accounts.");
+                }
             } else {
                 console.error(error);
+                toast.error("An unexpected error occurred.");
             }
         }
     };
+    
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -107,6 +111,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             toast.success(response.data.message);
             setOpenAiKey(response.data.api);
             setGoogleAnalytics(response.data.googleAnalytics);
+            setPropertyId(response.data.propertyId);
             setApiKey("");
             handlePopup();
         } catch (error) {
@@ -186,7 +191,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     params: { propertyId, clerkId: user?.id },
                 }
             );
-            console.log(response.data);
+            setPropertyId(response.data.propertyId);
+            setWorkspace(response.data.workspace);
+            handlePopup();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -242,7 +249,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                     {(integration.name === "ChatGPT" &&
                                         openAiKey) ||
                                     (integration.name === "Google Analytics" &&
-                                        googleAnalytics) ? (
+                                        propertyId) ? (
                                         <Check className="text-green-500" />
                                     ) : (
                                         integration.icon

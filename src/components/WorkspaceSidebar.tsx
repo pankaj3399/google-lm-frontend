@@ -38,13 +38,14 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
 }) => {
     const {
         sources,
-        setSource,
-        setIntegrationPopup,
         googleAnalytics,
         openAiKey,
+        propertyId,
         deleteSource,
         updateSourceName,
         setSourcePopup,
+        setSource,
+        setIntegrationPopup,
     } = useUserStore();
     const { workspaceId } = useParams();
     const navigate = useNavigate();
@@ -201,7 +202,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     />
                                 </div>
                             )}
-                            {googleAnalytics && (
+                            {propertyId && (
                                 <div className="flex justify-between mt-3">
                                     <div className="flex gap-1">
                                         <ChartNoAxesColumnIncreasing />

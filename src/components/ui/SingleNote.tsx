@@ -1,6 +1,13 @@
-import { BarChart3, Pen, MessageSquare, NotepadText, ChartNoAxesColumnIncreasing } from "lucide-react";
+import {
+    BarChart3,
+    Pen,
+    MessageSquare,
+    NotepadText,
+    ChartNoAxesColumnIncreasing,
+} from "lucide-react";
 import React from "react";
 import moment from "moment";
+import useUserStore from "../../store/userStore";
 
 interface SingleNoteProps {
     heading: string;
@@ -11,7 +18,7 @@ interface SingleNoteProps {
     type: string;
     selectedNotes: boolean[];
     handleNewNoteDisplay: () => void;
-    handleToggleNote: (indx: number)=> void;
+    handleToggleNote: (indx: number) => void;
 }
 
 const SingleNote: React.FC<SingleNoteProps> = ({
@@ -22,29 +29,39 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     createdAt,
     type,
     selectedNotes,
-    handleToggleNote
+    handleToggleNote,
+    handleNewNoteDisplay,
 }) => {
     const getPlainText = (html: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         return doc.body.textContent || "";
-        
     };
 
     function getIcon(iconType: string) {
-        switch(iconType) {
-            case 'Written Note': return Pen;
-            case 'Saved': return MessageSquare;
-            case 'Report': return NotepadText;
-            case 'Analytics': return ChartNoAxesColumnIncreasing;
-            default: return BarChart3;
+        switch (iconType) {
+            case "Written Note":
+                return Pen;
+            case "Saved":
+                return MessageSquare;
+            case "Report":
+                return NotepadText;
+            case "Analytics":
+                return ChartNoAxesColumnIncreasing;
+            default:
+                return BarChart3;
         }
     }
     const IconComponent = getIcon(type);
+    const { setSelectedNote } = useUserStore();
     return (
         <div
-            className=" w-[350px] max-h-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl"
+            className=" w-[350px] max-h-[350px] m-2 bg-white rounded-2xl shadow-lg overflow-hidden transition-all hover:shadow-xl cursor-pointer"
             key={indx}
+            onClick={() => {
+                handleNewNoteDisplay();
+                setSelectedNote(indx);
+            }}
         >
             <div className="p-5">
                 {/* Header */}
@@ -57,13 +74,21 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                         </span>
                     </div>
                     <div className="flex gap-2">
-                        <input type="checkbox" checked={selectedNotes[indx]} onClick={() => handleToggleNote(indx)}/>
+                        <input
+                            type="checkbox"
+                            checked={selectedNotes[indx]}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleNote(indx);
+                            }}
+                        />
                     </div>
                 </div>
 
                 {/* Title */}
                 <h3 className="mb-5 font-bold">
-                    {heading.substring(0, 20)}{".. "}
+                    {heading.substring(0, 20)}
+                    {".. "}
                     <span className="text-gray-500 ml-2">
                         {moment(updatedAt).format("MMMM Do YYYY")}
                     </span>
@@ -71,7 +96,10 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 
                 {/* Content */}
                 <div className="space-y-6 tracking-wide">
-                    <p className="text-gray-700">{getPlainText(content).substring(0, 300) + (content.length > 300 ? '...' : '')}</p>
+                    <p className="text-gray-700">
+                        {getPlainText(content).substring(0, 300) +
+                            (content.length > 300 ? "..." : "")}
+                    </p>
                 </div>
             </div>
         </div>
