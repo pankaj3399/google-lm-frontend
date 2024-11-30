@@ -311,6 +311,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 {
                     question: inputChat,
                     context: content,
+                    clerkId: user?.id
                 }
             );
             setInputChat("");
@@ -377,6 +378,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 `${API_URL}/api/users/createConversation/suggestion`,
                 {
                     question: questions,
+                    clerkId: user?.id
                 }
             );
             setInputChat("");
@@ -485,6 +487,7 @@ Make sure that it’s easy to understand and contains the primary information in
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
             generateReportText,
+            clerkId: user?.id
         };
         try {
             const token = await getToken();

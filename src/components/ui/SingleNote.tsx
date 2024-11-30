@@ -8,6 +8,10 @@ import {
 import React from "react";
 import moment from "moment";
 import useUserStore from "../../store/userStore";
+import MarkdownIt from "markdown-it";
+
+const md = new MarkdownIt();
+
 
 interface SingleNoteProps {
     heading: string;
@@ -25,19 +29,12 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     heading,
     content,
     indx,
-    updatedAt,
     createdAt,
     type,
     selectedNotes,
     handleToggleNote,
     handleNewNoteDisplay,
 }) => {
-    const getPlainText = (html: string): string => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, "text/html");
-        return doc.body.textContent || "";
-    };
-
     function getIcon(iconType: string) {
         switch (iconType) {
             case "Written Note":
@@ -88,17 +85,19 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 {/* Title */}
                 <h3 className="mb-5 font-bold">
                     {heading.substring(0, 20)}
-                    {".. "}
-                    <span className="text-gray-500 ml-2">
-                        {moment(updatedAt).format("MMMM Do YYYY")}
-                    </span>
+                    {heading.length > 20 ? ".. " : ''}
                 </h3>
 
                 {/* Content */}
                 <div className="space-y-6 tracking-wide">
                     <p className="text-gray-700">
-                        {getPlainText(content).substring(0, 300) +
-                            (content.length > 300 ? "..." : "")}
+                        {md
+                                .render(content)
+                                .replace(/<\/?[^>]+(>|$)/g, "")
+                                .trim()
+                                .substring(0, 300)
+                                || "No Data Available." }+
+                            {(content.length > 300 ? "..." : "")}
                     </p>
                 </div>
             </div>

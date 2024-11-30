@@ -5,7 +5,7 @@ import useUserStore from "../../store/userStore";
 import toast from "react-hot-toast";
 import { ThreeDot } from "react-loading-indicators";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -17,6 +17,7 @@ const AddSourcePopup = () => {
     const { workspaceId } = useParams();
     const { addSource, setSourcePopup } = useUserStore();
     const { getToken } = useAuth();
+    const { user } = useUser();
 
     const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -68,6 +69,11 @@ const AddSourcePopup = () => {
             setAuthToken(token);
 
             const formData = new FormData();
+            if (!user) {
+                toast.error("Please signup first");
+                return;
+            }
+            formData.append("clerkId", user.id);
 
             if (uploadedFile) {
                 formData.append("file", uploadedFile);
