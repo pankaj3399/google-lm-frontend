@@ -1017,7 +1017,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                     <textarea
                                         className="shadow-lg w-4/5 border-2 rounded-md h-20 outline-none mt-5"
                                         style={{ resize: "none" }}
-                                        placeholder="Querry about report"
+                                        placeholder="Query about report"
                                         value={generateReportText}
                                         onChange={(e) =>
                                             setGenerateReportText(
