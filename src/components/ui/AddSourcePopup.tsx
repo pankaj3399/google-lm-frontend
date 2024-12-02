@@ -38,6 +38,7 @@ const AddSourcePopup = () => {
         if (file) {
             setUploadedFile(file);
             setUrl("");
+            handleUrlSubmit(file);
         }
     };
 
@@ -61,8 +62,9 @@ const AddSourcePopup = () => {
         }
     };
 
-    const handleUrlSubmit = async () => {
-        if (!url && !uploadedFile) return;
+    const handleUrlSubmit = async (selectedFile?: File) => {
+        const fileToUpload = selectedFile || uploadedFile;
+        if (!url && !fileToUpload) return;
         setLoading(true);
         try {
             const token = await getToken();
@@ -75,8 +77,8 @@ const AddSourcePopup = () => {
             }
             formData.append("clerkId", user.id);
 
-            if (uploadedFile) {
-                formData.append("file", uploadedFile);
+            if (fileToUpload) {
+                formData.append("file", fileToUpload);
                 formData.append("uploadType", "file");
             } else if (url) {
                 formData.append("url", url);
@@ -91,8 +93,8 @@ const AddSourcePopup = () => {
                 }
             );
 
-            addSource(resp.data);
-            toast.success("Source added");
+            addSource(resp.data.newSource);
+            toast.success(resp.data.message);
             setUrl("");
             setUploadedFile(null);
             setSourcePopup();
@@ -205,7 +207,7 @@ const AddSourcePopup = () => {
                                 />
                             ) : (
                                 <button
-                                    onClick={handleUrlSubmit}
+                                    onClick={() => handleUrlSubmit()}
                                     className="bg-gray-100 hover:bg-gray-200 p-2 rounded-lg transition-colors"
                                     disabled={!url && !uploadedFile}
                                 >

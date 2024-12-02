@@ -81,6 +81,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             const resp = await apiClient.get(
                 `${API_URL}/api/users/getAllSources/${workspaceId}`
             );
+            console.log(resp.data)
             setSource(resp.data);
         } catch (error) {
             if (axios.isAxiosError(error)) {
