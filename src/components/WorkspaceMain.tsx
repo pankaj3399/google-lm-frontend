@@ -28,7 +28,7 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
-import MarkdownIt from "markdown-it";
+import markdownToTxt from "markdown-to-txt";
 import axios from "axios";
 import {
     Dialog,
@@ -36,8 +36,6 @@ import {
     DialogClose,
     DialogContent,
 } from "../components/ui/dialog";
-
-const md = new MarkdownIt();
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -224,6 +222,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (response.status === 200) {
                 toast.success(response.data.message);
                 deleteNote(selectedIds);
+                handleDeselectAll()
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -311,7 +310,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
                 {
                     question: inputChat,
                     context: content,
-                    clerkId: user?.id
+                    clerkId: user?.id,
                 }
             );
             setInputChat("");
@@ -378,7 +377,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 `${API_URL}/api/users/createConversation/suggestion`,
                 {
                     question: questions,
-                    clerkId: user?.id
+                    clerkId: user?.id,
                 }
             );
             setInputChat("");
@@ -407,7 +406,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     type: "Saved",
                 }
             );
-            addNote(resp.data);
+            addNote(resp.data.savedNote);
             toast.success("Successfully added");
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -487,7 +486,7 @@ Make sure that it’s easy to understand and contains the primary information in
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
             generateReportText,
-            clerkId: user?.id
+            clerkId: user?.id,
         };
         try {
             const token = await getToken();
@@ -532,7 +531,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     type: type,
                 }
             );
-            addNote(resp.data);
+            addNote(resp.data.savedNote);
             toast.success("Successfully added");
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -1051,10 +1050,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     </SheetHeader>
                     <div className="mt-5">
                         <p className="text-gray-700 whitespace-pre-line">
-                            {md
-                                .render(selectedSummary || "")
-                                .replace(/<\/?[^>]+(>|$)/g, "")
-                                .trim() || "No summary available."}
+                            {markdownToTxt(selectedSummary || "")}
                         </p>
                     </div>
                     <button
@@ -1084,10 +1080,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     </SheetHeader>
                     <div className="mt-5">
                         <p className="text-gray-700 whitespace-pre-line">
-                            {md
-                                .render(pullDataResponse)
-                                .replace(/<\/?[^>]+(>|$)/g, "")
-                                .trim() || "No Data Available."}
+                            {markdownToTxt(pullDataResponse)}
                         </p>
                     </div>
                     <button
