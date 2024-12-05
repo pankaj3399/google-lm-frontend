@@ -36,6 +36,7 @@ import {
     DialogClose,
     DialogContent,
 } from "../components/ui/dialog";
+import ReactMarkdown from "react-markdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -62,6 +63,42 @@ interface Chat {
     message: string;
     owner: string;
 }
+
+interface ReportCategory {
+    category: string;
+    options: string[];
+}
+
+const reportCategories: ReportCategory[] = [
+    {
+        category: "Product Performance Reports",
+        options: [
+            "Product Usage Analysis",
+            "Product Quality and Error Tracking",
+        ],
+    },
+    {
+        category: "User Experience (UX) Reports",
+        options: [
+            "User Engagement and Behaviour Analysis",
+            "User Frustration and Drop-off Points",
+        ],
+    },
+    {
+        category: "Sales Performance Reports",
+        options: [
+            "Sales Performance by Product Category",
+            "Customer Acquisition Cost and ROI",
+        ],
+    },
+    {
+        category: "Conversion Funnel Reports",
+        options: [
+            "Funnel Conversion Rate Analysis",
+            "Checkout Process Optimization Report",
+        ],
+    },
+];
 
 const suggestions = [
     "Summarise",
@@ -173,6 +210,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             prev.map((selected, i) => (i === index ? !selected : selected))
         );
     };
+    const [selected, setSelected] = useState<{
+        category: string;
+        option: string;
+    } | null>(null);
+
+    const handleSelection = (category: string, option: string) => {
+        setSelected({ category, option });
+    };
 
     useEffect(() => {
         setSelectedNotes((prevSelected) => {
@@ -222,7 +267,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (response.status === 200) {
                 toast.success(response.data.message);
                 deleteNote(selectedIds);
-                handleDeselectAll()
+                handleDeselectAll();
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -485,7 +530,7 @@ Make sure that it’s easy to understand and contains the primary information in
         const data = {
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
-            generateReportText,
+            generateReportText: generateReportText + selected?.option,
             clerkId: user?.id,
         };
         try {
@@ -657,7 +702,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                     <p
                                         className={`max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg`}
                                     >
-                                        {chat.message}
+                                        {chat.owner === "GPT" ? (
+                                            <ReactMarkdown>
+                                                {chat.message}
+                                            </ReactMarkdown>
+                                        ) : (
+                                            chat.message
+                                        )}
                                         {chat.owner === "GPT" ? (
                                             <div className="flex justify-between pt-2 items-center">
                                                 <div className="flex gap-1">
@@ -950,7 +1001,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                         })}
                                     </div>
                                     <button
-                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className="p-2 bg-blue-600 rounded-md text-white w-4/5 mt-5"
                                         onClick={handlePullData}
                                     >
                                         Pull Data
@@ -964,10 +1015,15 @@ Make sure that it’s easy to understand and contains the primary information in
                                     </button>
                                 </SheetTrigger>
                                 <SheetContent className="w-[30rem] flex flex-col items-center overflow-y-auto">
-                                    <SheetHeader className="mb-3 border-b-2">
-                                        <SheetTitle>Report</SheetTitle>
+                                    <SheetHeader className="w-full text-start">
+                                        <SheetTitle className="text-2xl font-light">
+                                            Generate
+                                        </SheetTitle>
+                                        <p className="border-b-2 mt-2">
+                                            Report
+                                        </p>
                                     </SheetHeader>
-                                    <div className="flex gap-2 mt-5 justify-center">
+                                    <div className="flex gap-2 justify-center">
                                         <div className="space-y-2">
                                             <label className="block text-sm font-medium text-gray-600">
                                                 Start Date
@@ -1013,8 +1069,53 @@ Make sure that it’s easy to understand and contains the primary information in
                                         </div>
                                     </div>
 
+                                    <div className="flex flex-col w-full ml-20">
+                                        {reportCategories.map((category) => (
+                                            <div
+                                                key={category.category}
+                                                className="mb-5"
+                                            >
+                                                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                                                    {category.category}
+                                                </h3>
+                                                <div className="space-y-2">
+                                                    {category.options.map(
+                                                        (option) => (
+                                                            <label
+                                                                key={option}
+                                                                className="flex items-center space-x-2 cursor-pointer"
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="reportOptions"
+                                                                    value={
+                                                                        option
+                                                                    }
+                                                                    checked={
+                                                                        selected?.option ===
+                                                                        option
+                                                                    }
+                                                                    onChange={() =>
+                                                                        handleSelection(
+                                                                            category.category,
+                                                                            option
+                                                                        )
+                                                                    }
+                                                                    className="form-radio h-4 w-4 text-blue-600"
+                                                                />
+                                                                <span className="text-gray-800 text-sm">
+                                                                    {option}
+                                                                </span>
+                                                            </label>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
                                     <textarea
-                                        className="shadow-lg w-4/5 border-2 rounded-md h-20 outline-none mt-5"
+                                        className="shadow-lg w-4/5 border-2 rounded-md min-h-20 outline-none p-1"
                                         style={{ resize: "none" }}
                                         placeholder="Query about report"
                                         value={generateReportText}
@@ -1026,7 +1127,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                     />
 
                                     <button
-                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className="p-2 bg-blue-600 rounded-md text-white w-4/5 mt-5"
                                         onClick={handleGenerateReport}
                                     >
                                         Generate Report

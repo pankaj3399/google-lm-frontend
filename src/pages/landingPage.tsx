@@ -3,7 +3,7 @@ import Navbar from '../components/navBar';
 import HeroBanner from '../components/HeroBanner';
 import SolutionSection from '../components/SolutionSection'
 import PricingSection from '../components/PricingSection';
-// import FaqSection from '../components/faqSection';
+import FaqSection from '../components/FaqSection';
 import Footer from '../components/footer';
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
@@ -24,7 +24,7 @@ const LandingPage: React.FC = () => {
         <HeroBanner />
         <SolutionSection />
         <PricingSection />
-        {/* <FaqSection /> */}
+        <FaqSection />
       </main>
       <Footer />
     </div>

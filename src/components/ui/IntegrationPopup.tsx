@@ -169,6 +169,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                 }
             );
             setShowProperty(true);
+            console.log(response.data)
             setProperties(response.data.properties);
         } catch (error) {
             if (axios.isAxiosError(error)) {

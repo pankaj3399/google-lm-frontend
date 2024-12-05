@@ -69,7 +69,8 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                         type: 'Written Note'
                     }
                 );
-                updateNote(selectedNote, resp.data.note);
+                console.log(resp.data.note)
+                // updateNote(selectedNote, resp.data.note);
                 toast.success("Updated Note");
                 setValue('');
                 setHeading('');

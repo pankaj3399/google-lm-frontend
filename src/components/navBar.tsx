@@ -15,29 +15,33 @@ const Navbar: React.FC = () => {
   };
   
   return (
-    <header data-layername="navbar1Fixed" className="flex justify-between items-center px-8 w-full bg-white max-md:px-5 max-md:max-w-full">
+    <header data-layername="navbar1Fixed" className="flex justify-between items-center px-20 w-full bg-white max-md:px-5 max-md:max-w-full">
       <nav data-layername="content" className="flex flex-col flex-1 shrink self-stretch my-auto w-full border-b basis-0 border-slate-300  min-w-[240px] max-md:max-w-full mx-auto">
         <div data-layername="mainMenu" className="flex flex-wrap gap-10 justify-between py-5 w-full max-md:max-w-full">
           <div data-layername="l" className="flex gap-10 items-center h-full text-center min-w-[240px]">
-            <h1 data-layername="text" className="self-stretch my-auto text-2xl font-bold leading-none rounded-none text-blue-950 w-[134px]">
-              Metrics<span>LM</span>
-            </h1>
+            <div
+                className="flex cursor-pointer text-2xl text-[#1B2559]"
+                onClick={() => navigate("/")}
+            >
+                <p className="font-bold">Metrics</p>
+                <span>LM</span>
+            </div>
             <div data-layername="menuList" className="flex gap-8 items-center self-stretch my-auto text-base font-medium leading-none text-gray-600 whitespace-nowrap">
               <button className="flex gap-1 items-center self-stretch my-auto">
-                <span data-layername="label" className="overflow-hidden self-stretch my-auto">
+                <span data-layername="label" className="self-stretch my-auto">
                   Applications
                 </span>
               </button>
               <button className="flex gap-1 items-center self-stretch my-auto">
-                <span data-layername="label" className="overflow-hidden self-stretch my-auto">
+                <a data-layername="label" className="self-stretch my-auto" href='#_price'>
                   Pricing
-                </span>
+                </a>
               </button>
             </div>
           </div>
           <div data-layername="r" className="flex gap-2 items-center my-auto text-sm font-bold leading-none min-w-[240px]">
-            <button data-layername="buttonText" className="flex overflow-hidden justify-center items-center self-stretch px-3 py-2 my-auto text-blue-500 bg-white rounded-lg border border-blue-200 border-solid">
-              <span data-layername="text" className="overflow-hidden self-stretch px-2 my-auto min-h-[20px]">
+            <button data-layername="buttonText" className="flex justify-center items-center self-stretch px-3 py-2 my-auto text-blue-500 bg-white rounded-lg border border-blue-200 border-solid">
+              <span data-layername="text" className="self-stretch px-2 my-auto min-h-[20px]">
                 Get a demo
               </span>
             </button>

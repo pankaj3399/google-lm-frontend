@@ -8,7 +8,7 @@ import {
 import React from "react";
 import moment from "moment";
 import useUserStore from "../../store/userStore";
-import markdownToTxt from 'markdown-to-txt';
+import markdownToTxt from "markdown-to-txt";
 
 interface SingleNoteProps {
     heading: string;
@@ -88,7 +88,10 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 {/* Content */}
                 <div className="space-y-6 tracking-wide">
                     <p className="text-gray-700">
-                        {content && markdownToTxt(content.substring(0, 330)) || "No Data Available."}
+                        {content && markdownToTxt(content.replace(/(<([^>]+)>)/ig, '').substring(0, 330)) || "No Data Available."}
+                        {/* <ReactMarkdown>
+                            {content.substring(0, 330) || "No Data Available."}
+                        </ReactMarkdown> */}
                         {content && content.length > 330 ? "..." : ""}
                     </p>
                 </div>
