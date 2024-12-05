@@ -39,14 +39,19 @@ interface Property {
 const integrations: Integration[] = [
     { name: "ChatGPT", icon: "+" },
     { name: "Google Analytics", icon: "+" },
-    { name: "Microsoft Clarity", icon: "+" },
-    { name: "Hotjar", icon: "+" },
 ];
 
 const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     const [apiKey, setApiKey] = useState("");
-    const { googleAnalytics, openAiKey, propertyId, setOpenAiKey, setGoogleAnalytics, setPropertyId, setWorkspace } =
-        useUserStore();
+    const {
+        googleAnalytics,
+        openAiKey,
+        propertyId,
+        setOpenAiKey,
+        setGoogleAnalytics,
+        setPropertyId,
+        setWorkspace,
+    } = useUserStore();
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
     const { getToken } = useAuth();
@@ -65,28 +70,42 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         try {
             const token = await getToken();
             setAuthToken(token);
-    
-            const response = await apiClient.get(`${API_URL}/api/users/analytics/accounts`, {
-                params: { clerkId: user?.id },
-            });
-    
+
+            const response = await apiClient.get(
+                `${API_URL}/api/users/analytics/accounts`,
+                {
+                    params: { clerkId: user?.id },
+                }
+            );
+
             const filtered: Account[] = response.data.map(
-                ({ name, displayName }: { name: string; displayName: string }) => ({
+                ({
+                    name,
+                    displayName,
+                }: {
+                    name: string;
+                    displayName: string;
+                }) => ({
                     id: name,
                     name: displayName,
                 })
             );
-    
+
             setAccounts(filtered);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const statusCode = error.response?.status;
                 if (statusCode === 410) {
-                    toast.error("Your Google Analytics token has expired. Please link your account again.");
+                    toast.error(
+                        "Your Google Analytics token has expired. Please link your account again."
+                    );
                     setGoogleAnalytics(false);
                     setPropertyId(false);
                 } else {
-                    toast.error(error.response?.data?.message || "An error occurred while fetching accounts.");
+                    toast.error(
+                        error.response?.data?.message ||
+                            "An error occurred while fetching accounts."
+                    );
                 }
             } else {
                 console.error(error);
@@ -94,7 +113,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             }
         }
     };
-    
 
     const saveApiKey = async (clerkId: string): Promise<void> => {
         try {
@@ -169,7 +187,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                 }
             );
             setShowProperty(true);
-            console.log(response.data)
+            console.log(response.data);
             setProperties(response.data.properties);
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -264,60 +282,78 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     </div>
 
                     {selectedIntegration === 1 && googleAnalytics && (
-                        <div className="flex">
-                            <div className="bg-white shadow-xl rounded-lg p-6 w-1/2 flex flex-col gap-4">
-                                <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
-                                    Select an Account
+                        <div className="flex border-t-2">
+                            <div className="flex p-2 mt-2 flex-col pr-5 border-r-2">
+                                <h2 className="text-xl font-semibold text-[#1a1f36]">
+                                    Connect to Google Analytics
                                 </h2>
-                                <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                                    {accounts.length > 0 ? (
-                                        accounts.map((account, indx) => (
-                                            <p
-                                                key={indx}
-                                                className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
-                                                onClick={() =>
-                                                    fetchProperties(account.id)
-                                                }
+                                <p className="mt-5 text-gray-600 mb-4 text-base">
+                                    Connect and allow access to your Google
+                                    Analytics. Once it’s done, select your
+                                    website below.
+                                </p>
+
+                                <select
+                                    className="relative p-4 border-2 rounded-3xl appearance-none outline-none"
+                                    onChange={(e) =>
+                                        fetchProperties(e.target.value)
+                                    }
+                                >
+                                    <option value="" disabled selected>
+                                        Select Analytics Account
+                                    </option>
+                                    {accounts.map((account, indx) => (
+                                        <option key={indx} value={account.id}>
+                                            {account.name}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <br />
+                                <select
+                                    disabled={properties.length === 0}
+                                    onChange={(e) =>
+                                        fetchReport(e.target.value)
+                                    }
+                                    className="p-4 border-2 rounded-3xl appearance-none outline-none"
+                                >
+                                    <option disabled selected>
+                                        Select Property
+                                    </option>
+                                    {showProperty &&
+                                        properties.map((property, index) => (
+                                            <option
+                                                key={index}
+                                                value={property.name}
                                             >
-                                                {account.name}
-                                            </p>
-                                        ))
-                                    ) : (
-                                        <p className="text-gray-500 text-center">
-                                            Please link your Google Analytics
-                                            account first.
-                                        </p>
-                                    )}
-                                </div>
+                                                {property.displayName}
+                                            </option>
+                                        ))}
+                                </select>
                             </div>
-                            {showProperty && (
-                                <div className="bg-white shadow-xl rounded-lg p-6 w-1/2 flex flex-col gap-4">
-                                    <h2 className="text-xl font-bold text-gray-800 border-b pb-3">
-                                        Select the application
-                                    </h2>
-                                    <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                                        {properties.length > 0 ? (
-                                            properties.map((property, indx) => (
-                                                <p
-                                                    key={indx}
-                                                    className="p-3 rounded-md bg-gray-50 hover:bg-gray-100 text-gray-800 cursor-pointer transition"
-                                                    onClick={() =>
-                                                        fetchReport(
-                                                            property.name
-                                                        )
-                                                    }
-                                                >
-                                                    {property.displayName}
-                                                </p>
-                                            ))
-                                        ) : (
-                                            <p className="text-gray-500 text-center">
-                                                Please add any application
-                                            </p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
+
+                            <div className="p-5">
+                                <h3 className="text-base font-semibold text-[#1a1f36] mb-4 mt-5 text-start">
+                                    Your Google Analytics Account is not
+                                    working?
+                                </h3>
+                                <ul className="mt-5 space-y-4 text-gray-600 text-base">
+                                    <li className="pt-5 text-start">
+                                        Make sure you have a{" "}
+                                        <a href="#">Google Analytics</a>{" "}
+                                        account.
+                                    </li>
+                                    <li className="pt-5 text-start">
+                                        Make sure you have selected the
+                                        analytics account and the respective
+                                        properties & apps from the dropdown.
+                                    </li>
+                                </ul>
+                                <p className="text-sm text-gray-500 mt-4 pt-5">
+                                    *The app will connect to Google Analytics
+                                    once you click allow.
+                                </p>
+                            </div>
                         </div>
                     )}
 

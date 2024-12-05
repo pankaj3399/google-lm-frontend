@@ -1,6 +1,5 @@
 import {
     Info,
-    SendHorizontal,
     FileText,
     X,
     Copy,
@@ -37,6 +36,7 @@ import {
     DialogContent,
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
+import icon6 from "../assets/icon6.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -904,12 +904,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                 onChange={(e) => setInputChat(e.target.value)}
                             />
                             <div
-                                className="p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
+                                className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
                                 onClick={handleChat}
                             >
-                                <SendHorizontal
-                                    className="w-5 h-5"
-                                    color="black"
+                                <img
+                                    src={icon6}
+                                    alt="sendIcon"
+                                    className="p-1"
                                 />
                             </div>
                         </div>

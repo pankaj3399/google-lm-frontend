@@ -147,6 +147,13 @@ const AddSourcePopup = () => {
                                         File Selected: {uploadedFile.name}
                                     </div>
                                 </div>
+                            ) : url ? (
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 rounded-lg">
+                                    <Lock className="w-8 h-8 text-gray-700" />
+                                    <span className="text-gray-700 ml-2">
+                                        File upload disabled
+                                    </span>
+                                </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-4">
                                     <Upload className="w-12 h-12 text-gray-400" />
@@ -170,14 +177,6 @@ const AddSourcePopup = () => {
                                     <div className="text-xs text-gray-500">
                                         Supported file types: PDF, txt, xls
                                     </div>
-                                </div>
-                            )}
-                            {url && (
-                                <div className="absolute inset-0 flex items-center justify-center bg-gray-300 bg-opacity-50 rounded-lg">
-                                    <Lock className="w-8 h-8 text-gray-700" />
-                                    <span className="text-gray-700 ml-2">
-                                        File upload disabled
-                                    </span>
                                 </div>
                             )}
                         </div>
