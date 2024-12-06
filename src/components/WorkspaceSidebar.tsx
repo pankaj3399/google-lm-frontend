@@ -251,7 +251,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
                                         {source.uploadType === "file" ? (
-                                            <img src={icon4} alt="file icon"  className="h-[20px]"/>
+                                            <img src={icon4} alt="file icon"  className="h-[20px] ml-1"/>
                                         ) : (
                                             <img src={icon3} alt="file icon"  className="h-[12px]"/>
                                         )}
