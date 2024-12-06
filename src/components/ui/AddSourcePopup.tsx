@@ -45,6 +45,14 @@ const AddSourcePopup = () => {
     const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if (files && files.length > 0) {
+            const maxFileSize = 5 * 1024 * 1024; 
+            if (files[0].size > maxFileSize) {
+                alert("File size exceeds 5MB. Please upload a smaller file.");
+                e.target.value = ""; 
+                return;
+            } else {
+                console.log("File is within size limit:");
+            }
             handleFileSelect(files);
         }
     };
@@ -101,7 +109,7 @@ const AddSourcePopup = () => {
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
-                console.error(error.response);
+                console.log(error.response?.data.message);
                 toast.error(error.response?.data.message);
             } else {
                 console.error(error);
@@ -169,13 +177,14 @@ const AddSourcePopup = () => {
                                                 className="hidden"
                                                 onChange={handleFileInputChange}
                                                 accept=".pdf,.txt,.xls"
-                                                disabled={!!url} // Disable file input if URL is entered
+                                                disabled={!!url}
                                             />
                                         </label>{" "}
                                         to upload
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                        Supported file types: PDF, txt, xls
+                                        Supported file types: PDF, txt, xls(5
+                                        Mb)
                                     </div>
                                 </div>
                             )}
