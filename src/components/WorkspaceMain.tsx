@@ -10,6 +10,7 @@ import {
     Check,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { jsPDF } from "jspdf";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
@@ -17,6 +18,7 @@ import toast from "react-hot-toast";
 import { UserButton, useUser } from "@clerk/clerk-react";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
+import download from "../assets/download.svg";
 import {
     Sheet,
     SheetContent,
@@ -190,6 +192,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
+    const [pullDataLoading, setPullDataLoading] = useState(false);
+    const [generateReportLoading, setGenerateReportLoading] = useState(false);
     const [pullDataResponse, setPullDataResponse] = useState("");
     const [dataToShowOnPull, setDataToShowOnPull] = useState(pullData);
     const [dates, setDates] = useState<DateRange>({
@@ -536,6 +540,7 @@ Make sure that it’s easy to understand and contains the primary information in
         try {
             const token = await getToken();
             setAuthToken(token);
+            setGenerateReportLoading(true);
 
             const resp = await apiClient.post(
                 `${API_URL}/api/users/getWorkspace-report/${workspaceId}`,
@@ -548,6 +553,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 startDate: null,
                 endDate: null,
             });
+            setGenerateReportLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -624,7 +630,7 @@ Make sure that it’s easy to understand and contains the primary information in
         try {
             const token = await getToken();
             setAuthToken(token);
-
+            setPullDataLoading(true);
             const response = await apiClient.post(
                 `${API_URL}/api/users/analytics/report-for-workspace`,
                 {
@@ -637,6 +643,7 @@ Make sure that it’s easy to understand and contains the primary information in
 
             setSecondScreen(true);
             setPullDataResponse(response.data);
+            setPullDataLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const statusCode = error.response?.status;
@@ -658,6 +665,22 @@ Make sure that it’s easy to understand and contains the primary information in
                 toast.error("An unexpected error occurred.");
             }
         }
+    };
+
+    const handleDownload = () => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        const text = selectedSummary;
+        const margin = 10; // Left margin
+        const pageWidth = doc.internal.pageSize.getWidth(); 
+        const maxWidth = pageWidth - 2 * margin;
+    
+        const textLines = doc.splitTextToSize(text as string, maxWidth);
+    
+        doc.text(textLines, margin, margin + 10);
+    
+        doc.save("summary.pdf");
     };
 
     return (
@@ -1002,8 +1025,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                         })}
                                     </div>
                                     <button
-                                        className="p-2 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className={`p-2 rounded-md w-4/5 mt-5 ${
+                                            pullDataLoading
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-600"
+                                        } text-white`}
                                         onClick={handlePullData}
+                                        disabled={pullDataLoading}
                                     >
                                         Pull Data
                                     </button>
@@ -1128,8 +1156,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                     />
 
                                     <button
-                                        className="p-2 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className={`p-2 rounded-md w-4/5 mt-5 ${
+                                            generateReportLoading
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-600"
+                                        } text-white`}
                                         onClick={handleGenerateReport}
+                                        disabled={generateReportLoading}
                                     >
                                         Generate Report
                                     </button>
@@ -1155,18 +1188,24 @@ Make sure that it’s easy to understand and contains the primary information in
                             {markdownToTxt(selectedSummary || "")}
                         </p>
                     </div>
-                    <button
-                        className="p-3 bg-slate-200 rounded-md"
-                        onClick={() =>
-                            handleSaveReport(
-                                selectedSummary as string,
-                                "Report",
-                                "Report"
-                            )
-                        }
-                    >
-                        Save As Note
-                    </button>
+                    <div className="flex gap-2 mt-5 justify-center">
+                        <button
+                            className="p-3 bg-slate-200 rounded-md"
+                            onClick={() =>
+                                handleSaveReport(
+                                    selectedSummary as string,
+                                    "Report",
+                                    "Report"
+                                )
+                            }
+                        >
+                            Save As Note
+                        </button>
+                        <button className="p-3 bg-slate-200 rounded-md flex" onClick={handleDownload}>
+                            <img src={download} />
+                            Download
+                        </button>
+                    </div>
                 </SheetContent>
             </Sheet>
             <Sheet
