@@ -20,9 +20,9 @@ import {
 } from "../components/ui/sheet";
 import axios from "axios";
 import icon2 from '../assets/icon2.svg';
-import icon3 from '../assets/Icon3.svg';
-import icon4 from '../assets/Icon4.svg';
-import icon5 from '../assets/Icon5.svg';
+import icon3 from '../assets/icon3.svg';
+import icon4 from '../assets/icon4.svg';
+import icon5 from '../assets/icon5.svg';
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {

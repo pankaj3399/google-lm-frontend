@@ -1,6 +1,5 @@
 import {
     Info,
-    FileText,
     X,
     Copy,
     Pin,
@@ -39,6 +38,7 @@ import {
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
 import icon6 from "../assets/icon6.svg";
+import icon7 from "../assets/icon7.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -672,7 +672,7 @@ Make sure that it’s easy to understand and contains the primary information in
         doc.setFont("helvetica", "normal");
         doc.setFontSize(12);
         const text = selectedSummary;
-        const margin = 10; // Left margin
+        const margin = 10; 
         const pageWidth = doc.internal.pageSize.getWidth(); 
         const maxWidth = pageWidth - 2 * margin;
     
@@ -784,13 +784,13 @@ Make sure that it’s easy to understand and contains the primary information in
                     <>
                         <div className="flex w-full gap-5  h-4">
                             <div
-                                className="flex items-center cursor-pointer"
+                                className="flex items-center cursor-pointer gap-1"
                                 onClick={() => {
                                     setSelectedNote(-1);
                                     handleNewNoteDisplay();
                                 }}
                             >
-                                <FileText className="h-5 text-gray-600" />
+                                <img src={icon7} alt="add note" className="h-[18px]"/>
                                 <span className="text-gray-600">Add Note</span>
                             </div>
                             {notes.length > 0 && (
