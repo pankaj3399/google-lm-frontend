@@ -1,6 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <footer data-layername="footer1" className="flex flex-col items-center px-8 pt-20 pb-10 w-full bg-white max-md:px-5 max-md:max-w-full">
       <div data-layername="content" className="flex flex-col w-full max-w-[1204px] max-md:max-w-full">
@@ -70,8 +73,8 @@ const Footer: React.FC = () => {
             ©2024 MetricsLM · All rights reserved.
           </p>
           <div className="flex gap-6 justify-center items-center self-stretch my-auto font-medium leading-none text-center text-gray-600">
-            <a href="#" className="hover:text-blue-500">Terms of use</a>
-            <a href="#" className="hover:text-blue-500">Privacy policy</a>
+            <a href="#" className="hover:text-blue-500" onClick={() => navigate('/terms')}>Terms of use</a>
+            <a href="#" className="hover:text-blue-500" onClick={() => navigate('/privacy')}>Privacy policy</a>
           </div>
         </div>
       </div>

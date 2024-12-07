@@ -388,8 +388,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                     </button>
                                 </div>
                                 <a
-                                    href="#"
+                                    href="https://platform.openai.com/settings/organization/api-keys"
                                     className="text-blue-500 hover:text-blue-600 mt-4 inline-block text-sm"
+                                    target="_blank"
                                 >
                                     Get your API key from Open AI Dashboard
                                 </a>
