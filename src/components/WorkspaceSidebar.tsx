@@ -1,8 +1,6 @@
 import {
     Info,
     CirclePlus,
-    Link2,
-    FileText,
     MessageSquare,
     Eye,
 } from "lucide-react";
@@ -12,7 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
-import { Brain, ChartNoAxesColumnIncreasing, Trash } from "lucide-react";
+import {  Trash } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -191,7 +189,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {openAiKey && (
                                 <div className="flex justify-between">
                                     <div className="flex gap-1">
-                                        <Brain />
+                                        <img src={'/icon2.svg'} alt="gpt icon" className="h-[22px]"/>
                                         <p>ChatGpt</p>
                                     </div>
                                     <input
@@ -205,7 +203,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {propertyId && (
                                 <div className="flex justify-between mt-3">
                                     <div className="flex gap-1">
-                                        <ChartNoAxesColumnIncreasing />
+                                        <img src='/icon5.svg' alt="analytics"  className="h-[22px]"/>
                                         <p>Google Analytics</p>
                                     </div>
                                     <input
@@ -247,14 +245,11 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     key={indx}
                                     className="flex justify-between"
                                 >
-                                    <div className="flex items-center relative cursor-pointer group">
+                                    <div className="flex items-center relative cursor-pointer group gap-2">
                                         {source.uploadType === "file" ? (
-                                            <FileText
-                                                size={17}
-                                                className="mr-1"
-                                            />
+                                            <img src={'/icon4.svg'} alt="file icon"  className="h-[20px] ml-1"/>
                                         ) : (
-                                            <Link2 size={17} className="mr-1" />
+                                            <img src={'/icon3.svg'} alt="file icon"  className="h-[12px]"/>
                                         )}
                                         {editingSourceId === source._id ? (
                                             <input

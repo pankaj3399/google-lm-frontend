@@ -55,7 +55,7 @@ const pricingPlans: PricingPlan[] = [
 
 const PricingSection: React.FC = () => {
   return (
-    <section data-layername="pricing" className="flex flex-col justify-center items-center py-28 w-full bg-slate-50 max-md:py-24 max-md:max-w-full">
+    <section data-layername="pricing" className="flex flex-col justify-center items-center py-10 w-full bg-slate-50 max-md:py-24 max-md:max-w-full">
       <div data-layername="container" className="flex flex-col items-center max-w-full w-[1280px]">
         <div data-layername="secitonHeadlingLevel11" className="flex flex-col text-base text-center max-w-[800px] w-[800px] max-md:max-w-full">
           <div className="flex flex-col items-center w-full max-md:max-w-full">

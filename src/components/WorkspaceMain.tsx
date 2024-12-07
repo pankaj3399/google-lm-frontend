@@ -1,7 +1,5 @@
 import {
     Info,
-    SendHorizontal,
-    FileText,
     X,
     Copy,
     Pin,
@@ -11,6 +9,7 @@ import {
     Check,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import { jsPDF } from "jspdf";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
@@ -36,6 +35,7 @@ import {
     DialogClose,
     DialogContent,
 } from "../components/ui/dialog";
+import ReactMarkdown from "react-markdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -62,6 +62,42 @@ interface Chat {
     message: string;
     owner: string;
 }
+
+interface ReportCategory {
+    category: string;
+    options: string[];
+}
+
+const reportCategories: ReportCategory[] = [
+    {
+        category: "Product Performance Reports",
+        options: [
+            "Product Usage Analysis",
+            "Product Quality and Error Tracking",
+        ],
+    },
+    {
+        category: "User Experience (UX) Reports",
+        options: [
+            "User Engagement and Behaviour Analysis",
+            "User Frustration and Drop-off Points",
+        ],
+    },
+    {
+        category: "Sales Performance Reports",
+        options: [
+            "Sales Performance by Product Category",
+            "Customer Acquisition Cost and ROI",
+        ],
+    },
+    {
+        category: "Conversion Funnel Reports",
+        options: [
+            "Funnel Conversion Rate Analysis",
+            "Checkout Process Optimization Report",
+        ],
+    },
+];
 
 const suggestions = [
     "Summarise",
@@ -153,6 +189,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
+    const [pullDataLoading, setPullDataLoading] = useState(false);
+    const [generateReportLoading, setGenerateReportLoading] = useState(false);
     const [pullDataResponse, setPullDataResponse] = useState("");
     const [dataToShowOnPull, setDataToShowOnPull] = useState(pullData);
     const [dates, setDates] = useState<DateRange>({
@@ -172,6 +210,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         setSelectedNotes((prev) =>
             prev.map((selected, i) => (i === index ? !selected : selected))
         );
+    };
+    const [selected, setSelected] = useState<{
+        category: string;
+        option: string;
+    } | null>(null);
+
+    const handleSelection = (category: string, option: string) => {
+        setSelected({ category, option });
     };
 
     useEffect(() => {
@@ -222,7 +268,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (response.status === 200) {
                 toast.success(response.data.message);
                 deleteNote(selectedIds);
-                handleDeselectAll()
+                handleDeselectAll();
             }
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -485,12 +531,13 @@ Make sure that it’s easy to understand and contains the primary information in
         const data = {
             startDate: dayjs(startDate).format("YYYY-MM-DD"),
             endDate: dayjs(endDate).format("YYYY-MM-DD"),
-            generateReportText,
+            generateReportText: generateReportText + selected?.option,
             clerkId: user?.id,
         };
         try {
             const token = await getToken();
             setAuthToken(token);
+            setGenerateReportLoading(true);
 
             const resp = await apiClient.post(
                 `${API_URL}/api/users/getWorkspace-report/${workspaceId}`,
@@ -503,6 +550,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 startDate: null,
                 endDate: null,
             });
+            setGenerateReportLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -579,7 +627,7 @@ Make sure that it’s easy to understand and contains the primary information in
         try {
             const token = await getToken();
             setAuthToken(token);
-
+            setPullDataLoading(true);
             const response = await apiClient.post(
                 `${API_URL}/api/users/analytics/report-for-workspace`,
                 {
@@ -592,6 +640,7 @@ Make sure that it’s easy to understand and contains the primary information in
 
             setSecondScreen(true);
             setPullDataResponse(response.data);
+            setPullDataLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const statusCode = error.response?.status;
@@ -613,6 +662,22 @@ Make sure that it’s easy to understand and contains the primary information in
                 toast.error("An unexpected error occurred.");
             }
         }
+    };
+
+    const handleDownload = () => {
+        const doc = new jsPDF();
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        const text = selectedSummary;
+        const margin = 10; 
+        const pageWidth = doc.internal.pageSize.getWidth(); 
+        const maxWidth = pageWidth - 2 * margin;
+    
+        const textLines = doc.splitTextToSize(text as string, maxWidth);
+    
+        doc.text(textLines, margin, margin + 10);
+    
+        doc.save("summary.pdf");
     };
 
     return (
@@ -657,7 +722,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                     <p
                                         className={`max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg`}
                                     >
-                                        {chat.message}
+                                        {chat.owner === "GPT" ? (
+                                            <ReactMarkdown>
+                                                {chat.message}
+                                            </ReactMarkdown>
+                                        ) : (
+                                            chat.message
+                                        )}
                                         {chat.owner === "GPT" ? (
                                             <div className="flex justify-between pt-2 items-center">
                                                 <div className="flex gap-1">
@@ -710,13 +781,13 @@ Make sure that it’s easy to understand and contains the primary information in
                     <>
                         <div className="flex w-full gap-5  h-4">
                             <div
-                                className="flex items-center cursor-pointer"
+                                className="flex items-center cursor-pointer gap-1"
                                 onClick={() => {
                                     setSelectedNote(-1);
                                     handleNewNoteDisplay();
                                 }}
                             >
-                                <FileText className="h-5 text-gray-600" />
+                                <img src={'/icon7.svg'} alt="add note" className="h-[18px]"/>
                                 <span className="text-gray-600">Add Note</span>
                             </div>
                             {notes.length > 0 && (
@@ -853,12 +924,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                 onChange={(e) => setInputChat(e.target.value)}
                             />
                             <div
-                                className="p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
+                                className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
                                 onClick={handleChat}
                             >
-                                <SendHorizontal
-                                    className="w-5 h-5"
-                                    color="black"
+                                <img
+                                    src={'/icon6.svg'}
+                                    alt="sendIcon"
+                                    className="p-1"
                                 />
                             </div>
                         </div>
@@ -950,8 +1022,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                         })}
                                     </div>
                                     <button
-                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className={`p-2 rounded-md w-4/5 mt-5 ${
+                                            pullDataLoading
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-600"
+                                        } text-white`}
                                         onClick={handlePullData}
+                                        disabled={pullDataLoading}
                                     >
                                         Pull Data
                                     </button>
@@ -964,10 +1041,15 @@ Make sure that it’s easy to understand and contains the primary information in
                                     </button>
                                 </SheetTrigger>
                                 <SheetContent className="w-[30rem] flex flex-col items-center overflow-y-auto">
-                                    <SheetHeader className="mb-3 border-b-2">
-                                        <SheetTitle>Report</SheetTitle>
+                                    <SheetHeader className="w-full text-start">
+                                        <SheetTitle className="text-2xl font-light">
+                                            Generate
+                                        </SheetTitle>
+                                        <p className="border-b-2 mt-2">
+                                            Report
+                                        </p>
                                     </SheetHeader>
-                                    <div className="flex gap-2 mt-5 justify-center">
+                                    <div className="flex gap-2 justify-center">
                                         <div className="space-y-2">
                                             <label className="block text-sm font-medium text-gray-600">
                                                 Start Date
@@ -1013,8 +1095,53 @@ Make sure that it’s easy to understand and contains the primary information in
                                         </div>
                                     </div>
 
+                                    <div className="flex flex-col w-full ml-20">
+                                        {reportCategories.map((category) => (
+                                            <div
+                                                key={category.category}
+                                                className="mb-5"
+                                            >
+                                                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                                                    {category.category}
+                                                </h3>
+                                                <div className="space-y-2">
+                                                    {category.options.map(
+                                                        (option) => (
+                                                            <label
+                                                                key={option}
+                                                                className="flex items-center space-x-2 cursor-pointer"
+                                                            >
+                                                                <input
+                                                                    type="radio"
+                                                                    name="reportOptions"
+                                                                    value={
+                                                                        option
+                                                                    }
+                                                                    checked={
+                                                                        selected?.option ===
+                                                                        option
+                                                                    }
+                                                                    onChange={() =>
+                                                                        handleSelection(
+                                                                            category.category,
+                                                                            option
+                                                                        )
+                                                                    }
+                                                                    className="form-radio h-4 w-4 text-blue-600"
+                                                                />
+                                                                <span className="text-gray-800 text-sm">
+                                                                    {option}
+                                                                </span>
+                                                            </label>
+                                                        )
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
                                     <textarea
-                                        className="shadow-lg w-4/5 border-2 rounded-md h-20 outline-none mt-5"
+                                        className="shadow-lg w-4/5 border-2 rounded-md min-h-20 outline-none p-1"
                                         style={{ resize: "none" }}
                                         placeholder="Query about report"
                                         value={generateReportText}
@@ -1026,8 +1153,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                     />
 
                                     <button
-                                        className="p-3 bg-blue-600 rounded-md text-white w-4/5 mt-5"
+                                        className={`p-2 rounded-md w-4/5 mt-5 ${
+                                            generateReportLoading
+                                                ? "bg-gray-400 cursor-not-allowed"
+                                                : "bg-blue-600"
+                                        } text-white`}
                                         onClick={handleGenerateReport}
+                                        disabled={generateReportLoading}
                                     >
                                         Generate Report
                                     </button>
@@ -1053,18 +1185,24 @@ Make sure that it’s easy to understand and contains the primary information in
                             {markdownToTxt(selectedSummary || "")}
                         </p>
                     </div>
-                    <button
-                        className="p-3 bg-slate-200 rounded-md"
-                        onClick={() =>
-                            handleSaveReport(
-                                selectedSummary as string,
-                                "Report",
-                                "Report"
-                            )
-                        }
-                    >
-                        Save As Note
-                    </button>
+                    <div className="flex gap-2 mt-5 justify-center">
+                        <button
+                            className="p-3 bg-slate-200 rounded-md"
+                            onClick={() =>
+                                handleSaveReport(
+                                    selectedSummary as string,
+                                    "Report",
+                                    "Report"
+                                )
+                            }
+                        >
+                            Save As Note
+                        </button>
+                        <button className="p-3 bg-slate-200 rounded-md flex" onClick={handleDownload}>
+                            <img src={'/download.svg'} />
+                            Download
+                        </button>
+                    </div>
                 </SheetContent>
             </Sheet>
             <Sheet
