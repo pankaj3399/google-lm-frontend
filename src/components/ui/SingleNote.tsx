@@ -2,10 +2,10 @@ import React from "react";
 import moment from "moment";
 import useUserStore from "../../store/userStore";
 import markdownToTxt from "markdown-to-txt";
-import icon5 from "../../assets/Icon5.svg";
-import Edit from "../../assets/Edit.svg";
-import File from "../../assets/File.svg";
-import Message from "../../assets/Message.svg";
+// import icon5 from "../../assets/Icon5.svg";
+// import Edit from "../../assets/Edit.svg";
+// import File from "../../assets/File.svg";
+// import Message from "../../assets/Message.svg";
 
 interface SingleNoteProps {
     heading: string;
@@ -32,15 +32,15 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     function getIcon(iconType: string) {
         switch (iconType) {
             case "Written Note":
-                return Edit;
+                return '/Edit.svg';
             case "Saved":
-                return Message;
+                return '/Message.svg';
             case "Report":
-                return File;
+                return '/File.svg';
             case "Analytics":
-                return icon5;
+                return '/icon5.svg';
             default:
-                return icon5;
+                return '/icon5.svg';
         }
     }
     const IconComponent = getIcon(type);

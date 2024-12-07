@@ -19,10 +19,6 @@ import {
     SheetTrigger,
 } from "../components/ui/sheet";
 import axios from "axios";
-import icon2 from '../assets/icon2.svg';
-import icon3 from '../assets/icon3.svg';
-import icon4 from '../assets/icon4.svg';
-import icon5 from '../assets/icon5.svg';
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -193,7 +189,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {openAiKey && (
                                 <div className="flex justify-between">
                                     <div className="flex gap-1">
-                                        <img src={icon2} alt="gpt icon" className="h-[22px]"/>
+                                        <img src={'/icon2.svg'} alt="gpt icon" className="h-[22px]"/>
                                         <p>ChatGpt</p>
                                     </div>
                                     <input
@@ -207,7 +203,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {propertyId && (
                                 <div className="flex justify-between mt-3">
                                     <div className="flex gap-1">
-                                        <img src={icon5} alt="analytics"  className="h-[22px]"/>
+                                        <img src='/icon5.svg' alt="analytics"  className="h-[22px]"/>
                                         <p>Google Analytics</p>
                                     </div>
                                     <input
@@ -251,9 +247,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
                                         {source.uploadType === "file" ? (
-                                            <img src={icon4} alt="file icon"  className="h-[20px] ml-1"/>
+                                            <img src={'/icon4.svg'} alt="file icon"  className="h-[20px] ml-1"/>
                                         ) : (
-                                            <img src={icon3} alt="file icon"  className="h-[12px]"/>
+                                            <img src={'/icon3.svg'} alt="file icon"  className="h-[12px]"/>
                                         )}
                                         {editingSourceId === source._id ? (
                                             <input

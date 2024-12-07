@@ -59,6 +59,23 @@ const FaqSection: React.FC = () => {
             <div className="flex w-7/12 items-start gap-x-4 mb-12">
                 <div className="flex-shrink-0"></div>
                 <div className="p-20">
+                    <div
+                        data-layername="smallEyebrowTagLabelStyle1"
+                        className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
+                    >
+                        <img
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
+                            alt=""
+                            className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
+                        />
+                        <p
+                            data-layername="content"
+                            className="self-stretch my-auto"
+                        >
+                            FAQ
+                        </p>
+                    </div>
                     <h2 className="text-2xl font-semibold text-gray-900 w-56">
                         Frequently asked questions
                     </h2>

@@ -28,9 +28,9 @@ export const PricingCard: React.FC<PricingCardProps> = ({
     }`;
 
     return (
-        <div data-layername="card1" className={cardClassName} id='_price'>
+        <div data-layername="card1" className={cardClassName} id="_price">
             <div className="flex flex-col min-w-[240px] w-[339px]">
-                <div className="flex flex-col w-full" >
+                <div className="flex flex-col w-full">
                     <div className="flex flex-col w-full">
                         <div className="flex flex-col items-start max-w-full w-[259px]">
                             <p
@@ -97,12 +97,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                     data-layername="buttonPrimaryWithIcon"
                     className={buttonClassName}
                 >
-                    <span
+                    <a
                         data-layername="buttonName"
                         className="gap-2.5 self-stretch text-center"
+                        href={`${buttonText === 'Enterprise - book a call'? 'https://calendar.app.google/pBHL5sBQvYxvcjCg7': '#'}`}
+                        target="_blank"
                     >
                         {buttonText}
-                    </span>
+                    </a>
                 </button>
             </div>
         </div>

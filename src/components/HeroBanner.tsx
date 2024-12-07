@@ -1,31 +1,34 @@
 import React from 'react';
-import { TrialBenefitItem } from './ui/TrialBenefitItem';
+// import { TrialBenefitItem } from './ui/TrialBenefitItem';
+// import Container from '../assets/Container.svg';
+import { useNavigate } from 'react-router-dom';
 
-interface BenefitData {
-  icon: string;
-  title: string;
-  description: string;
-}
+// interface BenefitData {
+//   icon: string;
+//   title: string;
+//   description: string;
+// }
 
-const benefits: BenefitData[] = [
-  {
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/c1e8a93abcfd33fed81fcbf20d7b248a31c1f13a037c7a064c3e5321837d84da?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
-    title: "Instant Access",
-    description: "Begin exploring MetricsLM's full suite of features immediately"
-  },
-  {
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/5e390e69dbc7f6d8e480264503b5a3bb07e320362863dd5fb29ded125dbadb9f?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
-    title: "No Commitments",
-    description: "Automated analysis is not for you? No problem, you can cancel anytime."
-  },
-  {
-    icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/2e84f83f5a7e7f9ba529ae5f9c623b0dc5ea670aac2db51ffa40f3a4ce6652b5?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
-    title: "Multi-platform support",
-    description: "Connect multiple analytics platforms as your integrations in seconds."
-  }
-];
+// const benefits: BenefitData[] = [
+//   {
+//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/c1e8a93abcfd33fed81fcbf20d7b248a31c1f13a037c7a064c3e5321837d84da?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
+//     title: "Instant Access",
+//     description: "Begin exploring MetricsLM's full suite of features immediately"
+//   },
+//   {
+//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/5e390e69dbc7f6d8e480264503b5a3bb07e320362863dd5fb29ded125dbadb9f?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
+//     title: "No Commitments",
+//     description: "Automated analysis is not for you? No problem, you can cancel anytime."
+//   },
+//   {
+//     icon: "https://cdn.builder.io/api/v1/image/assets/TEMP/2e84f83f5a7e7f9ba529ae5f9c623b0dc5ea670aac2db51ffa40f3a4ce6652b5?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95",
+//     title: "Multi-platform support",
+//     description: "Connect multiple analytics platforms as your integrations in seconds."
+//   }
+// ];
 
 const HeroBanner: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <section data-layername="heroBanner03" className="flex flex-col items-center px-8 pt-28 pb-20 w-full bg-white max-md:px-5 max-md:pt-24 max-md:max-w-full">
       <div data-layername="container" className="flex flex-col items-center w-full max-w-[1204px] max-md:max-w-full">
@@ -47,7 +50,7 @@ const HeroBanner: React.FC = () => {
             </div>
           </div>
         </div>
-        <div data-layername="container" className="flex overflow-hidden relative flex-col p-16 mt-16 w-full bg-blue-500 rounded-[32px] max-md:px-5 max-md:mt-10 max-md:max-w-full">
+        {/* <div data-layername="container" className="flex overflow-hidden relative flex-col p-16 mt-16 w-full bg-blue-500 rounded-[32px] max-md:px-5 max-md:mt-10 max-md:max-w-full">
           <div data-layername="heading" className="flex z-0 flex-wrap gap-10 items-start w-full max-md:max-w-full">
             <div data-layername="l" className="flex flex-col flex-1 shrink font-bold text-white basis-0 min-w-[360px] max-md:max-w-full">
               <h3 data-layername="title" className="text-5xl leading-[56px] max-md:max-w-full max-md:text-4xl max-md:leading-[52px]">
@@ -73,7 +76,8 @@ const HeroBanner: React.FC = () => {
             </div>
           </div>
           <div data-layername="themeColorOverlayTransition" className="flex absolute inset-0 z-0 w-full bg-blue-500 bg-opacity-10 min-h-[424px]" />
-        </div>
+        </div> */}
+        <img src={'/Container.svg'} alt="mailLogo" className='mt-20 cursor-pointer' onClick={() => navigate('/home')}/>
       </div>
     </section>
   );

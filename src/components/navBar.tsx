@@ -28,9 +28,9 @@ const Navbar: React.FC = () => {
             </div>
             <div data-layername="menuList" className="flex gap-8 items-center self-stretch my-auto text-base font-medium leading-none text-gray-600 whitespace-nowrap">
               <button className="flex gap-1 items-center self-stretch my-auto">
-                <span data-layername="label" className="self-stretch my-auto">
+                <a data-layername="label" className="self-stretch my-auto" href='#_application'>
                   Applications
-                </span>
+                </a>
               </button>
               <button className="flex gap-1 items-center self-stretch my-auto">
                 <a data-layername="label" className="self-stretch my-auto" href='#_price'>
@@ -41,9 +41,9 @@ const Navbar: React.FC = () => {
           </div>
           <div data-layername="r" className="flex gap-2 items-center my-auto text-sm font-bold leading-none min-w-[240px]">
             <button data-layername="buttonText" className="flex justify-center items-center self-stretch px-3 py-2 my-auto text-blue-500 bg-white rounded-lg border border-blue-200 border-solid">
-              <span data-layername="text" className="self-stretch px-2 my-auto min-h-[20px]">
+              <a data-layername="text" className="self-stretch px-2 my-auto min-h-[20px] flex items-center" href='https://calendar.app.google/pBHL5sBQvYxvcjCg7' target="_blank">
                 Get a demo
-              </span>
+              </a>
             </button>
       {/* <SignedIn> */}
 
@@ -52,7 +52,7 @@ const Navbar: React.FC = () => {
       className="flex overflow-hidden justify-center items-center self-stretch px-3 py-2 my-auto text-white bg-blue-500 rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
       onClick={handleSignupClick}
     >
-      <span data-layername="text" className="overflow-hidden self-stretch px-2 my-auto min-h-[20px]">
+      <span data-layername="text" className="overflow-hidden self-stretch px-2 my-auto min-h-[20px] flex items-center">
         Start your free trial
       </span>
       <img

@@ -17,7 +17,6 @@ import toast from "react-hot-toast";
 import { UserButton, useUser } from "@clerk/clerk-react";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
-import download from "../assets/download.svg";
 import {
     Sheet,
     SheetContent,
@@ -37,8 +36,6 @@ import {
     DialogContent,
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
-import icon6 from "../assets/icon6.svg";
-import icon7 from "../assets/icon7.svg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -790,7 +787,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                     handleNewNoteDisplay();
                                 }}
                             >
-                                <img src={icon7} alt="add note" className="h-[18px]"/>
+                                <img src={'/icon7.svg'} alt="add note" className="h-[18px]"/>
                                 <span className="text-gray-600">Add Note</span>
                             </div>
                             {notes.length > 0 && (
@@ -931,7 +928,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                 onClick={handleChat}
                             >
                                 <img
-                                    src={icon6}
+                                    src={'/icon6.svg'}
                                     alt="sendIcon"
                                     className="p-1"
                                 />
@@ -1202,7 +1199,7 @@ Make sure that it’s easy to understand and contains the primary information in
                             Save As Note
                         </button>
                         <button className="p-3 bg-slate-200 rounded-md flex" onClick={handleDownload}>
-                            <img src={download} />
+                            <img src={'/download.svg'} />
                             Download
                         </button>
                     </div>
