@@ -82,3 +82,13 @@
     @apply bg-background text-foreground;
     }
 }
+
+.ql-editor {
+  @apply text-gray-800 font-serif text-lg leading-relaxed tracking-wide p-4;
+}
+
+@layer base {
+  body {
+    @apply text-[#1B2559];
+  }
+}

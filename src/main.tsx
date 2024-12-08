@@ -1,4 +1,3 @@
-import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
@@ -16,10 +15,8 @@ if(!clerk_key){
 ReactGA.initialize(measurementId);
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
     <ClerkProvider publishableKey={clerk_key} afterSignOutUrl="/">
       <App />
       <Toaster/>
     </ClerkProvider>
-  </StrictMode>,
 );

@@ -13,7 +13,8 @@ import LandingPage from "./pages/landingPage";
 import Home from "./pages/home";
 import Workspace from "./pages/Workspace";
 import PageNotFound from "./pages/PageNotFound";
-
+import Condition from "./pages/condition";
+import PrivacyPage from "./pages/privacy";
 import useUserStore from "./store/userStore";
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
@@ -39,7 +40,9 @@ const App = () => {
             <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/terms" element={<Condition />} />
                 <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/privacy" element={<PrivacyPage />} />
                 <Route
                     path="/home"
                     element={

@@ -45,10 +45,10 @@ const AddSourcePopup = () => {
     const handleFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if (files && files.length > 0) {
-            const maxFileSize = 5 * 1024 * 1024; 
+            const maxFileSize = 5 * 1024 * 1024;
             if (files[0].size > maxFileSize) {
                 alert("File size exceeds 5MB. Please upload a smaller file.");
-                e.target.value = ""; 
+                e.target.value = "";
                 return;
             } else {
                 console.log("File is within size limit:");
@@ -110,7 +110,9 @@ const AddSourcePopup = () => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.log(error.response?.data.message);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }

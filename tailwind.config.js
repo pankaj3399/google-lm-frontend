@@ -8,6 +8,9 @@ export default {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			pops: ['Poppins', 'Arial', 'sans-serif'],
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',

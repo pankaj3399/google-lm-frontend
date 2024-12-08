@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Navigation = () => {
     const navigate = useNavigate();
     return (
-        <nav className="flex p-4 w-screen justify-between">
+        <nav className="flex p-4 px-20 w-screen justify-between border-b">
             <div
                 className="flex cursor-pointer text-2xl text-[#1B2559]"
                 onClick={() => navigate("/")}
