@@ -1,16 +1,11 @@
-import {
-    Info,
-    CirclePlus,
-    MessageSquare,
-    Eye,
-} from "lucide-react";
+import { Info, CirclePlus, MessageSquare, Eye } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import apiClient, { setAuthToken } from "../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
-import {  Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import {
     Sheet,
     SheetContent,
@@ -84,7 +79,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -111,7 +108,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -139,7 +138,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -189,7 +190,11 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {openAiKey && (
                                 <div className="flex justify-between">
                                     <div className="flex gap-1">
-                                        <img src={'/icon2.svg'} alt="gpt icon" className="h-[22px]"/>
+                                        <img
+                                            src={"/icon2.svg"}
+                                            alt="gpt icon"
+                                            className="h-[22px]"
+                                        />
                                         <p>ChatGpt</p>
                                     </div>
                                     <input
@@ -203,7 +208,11 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             {propertyId && (
                                 <div className="flex justify-between mt-3">
                                     <div className="flex gap-1">
-                                        <img src='/icon5.svg' alt="analytics"  className="h-[22px]"/>
+                                        <img
+                                            src="/icon5.svg"
+                                            alt="analytics"
+                                            className="h-[22px]"
+                                        />
                                         <p>Google Analytics</p>
                                     </div>
                                     <input
@@ -247,9 +256,17 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
                                         {source.uploadType === "file" ? (
-                                            <img src={'/icon4.svg'} alt="file icon"  className="h-[20px] ml-1"/>
+                                            <img
+                                                src={"/icon4.svg"}
+                                                alt="file icon"
+                                                className="h-[20px] ml-1"
+                                            />
                                         ) : (
-                                            <img src={'/icon3.svg'} alt="file icon"  className="h-[12px]"/>
+                                            <img
+                                                src={"/icon3.svg"}
+                                                alt="file icon"
+                                                className="h-[12px]"
+                                            />
                                         )}
                                         {editingSourceId === source._id ? (
                                             <input

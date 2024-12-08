@@ -46,7 +46,9 @@ const WorkspacePopup: React.FC<WorkspacePopupProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }

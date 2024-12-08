@@ -7,6 +7,7 @@ import {
     ThumbsDown,
     Trash,
     Check,
+    Ellipsis,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { jsPDF } from "jspdf";
@@ -36,6 +37,7 @@ import {
     DialogContent,
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
+import { CSpinner } from "@coreui/react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -181,6 +183,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         setPropertyId,
     } = useUserStore();
     const [inputChat, setInputChat] = useState("");
+    const [chatLoading, setChatLoading] = useState(false);
     const [chats, setChats] = useState<Chat[]>([]);
     const [chatSection, setChatSection] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -274,7 +277,9 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -294,7 +299,9 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -315,7 +322,9 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -333,6 +342,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
         }
         try {
             setChatSection(true);
+            setChatLoading(true);
             let content = "";
             content += checkedSource.map((isChecked, index) => {
                 if (isChecked) {
@@ -361,11 +371,14 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setInputChat("");
             addChat(resp.data.message, "GPT");
+            setChatLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -418,6 +431,7 @@ Make sure that it’s easy to understand and contains the primary information in
             setAuthToken(token);
 
             const questions = getContext(content, Word);
+            setChatLoading(true);
 
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createConversation/suggestion`,
@@ -428,11 +442,14 @@ Make sure that it’s easy to understand and contains the primary information in
             );
             setInputChat("");
             addChat(resp.data.message, "GPT");
+            setChatLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -458,7 +475,9 @@ Make sure that it’s easy to understand and contains the primary information in
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -497,7 +516,9 @@ Make sure that it’s easy to understand and contains the primary information in
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -555,7 +576,9 @@ Make sure that it’s easy to understand and contains the primary information in
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -585,7 +608,9 @@ Make sure that it’s easy to understand and contains the primary information in
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -669,14 +694,14 @@ Make sure that it’s easy to understand and contains the primary information in
         doc.setFont("helvetica", "normal");
         doc.setFontSize(12);
         const text = selectedSummary;
-        const margin = 10; 
-        const pageWidth = doc.internal.pageSize.getWidth(); 
+        const margin = 10;
+        const pageWidth = doc.internal.pageSize.getWidth();
         const maxWidth = pageWidth - 2 * margin;
-    
+
         const textLines = doc.splitTextToSize(text as string, maxWidth);
-    
+
         doc.text(textLines, margin, margin + 10);
-    
+
         doc.save("summary.pdf");
     };
 
@@ -727,7 +752,9 @@ Make sure that it’s easy to understand and contains the primary information in
                                                 {chat.message}
                                             </ReactMarkdown>
                                         ) : (
-                                            chat.message
+                                            <div>
+                                                <div>{chat.message}</div>
+                                            </div>
                                         )}
                                         {chat.owner === "GPT" ? (
                                             <div className="flex justify-between pt-2 items-center">
@@ -765,10 +792,18 @@ Make sure that it’s easy to understand and contains the primary information in
                                 </div>
                             ))
                         ) : (
-                            <div>
+                            <div className="flex justify-center">
                                 <h1 className="text-2xl text-gray-500">
                                     Please start conversation
                                 </h1>
+                            </div>
+                        )}
+
+                        {chatLoading && (
+                            <div className="w-full flex justify-start mt-5">
+                                <div className="max-w-[80%] bg-slate-100 p-3 rounded-b-md listItem tracking-wide shadow-lg">
+                                    <Ellipsis size={30}/>
+                                </div>
                             </div>
                         )}
 
@@ -787,7 +822,11 @@ Make sure that it’s easy to understand and contains the primary information in
                                     handleNewNoteDisplay();
                                 }}
                             >
-                                <img src={'/icon7.svg'} alt="add note" className="h-[18px]"/>
+                                <img
+                                    src={"/icon7.svg"}
+                                    alt="add note"
+                                    className="h-[18px]"
+                                />
                                 <span className="text-gray-600">Add Note</span>
                             </div>
                             {notes.length > 0 && (
@@ -928,7 +967,7 @@ Make sure that it’s easy to understand and contains the primary information in
                                 onClick={handleChat}
                             >
                                 <img
-                                    src={'/icon6.svg'}
+                                    src={"/icon6.svg"}
                                     alt="sendIcon"
                                     className="p-1"
                                 />
@@ -1030,7 +1069,17 @@ Make sure that it’s easy to understand and contains the primary information in
                                         onClick={handlePullData}
                                         disabled={pullDataLoading}
                                     >
-                                        Pull Data
+                                        {pullDataLoading ? (
+                                            <div className="flex justify-center">
+                                                <CSpinner
+                                                    as="span"
+                                                    size="sm"
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+                                        ) : (
+                                            "Pull Data"
+                                        )}
                                     </button>
                                 </SheetContent>
                             </Sheet>
@@ -1161,7 +1210,17 @@ Make sure that it’s easy to understand and contains the primary information in
                                         onClick={handleGenerateReport}
                                         disabled={generateReportLoading}
                                     >
-                                        Generate Report
+                                        {generateReportLoading ? (
+                                            <div className="flex justify-center">
+                                                <CSpinner
+                                                    as="span"
+                                                    size="sm"
+                                                    aria-hidden="true"
+                                                />
+                                            </div>
+                                        ) : (
+                                            "Generate Report"
+                                        )}
                                     </button>
                                 </SheetContent>
                             </Sheet>
@@ -1180,7 +1239,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     <SheetHeader>
                         <SheetTitle>Report Summary</SheetTitle>
                     </SheetHeader>
-                    <div className="mt-5">
+                    <div className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200">
                         <p className="text-gray-700 whitespace-pre-line">
                             {markdownToTxt(selectedSummary || "")}
                         </p>
@@ -1198,8 +1257,11 @@ Make sure that it’s easy to understand and contains the primary information in
                         >
                             Save As Note
                         </button>
-                        <button className="p-3 bg-slate-200 rounded-md flex" onClick={handleDownload}>
-                            <img src={'/download.svg'} />
+                        <button
+                            className="p-3 bg-slate-200 rounded-md flex"
+                            onClick={handleDownload}
+                        >
+                            <img src={"/download.svg"} />
                             Download
                         </button>
                     </div>

@@ -136,7 +136,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -169,7 +171,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -193,7 +197,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -217,7 +223,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -230,10 +238,9 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                 <div className="bg-white rounded-3xl w-full max-w-4xl p-8 relative">
                     <div className="flex justify-between items-center mb-8">
                         <div className="flex items-center gap-2">
-                            <h2 className="text-2xl font-semibold text-[#1a1f36]">
+                            <h2 className="text-2xl font-semibold text-[#1a1f36] font-pops">
                                 Add Integrations
                             </h2>
-                            <span className="text-gray-500">ⓘ</span>
                         </div>
                         <button
                             onClick={() => {
@@ -284,10 +291,10 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     {selectedIntegration === 1 && googleAnalytics && (
                         <div className="flex border-t-2">
                             <div className="flex p-2 mt-2 flex-col pr-5 border-r-2">
-                                <h2 className="text-xl font-semibold text-[#1a1f36]">
+                                <h2 className="text-xl font-semibold text-[#1a1f36] font-pops">
                                     Connect to Google Analytics
                                 </h2>
-                                <p className="mt-5 text-gray-600 mb-4 text-base">
+                                <p className="mt-5 text-gray-600 mb-4 text-base font-pops">
                                     Connect and allow access to your Google
                                     Analytics. Once it’s done, select your
                                     website below.
@@ -333,23 +340,23 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                             </div>
 
                             <div className="p-5">
-                                <h3 className="text-base font-semibold text-[#1a1f36] mb-4 mt-5 text-start">
+                                <h3 className="text-base font-semibold text-[#1a1f36] mb-4 mt-5 text-start font-pops">
                                     Your Google Analytics Account is not
                                     working?
                                 </h3>
-                                <ul className="mt-5 space-y-4 text-gray-600 text-base">
+                                <ul className="mt-5 space-y-4 text-gray-600 text-base font-pops">
                                     <li className="pt-5 text-start">
                                         Make sure you have a{" "}
                                         <a href="#">Google Analytics</a>{" "}
                                         account.
                                     </li>
-                                    <li className="pt-5 text-start">
+                                    <li className="pt-5 text-start font-pops">
                                         Make sure you have selected the
                                         analytics account and the respective
                                         properties & apps from the dropdown.
                                     </li>
                                 </ul>
-                                <p className="text-sm text-gray-500 mt-4 pt-5">
+                                <p className="text-sm text-gray-500 mt-4 pt-5 font-pops">
                                     *The app will connect to Google Analytics
                                     once you click allow.
                                 </p>
@@ -360,10 +367,10 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     {selectedIntegration === 0 && (
                         <div className="flex flex-col lg:flex-row gap-8 border-t-2 pt-10">
                             <div className="flex-1 pr-5 border-r-2">
-                                <h3 className="text-xl font-semibold text-[#1a1f36] mb-4">
+                                <h3 className="text-xl font-semibold text-[#1a1f36] mb-4 font-pops">
                                     Enter your OpenAI API Key
                                 </h3>
-                                <p className="text-gray-600 mb-4 text-base">
+                                <p className="text-gray-600 mb-4 text-base font-pops">
                                     You need an OpenAI API Key to use MetricsLM.
                                     Your API Key is stored locally on your
                                     browser and never sent anywhere else.

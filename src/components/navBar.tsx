@@ -1,9 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ReactGA from "react-ga4";
+import { useUser } from "@clerk/clerk-react";
+import { UserButton } from "@clerk/clerk-react";
 
 const Navbar: React.FC = () => {
     const navigate = useNavigate();
+    const { user: clerkUser } = useUser();
+    const clerkId = clerkUser?.id;
 
     const handleSignupClick = () => {
         ReactGA.event({
@@ -73,42 +77,46 @@ const Navbar: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                    <div
-                        data-layername="r"
-                        className="flex gap-2 items-center my-auto text-sm font-bold leading-none min-w-[240px]"
-                    >
-                        <button
-                            data-layername="buttonText"
-                            className="flex justify-center items-center self-stretch px-3 py-2 my-auto text-blue-500 bg-white rounded-lg border border-blue-200 border-solid"
+                    {clerkId ? (
+                        <UserButton />
+                    ) : (
+                        <div
+                            data-layername="r"
+                            className="flex gap-2 items-center my-auto text-sm font-bold leading-none min-w-[240px]"
                         >
-                            <a
-                                data-layername="text"
-                                className="self-stretch px-2 my-auto min-h-[20px] flex items-center"
-                                href="https://calendar.app.google/pBHL5sBQvYxvcjCg7"
-                                target="_blank"
+                            <button
+                                data-layername="buttonText"
+                                className="flex justify-center items-center self-stretch px-3 py-2 my-auto text-blue-500 bg-white rounded-lg border border-blue-200 border-solid"
                             >
-                                Get a demo
-                            </a>
-                        </button>
-                        <button
-                            data-layername="buttonText"
-                            className="flex overflow-hidden justify-center items-center self-stretch px-3 py-2 my-auto text-white bg-blue-500 rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
-                            onClick={handleSignupClick}
-                        >
-                            <span
-                                data-layername="text"
-                                className="overflow-hidden self-stretch px-2 my-auto min-h-[20px] flex items-center"
+                                <a
+                                    data-layername="text"
+                                    className="self-stretch px-2 my-auto min-h-[20px] flex items-center"
+                                    href="https://calendar.app.google/pBHL5sBQvYxvcjCg7"
+                                    target="_blank"
+                                >
+                                    Get a demo
+                                </a>
+                            </button>
+                            <button
+                                data-layername="buttonText"
+                                className="flex overflow-hidden justify-center items-center self-stretch px-3 py-2 my-auto text-white bg-blue-500 rounded-lg transition transform hover:scale-105 hover:bg-blue-600"
+                                onClick={handleSignupClick}
                             >
-                                Start your free trial
-                            </span>
-                            <img
-                                loading="lazy"
-                                src="https://cdn.builder.io/api/v1/image/assets/TEMP/ff5f3c2f38c7488e478b3bd0b4fc258a66495360d8867fad0c6abf1c458ec895?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
-                                alt=""
-                                className="object-contain shrink-0 self-stretch my-auto w-6 aspect-square"
-                            />
-                        </button>
-                    </div>
+                                <span
+                                    data-layername="text"
+                                    className="overflow-hidden self-stretch px-2 my-auto min-h-[20px] flex items-center"
+                                >
+                                    Start your free trial
+                                </span>
+                                <img
+                                    loading="lazy"
+                                    src="https://cdn.builder.io/api/v1/image/assets/TEMP/ff5f3c2f38c7488e478b3bd0b4fc258a66495360d8867fad0c6abf1c458ec895?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
+                                    alt=""
+                                    className="object-contain shrink-0 self-stretch my-auto w-6 aspect-square"
+                                />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </nav>
         </header>

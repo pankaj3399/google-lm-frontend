@@ -19,7 +19,7 @@ const Sidebar = () => {
         addWorkspace,
         setOpenAiKey,
         setGoogleAnalytics,
-        setPropertyId
+        setPropertyId,
     } = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
@@ -47,7 +47,9 @@ const Sidebar = () => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -75,7 +77,9 @@ const Sidebar = () => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -95,7 +99,9 @@ const Sidebar = () => {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.error);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }

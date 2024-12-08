@@ -73,7 +73,9 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
                 console.error(error.response);
-                toast.error(error.response?.data.message);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
             } else {
                 console.error(error);
             }
@@ -129,7 +131,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                         onChange={setValue}
                         modules={modules}
                         formats={formats}
-                        className="h-[90%]"
+                        className="h-[90%] rounded-lg"
                     />
                 </div>
             </div>

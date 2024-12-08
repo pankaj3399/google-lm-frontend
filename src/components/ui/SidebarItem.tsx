@@ -32,7 +32,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
     return (
         <div>
-            <h2 className="text-start text-2xl">{title}</h2>
+            <h2 className="text-start text-2xl font-pops">{title}</h2>
             {type === "icon" && (
                 <div className="flex shrink-0 mt-7 rounded-3xl border border-gray-300 border-solid h-[110px] w-[110px]" />
             )}
@@ -40,7 +40,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                 <div className="flex gap-2 w-screen p-5">
                     {/* Button */}
                     <button
-                        className="flex flex-col items-center justify-center min-w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200"
+                        className={`${title === 'Integrations'? 'min-w-40 h-40': 'min-w-48 h-48'} font-pops flex flex-col items-center justify-center px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200`}
                         onClick={() => functionality()}
                     >
                         <img
@@ -80,13 +80,13 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                                 </div>
                             ))}
                         {openAiKey && title === "Integrations" && (
-                            <div className="flex items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
+                            <div className="flex items-center justify-center w-40 h-40 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
                                 <span>ChatGpt</span>
                                 <Check className="text-green-500" />
                             </div>
                         )}
                         {propertyId && title === "Integrations" && (
-                            <div className="flex items-center justify-center w-48 h-48 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
+                            <div className="flex items-center justify-center w-40 h-40 px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200 cursor-pointer gap-1">
                                 <span>Analytics</span>
                                 <Check className="text-green-500" />
                             </div>
