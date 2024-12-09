@@ -237,9 +237,21 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
             <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
                 <div className="bg-white rounded-3xl w-full max-w-4xl p-8 relative">
                     <div className="flex justify-between items-center mb-8">
-                        <div className="flex items-center gap-2">
-                            <h2 className="text-2xl font-semibold text-[#1a1f36] font-pops">
-                                Add Integrations
+                        <div className="flex items-center gap-2 ">
+                            <h2 className="text-2xl flex font-semibold gap-x-2 items-center text-[#1a1f36] font-pops">
+                                Add Integrations <span> <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_374_8637)">
+<path d="M7.99992 14.6654C11.6818 14.6654 14.6666 11.6806 14.6666 7.9987C14.6666 4.3168 11.6818 1.33203 7.99992 1.33203C4.31802 1.33203 1.33325 4.3168 1.33325 7.9987C1.33325 11.6806 4.31802 14.6654 7.99992 14.6654Z" stroke="#1B2559" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8 10.6667V8" stroke="#1B2559" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M8 5.33203H8.00583" stroke="#1B2559" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<defs>
+<clipPath id="clip0_374_8637">
+<rect width="16" height="16" fill="white"/>
+</clipPath>
+</defs>
+</svg></span>
+
                             </h2>
                         </div>
                         <button
@@ -247,7 +259,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 handlePopup();
                                 updateSelectedIntegration(-1);
                             }}
-                            className="text-gray-500 hover:text-gray-700 transition-colors"
+                            className="text-black text-xl top-0 font-bold hover:text-gray-700 transition-colors"
                         >
                             ✕
                         </button>
@@ -261,8 +273,8 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
-                                        ? "border-black"
-                                        : "none"
+                                        ? "border-blue-400"
+                                        : "border-none"
                                 }
                                         
                                 `}
@@ -364,70 +376,61 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                         </div>
                     )}
 
-                    {selectedIntegration === 0 && (
-                        <div className="flex flex-col lg:flex-row gap-8 border-t-2 pt-10">
-                            <div className="flex-1 pr-5 border-r-2">
-                                <h3 className="text-xl font-semibold text-[#1a1f36] mb-4 font-pops">
-                                    Enter your OpenAI API Key
-                                </h3>
-                                <p className="text-gray-600 mb-4 text-base font-pops">
-                                    You need an OpenAI API Key to use MetricsLM.
-                                    Your API Key is stored locally on your
-                                    browser and never sent anywhere else.
-                                </p>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={apiKey}
-                                        onChange={(e) =>
-                                            setApiKey(e.target.value)
-                                        }
-                                        placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxx"
-                                        className="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-                                    />
-                                    <button
-                                        className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                                        onClick={() =>
-                                            saveApiKey(user?.id as string)
-                                        }
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                                <a
-                                    href="https://platform.openai.com/settings/organization/api-keys"
-                                    className="text-blue-500 hover:text-blue-600 mt-4 inline-block text-sm"
-                                    target="_blank"
-                                >
-                                    Get your API key from Open AI Dashboard
-                                </a>
-                            </div>
+{selectedIntegration === 0 && (
+    <div className="flex flex-col lg:flex-row gap-8 border-t-2 pt-8">
+        {/* Left Section */}
+        <div className="flex-1 pr-5 ">
+            <h3 className="text-2xl font-bold text-[#1a1f36] mb-4 font-sans text-center">
+                Enter your OpenAI API Key
+            </h3>
+            <p className="text-[#718096] mb-4 text-center font-medium font-sfpro text-sm  ">
+                You need an OpenAI API Key to use MetricsLM. <p className="inline-block text-sm">Your API Key is stored
+                locally on your browser and never</p>  <p className="text-center">sent anywhere else.</p> 
+            </p>
+            <div className="flex gap-2 justify-evenly">
+                <input
+                    type="text"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxx"
+                    className=" px-4 py-2 border w-64   border-gray-300 rounded-3xl text-sm text-[#718096] font-regular font-sfpro "
+                />
+                <button
+                    className="py-2 px-6 w-24 bg-[#0052CC] text-white  hover:bg-blue-600 transition-colors text-sm mb-2 text-center mt-2 font-bold font-sfpro"
+                    onClick={() => saveApiKey(user?.id as string)}
+                >
+                    Save
+                </button>
+            </div>
+            <a
+                href="https://platform.openai.com/settings/organization/api-keys"
+                className="text-[#0052CC] text-center ml-10 underline hover:text-blue-600 mt-4 inline-block text-sm font-semibold font-sfpro"
+                target="_blank"
+            >
+                Get your API key from Open AI Dashboard
+            </a>
+        </div>
+          <div className=" border "></div>
+        {/* Right Section */}
+        <div className="flex-1">
+            <h3 className="text-sm  font-bold text-[#718096]ah  text-start font-sfpro">
+                Your API Key is not working?
+            </h3>
+            <ul className="space-y-4 text-[#718096] text-base font-medium font-sfpro list-disc pl-5">
+                <li className="pt-5 text-start">
+                    Make sure you have an OpenAI account and a valid API key to use ChatGPT. We don't sell API keys.
+                </li>
+                <li className="pt-5 text-start">
+                    Make sure you have your billing info added in OpenAI Billing page. Without billing info, your API key will not work.
+                </li>
+            </ul>
+            <p className="text-sm text-[#718096] mt-4 pt-5 font-medium font-sfpro">
+                *The app will connect to OpenAI API server to check if your API Key is working properly.
+            </p>
+        </div>
+    </div>
+)}
 
-                            <div className="flex-1">
-                                <h3 className="text-base font-semibold text-[#1a1f36] mb-4 text-start">
-                                    Your API Key is not working?
-                                </h3>
-                                <ul className="space-y-4 text-gray-600 text-base">
-                                    <li className="pt-5 text-start">
-                                        Make sure you have an OpenAI account and
-                                        a valid API key to use ChatGPT. We don't
-                                        sell API keys.
-                                    </li>
-                                    <li className="pt-5 text-start">
-                                        Make sure you have your billing info
-                                        added in OpenAI Billing page. Without
-                                        billing info, your API key will not
-                                        work.
-                                    </li>
-                                </ul>
-                                <p className="text-sm text-gray-500 mt-4 pt-5">
-                                    *The app will connect to OpenAI API server
-                                    to check if your API Key is working
-                                    properly.
-                                </p>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>
