@@ -892,43 +892,43 @@ Make sure that it’s easy to understand and contains the primary information in
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-                                <h2 className="text-4xl text-gray-700 mb-2">
-                                    Your saved work will appear here
-                                </h2>
-                                <p className="text-gray-600 mb-6 w-96 text-center">
-                                    Thanks for choosing MetricsLM. Your next
-                                    steps are to add integrations or sources in
-                                    your workspace.
-                                </p>
-                                <div className="flex">
-                                    <button
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                                        onClick={setIntegrationPopup}
-                                    >
-                                        Add Integrations
-                                    </button>
-                                    <button
-                                        className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50"
-                                        onClick={setSourcePopup}
-                                    >
-                                        Add Sources
-                                    </button>
-                                </div>
-                                <a
-                                    href="#"
-                                    className="text-blue-500 hover:underline mt-4"
+                            <div className="flex flex-col items-center  justify-center h-[calc(100vh-250px)]">
+                            <h2 className="text-[40px] text-[#42526E] text-center items-center  leading-tight mb-2">
+                                Your saved work will appear here
+                            </h2> <br />
+                            <p className="text-[14px] text-[#172B4D]  font-medium font-regular text-center leading-relaxed mb-6 w-96">
+                                Thanks for choosing MetricsLM.
+                                Your next steps are to add integrations or sources in your workspace.
+                            </p>
+                            <div className="flex gap-4">
+                                <button
+                                    className="px-4 py-2 text-[14px] text-center font-medium bg-[#0052CC] text-white rounded-sm hover:bg-[#0055CC]"
+                                    onClick={setIntegrationPopup}
                                 >
-                                    Learn how
-                                </a>
+                                    Add Integration
+                                </button>
+                                <button
+                                    className="px-4 py-2 text-[14px] text-center font-medium bg-[#F0F1F4] text-[#172B4D] rounded-sm  border border-[#D9DADC] hover:bg-[#E3E4E6]"
+                                    onClick={setSourcePopup}
+                                >
+                                    Add Sources
+                                </button>
                             </div>
+                            <a
+                                href="/"
+                                className="text-[#0C66E4] text-center font-sfpro font-semibold hover:underline mt-4 text-[14px]"
+                            >
+                                Learn how
+                            </a>
+                        </div>
+                        
                         )}
                     </>
                 )}
             </div>
 
-            <div className="w-full h-32">
-                <div className="flex flex-col w-[90%] p-5 border-t bg-white border-gray-200 rounded-t-xl shadow-lg shadow-blue-500/50 items-center h-full justify-center mx-auto">
+            <div className="w-full h-32 ">
+                <div className="flex flex-col w-[90%] p-5  bg-white  rounded-t-xl shadow-2xl items-center h-full justify-center mx-auto">
                     <div className="flex gap-2">
                         {(selectedNotes.some(Boolean) ||
                             checkedSource.some(Boolean)) &&
@@ -944,12 +944,12 @@ Make sure that it’s easy to understand and contains the primary information in
                                 </div>
                             ))}
                     </div>
-                    <div className="flex w-full mt-2 mb-2">
+                    <div className="flex w-full mt-2 mb-2 ">
                         <div
                             className="flex items-center space-x-2 text-gray-500 cursor-pointer"
                             onClick={() => setChatSection((prev) => !prev)}
                         >
-                            <span className="text-blue-500">
+                            <span className="text-[#c2c5ca] font-semibold">
                                 {chatSection ? "Close chat" : "Open chat"}
                             </span>
                             <Info className="w-4 h-4" />
