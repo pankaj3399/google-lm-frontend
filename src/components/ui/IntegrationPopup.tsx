@@ -273,7 +273,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
-                                        ? "border-blue-400"
+                                        ? "border-blue-500"
                                         : "border-none"
                                 }
                                         

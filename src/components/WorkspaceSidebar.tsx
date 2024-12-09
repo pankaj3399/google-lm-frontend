@@ -154,31 +154,31 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     };
 
     return (
-        <div className="w-[20%] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
+        <div className="w-[270px] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
             <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
                 <div
-                    className="flex cursor-pointer text-2xl text-[#1B2559]"
+                    className="flex cursor-pointer text-2xl text-[#1B2559] font-pops"
                     onClick={() => navigate("/home")}
                 >
-                    <p className="font-bold">Metrics</p>
+                    <p className="font-bold ">Metrics</p>
                     <span>LM</span>
                 </div>
             </div>
 
-            <div className="p-4 flex-1">
+            <div className="p-4 flex-1 text-[#42526E]">
                 <div className="mb-6">
                     <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 text-[#42526E]">
                             <span className="font-medium">Integrations</span>
-                            <Info className="w-4 h-4 text-gray-400" />
+                            <Info className="w-4 h-4 " />
                         </div>
                         <CirclePlus
-                            className="w-4 h-4 text-gray-400 cursor-pointer"
+                            className="w-4 h-4  cursor-pointer text-[#42526E]"
                             onClick={setIntegrationPopup}
                         />
                     </div>
-                    <label className="flex items-center justify-between space-x-2 text-sm text-gray-600">
-                        <span>Select all integrations</span>
+                    <label className="flex items-center justify-between space-x-2 text-sm ">
+                        <span className="text-[#42526E]">Select all integrations</span>
                         <input
                             type="checkbox"
                             className="rounded text-blue-500"
@@ -195,7 +195,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             alt="gpt icon"
                                             className="h-[22px]"
                                         />
-                                        <p>ChatGpt</p>
+                                        <p className="text-[#42526E]">ChatGpt</p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -213,7 +213,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             alt="analytics"
                                             className="h-[22px]"
                                         />
-                                        <p>Google Analytics</p>
+                                        <p className="text-[#42526E]">Google Analytics</p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -230,16 +230,16 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 <div>
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
-                            <span className="font-medium">Sources</span>
-                            <Info className="w-4 h-4 text-gray-400" />
+                            <span className="font-medium text-[#42526E]">Sources</span>
+                            <Info className="w-4 h-4 text-[#42526E]" />
                         </div>
                         <CirclePlus
-                            className="w-4 h-4 text-gray-400 cursor-pointer"
+                            className="w-4 h-4 text-[#42526E] cursor-pointer"
                             onClick={setSourcePopup}
                         />
                     </div>
-                    <label className="flex items-center space-x-2 text-sm text-gray-600 justify-between">
-                        <span>Select all Sources</span>
+                    <label className="flex items-center space-x-2 text-sm text-[#42526E] justify-between">
+                        <span className="text-[#42526E]">Select all Sources</span>
                         <input
                             type="checkbox"
                             className="rounded text-blue-500"
@@ -285,7 +285,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                     )
                                                 }
                                                 autoFocus
-                                                className="text-gray-600 outline-none"
+                                                className="text-[#42526E] outline-none"
                                             />
                                         ) : (
                                             <p
@@ -313,7 +313,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                 }
                                             >
                                                 <Trash size={20} />
-                                                <p>Remove Item</p>
+                                                <p className="text-[#42526E]">Remove Item</p>
                                             </div>
                                             <Sheet>
                                                 <SheetTrigger asChild>
@@ -321,12 +321,12 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                         <MessageSquare
                                                             size={20}
                                                         />
-                                                        <p>View Summary</p>
+                                                        <p className="text-[#42526E]">View Summary</p>
                                                     </div>
                                                 </SheetTrigger>
                                                 <SheetContent
                                                     side="left"
-                                                    className="h-screen w-[40rem] overflow-y-auto p-6 bg-gray-50 text-gray-800"
+                                                    className="h-screen w-[40rem] overflow-y-auto p-6 bg-gray-50 text-[#42526E] "
                                                 >
                                                     <SheetHeader className="mb-4 border-b pb-4">
                                                         <SheetTitle className="text-2xl font-semibold text-gray-900">
