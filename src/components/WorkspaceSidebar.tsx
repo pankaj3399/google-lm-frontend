@@ -1,4 +1,4 @@
-import { Info, CirclePlus, MessageSquare, Eye } from "lucide-react";
+import { CirclePlus, MessageSquare, Eye } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -154,7 +154,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     };
 
     return (
-        <div className="w-[270px] overflow-y-auto bg-white border-r border-gray-200 h-screen flex flex-col">
+        <div className="w-[270px] overflow-y-auto bg-[#FAFBFC] border-r border-gray-200 h-screen flex flex-col">
             <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
                 <div
                     className="flex cursor-pointer text-2xl text-[#1B2559] font-pops"
@@ -170,7 +170,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2 text-[#42526E]">
                             <span className="font-medium">Integrations</span>
-                            <Info className="w-4 h-4 " />
+                            {/* <Info className="w-4 h-4 " /> */}
                         </div>
                         <CirclePlus
                             className="w-4 h-4  cursor-pointer text-[#42526E]"
@@ -213,7 +213,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             alt="analytics"
                                             className="h-[22px]"
                                         />
-                                        <p className="text-[#42526E]">Google Analytics</p>
+                                        <p className="text-[#42526E] font-semibold font-sfpro">Google Analytics</p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -231,7 +231,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2">
                             <span className="font-medium text-[#42526E]">Sources</span>
-                            <Info className="w-4 h-4 text-[#42526E]" />
+                            {/* <Info className="w-4 h-4 text-[#42526E]" /> */}
                         </div>
                         <CirclePlus
                             className="w-4 h-4 text-[#42526E] cursor-pointer"

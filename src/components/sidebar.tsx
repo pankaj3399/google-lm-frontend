@@ -129,7 +129,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="flex flex-col items-start mt-14 pl-5 relative">
+        <aside className="flex flex-col items-start mt-14 pl-5 relative ]">
             {sidebarItems.map((item, index) => (
                 <SidebarItem key={index} {...item} />
             ))}

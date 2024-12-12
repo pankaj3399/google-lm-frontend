@@ -1,10 +1,8 @@
 import {
-    Info,
+    
     X,
     Copy,
     Pin,
-    ThumbsUp,
-    ThumbsDown,
     Trash,
     Check,
     Ellipsis,
@@ -706,7 +704,7 @@ Make sure that it’s easy to understand and contains the primary information in
     };
 
     return (
-        <div className="h-screen w-[80%] flex flex-col">
+        <div className={`h-screen w-[90%]   flex flex-col ${!chatSection ? "":"bg-[#E5EBF2]"} `}>
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
                 {isEditing ? (
                     <input
@@ -728,204 +726,169 @@ Make sure that it’s easy to understand and contains the primary information in
                 <UserButton />
             </div>
 
-            <div
-                className="flex-1 w-full p-6 overflow-y-auto relative"
-                ref={containerRef}
-            >
-                {chatSection ? (
-                    <>
-                        {chats.length > 0 ? (
-                            chats.map((chat, indx) => (
-                                <div
-                                    key={indx}
-                                    className={`w-full flex ${
-                                        chat.owner === "Me"
-                                            ? "justify-end"
-                                            : "justify-start"
-                                    }`}
-                                >
-                                    <p
-                                        className={`max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg`}
-                                    >
-                                        {chat.owner === "GPT" ? (
-                                            <ReactMarkdown>
-                                                {chat.message}
-                                            </ReactMarkdown>
-                                        ) : (
-                                            <div>
-                                                <div>{chat.message}</div>
-                                            </div>
-                                        )}
-                                        {chat.owner === "GPT" ? (
-                                            <div className="flex justify-between pt-2 items-center">
-                                                <div className="flex gap-1">
-                                                    <Copy
-                                                        size={15}
-                                                        className="cursor-pointer"
-                                                    />
-                                                    <ThumbsUp
-                                                        size={15}
-                                                        className="cursor-pointer"
-                                                    />
-                                                    <ThumbsDown
-                                                        size={15}
-                                                        className="cursor-pointer"
-                                                    />
-                                                </div>
-                                                <div
-                                                    className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
-                                                    onClick={() =>
-                                                        handleSaveNote(
-                                                            chat.message,
-                                                            indx
-                                                        )
-                                                    }
-                                                >
-                                                    <Pin size={16} />
-                                                    <span>
-                                                        Save to Workspace
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        ) : null}
-                                    </p>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="flex justify-center">
-                                <h1 className="text-2xl text-gray-500">
-                                    Please start conversation
-                                </h1>
-                            </div>
-                        )}
-
-                        {chatLoading && (
-                            <div className="w-full flex justify-start mt-5">
-                                <div className="max-w-[80%] bg-slate-100 p-3 rounded-b-md listItem tracking-wide shadow-lg">
-                                    <Ellipsis size={30}/>
-                                </div>
-                            </div>
-                        )}
-
-                        <X
-                            className="fixed right-5 top-16 cursor-pointer"
-                            onClick={() => setChatSection(false)}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <div className="flex w-full gap-5  h-4">
-                            <div
-                                className="flex items-center cursor-pointer gap-1"
-                                onClick={() => {
-                                    setSelectedNote(-1);
-                                    handleNewNoteDisplay();
-                                }}
-                            >
-                                <img
-                                    src={"/icon7.svg"}
-                                    alt="add note"
-                                    className="h-[18px]"
-                                />
-                                <span className="text-gray-600">Add Note</span>
-                            </div>
-                            {notes.length > 0 && (
-                                <>
-                                    <Dialog>
-                                        <DialogTrigger className="flex items-center">
-                                            <div className="flex items-center cursor-pointer">
-                                                <Trash className="h-5 text-gray-600" />
-                                                <span>Delete</span>
-                                            </div>
-                                        </DialogTrigger>
-                                        <DialogContent className="flex flex-col w-60">
-                                            <h3>Delete Selected Notes</h3>
-                                            <DialogClose className="flex gap-2">
-                                                <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
-                                                    Cancel
-                                                </button>
-                                                <button
-                                                    className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
-                                                    onClick={
-                                                        deleteSelectedNotes
-                                                    }
-                                                >
-                                                    Delete
-                                                </button>
-                                            </DialogClose>
-                                        </DialogContent>
-                                    </Dialog>
-                                    <div
-                                        className="flex items-center cursor-pointer"
-                                        onClick={handleSelectAll}
-                                    >
-                                        <Check className="h-5 text-gray-600" />
-                                        <span>Select all</span>
-                                    </div>
-                                    <div
-                                        className="flex items-center cursor-pointer"
-                                        onClick={handleDeselectAll}
-                                    >
-                                        <X className="h-5 text-gray-600" />
-                                        <span>Deselect all</span>
-                                    </div>
-                                </>
+            <div className="flex-1 w-full p-6 overflow-y-auto relative" ref={containerRef}>
+    {chatSection ? (
+        <>
+            {chats.length > 0 ? (
+                chats.map((chat, indx) => (
+                    <div
+                        key={indx}
+                        className={`w-full flex ${
+                            chat.owner === "Me" ? "justify-end" : "justify-start"
+                        }`}
+                    >
+                        <p className="max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg">
+                            {chat.owner === "GPT" ? (
+                                <ReactMarkdown>{chat.message}</ReactMarkdown>
+                            ) : (
+                                <div>{chat.message}</div>
                             )}
+                            {chat.owner === "GPT" && (
+                                <div className="flex justify-between pt-2 items-center">
+                                    <div className="flex gap-1">
+                                        <Copy size={15} className="cursor-pointer" />
+                                        {/* <ThumbsUp size={15} className="cursor-pointer" />
+                                        <ThumbsDown size={15} className="cursor-pointer" /> */}
+                                    </div>
+                                    <div
+                                        className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
+                                        onClick={() => handleSaveNote(chat.message, indx)}
+                                    >
+                                        <Pin size={16} />
+                                        <span>Save to Workspace</span>
+                                    </div>
+                                </div>
+                            )}
+                        </p>
+                    </div>
+                ))
+            ) : (
+                <div className="flex justify-center">
+                    <h1 className="text-2xl text-[#43526E] font-sfpro">
+                        Please start conversation
+                    </h1>
+                </div>
+            )}
+
+            {chatLoading && (
+                <div className="w-full flex justify-start mt-5">
+                    <div className="max-w-[80%] bg-slate-100 p-3 rounded-b-md listItem tracking-wide shadow-lg">
+                        <Ellipsis size={30} />
+                    </div>
+                </div>
+            )}
+
+            <X
+                className="fixed right-5 top-16 cursor-pointer"
+                onClick={() => setChatSection(false)}
+            />
+        </>
+    ) : (
+        <>
+            <div className="flex w-full gap-5 h-4">
+                <div
+                    className="flex items-center cursor-pointer gap-1"
+                    onClick={() => {
+                        setSelectedNote(-1);
+                        handleNewNoteDisplay();
+                    }}
+                >
+                    <img src="/icon7.svg" alt="add note" className="h-[18px]" />
+                    <span className="text-gray-600">Add Note</span>
+                </div>
+                {notes.length > 0 && (
+                    <>
+                        <Dialog>
+                            <DialogTrigger className="flex items-center">
+                                <div className="flex items-center cursor-pointer">
+                                    <Trash className="h-5 text-gray-600" />
+                                    <span>Delete</span>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="flex flex-col w-60">
+                                <h3>Are you sure you want to delete the notes?</h3>
+                                <DialogClose className="flex gap-2">
+                                    <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
+                                        onClick={deleteSelectedNotes}
+                                    >
+                                        Delete
+                                    </button>
+                                </DialogClose>
+                            </DialogContent>
+                        </Dialog>
+                        <div
+                            className="flex items-center cursor-pointer"
+                            onClick={handleSelectAll}
+                        >
+                            <Check className="h-5 text-gray-600" />
+                            <span>Select all</span>
                         </div>
-                        {notes.length > 0 ? (
-                            <div className="flex mt-2 w-full  flex-wrap">
-                                {notes.map((note: Note, indx) => (
-                                    <SingleNote
-                                        key={note._id}
-                                        indx={indx}
-                                        heading={note?.heading}
-                                        content={note?.content}
-                                        type={note?.type}
-                                        updatedAt={note?.updatedAt}
-                                        createdAt={note?.createdAt}
-                                        selectedNotes={selectedNotes}
-                                        handleToggleNote={handleToggleNote}
-                                        handleNewNoteDisplay={
-                                            handleNewNoteDisplay
-                                        }
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center  justify-center h-[calc(100vh-250px)]">
-                            <h2 className="text-[40px] text-[#42526E] text-center items-center  leading-tight mb-2">
-                                Your saved work will appear here
-                            </h2> <br />
-                            <p className="text-[14px] text-[#172B4D]  font-medium font-regular text-center leading-relaxed mb-6 w-96">
-                                Thanks for choosing MetricsLM.
-                                Your next steps are to add integrations or sources in your workspace.
-                            </p>
-                            <div className="flex gap-4">
-                                <button
-                                    className="px-4 py-2 text-[14px] text-center font-medium bg-[#0052CC] text-white rounded-sm hover:bg-[#0055CC]"
-                                    onClick={setIntegrationPopup}
-                                >
-                                    Add Integration
-                                </button>
-                                <button
-                                    className="px-4 py-2 text-[14px] text-center font-medium bg-[#F0F1F4] text-[#172B4D] rounded-sm  border border-[#D9DADC] hover:bg-[#E3E4E6]"
-                                    onClick={setSourcePopup}
-                                >
-                                    Add Sources
-                                </button>
-                            </div>
-                            <a
-                                href="/"
-                                className="text-[#0C66E4] text-center font-sfpro font-semibold hover:underline mt-4 text-[14px]"
-                            >
-                                Learn how
-                            </a>
+                        <div
+                            className="flex items-center cursor-pointer"
+                            onClick={handleDeselectAll}
+                        >
+                            <X className="h-5 text-gray-600" />
+                            <span>Deselect all</span>
                         </div>
-                        
-                        )}
                     </>
                 )}
             </div>
+            {notes.length > 0 ? (
+                <div className="flex mt-2 w-full flex-wrap">
+                    {notes.map((note: Note, indx) => (
+                        <SingleNote
+                            key={note._id}
+                            indx={indx}
+                            heading={note?.heading}
+                            content={note?.content}
+                            type={note?.type}
+                            updatedAt={note?.updatedAt}
+                            createdAt={note?.createdAt}
+                            selectedNotes={selectedNotes}
+                            handleToggleNote={handleToggleNote}
+                            handleNewNoteDisplay={handleNewNoteDisplay}
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+                    <h2 className="text-[40px] text-[#42526E] text-center leading-tight mb-2">
+                        Your saved work will appear here
+                    </h2>
+                    <br />
+                    <p className="text-[14px] text-[#172B4D] font-sfpro w-[570px] h-[21px] font-medium text-center leading-relaxed mb-6">
+                        Thanks for choosing MetricsLM. Your next steps are to add integrations or sources in your workspace.
+                    </p>
+                    <div className="flex gap-4">
+                        <button
+                            className="px-4 py-2 text-[14px] text-center font-medium font-sfpro bg-[#0052CC] text-white rounded-sm hover:bg-[#0055CC]"
+                            onClick={setIntegrationPopup}
+                        >
+                            Add Integration
+                        </button>
+                        <button
+                            className="px-4 py-2 text-[14px] font-sfpro text-[#172B4D] text-center font-medium bg-[#F0F1F4]  rounded-sm border border-[#D9DADC] hover:bg-[#E3E4E6]"
+                            onClick={setSourcePopup}
+                        >
+                            Add Sources
+                        </button>
+                    </div>
+                    <a
+                        href="/"
+                        className="text-[#0C66E4] text-center font-sfpro font-semibold hover:underline mt-4 text-[14px]"
+                    >
+                        Learn how
+                    </a>
+                </div>
+            )}
+        </>
+    )}
+</div>
+
 
             <div className="w-full h-32 ">
                 <div className="flex flex-col w-[90%] p-5  bg-white  rounded-t-xl shadow-2xl items-center h-full justify-center mx-auto">
@@ -934,7 +897,7 @@ Make sure that it’s easy to understand and contains the primary information in
                             checkedSource.some(Boolean)) &&
                             suggestions.map((suggestion, indx) => (
                                 <div
-                                    className="p-2 bg-slate-100 text-blue-400 rounded-md cursor-pointer"
+                                    className="p-2 bg-slate-00 rounded-2xl text-[#0052CC] font-semibold font-sfpro  cursor-pointer"
                                     onClick={() =>
                                         handleChatWithSuggestion(suggestion)
                                     }
@@ -945,40 +908,40 @@ Make sure that it’s easy to understand and contains the primary information in
                             ))}
                     </div>
                     <div className="flex w-full mt-2 mb-2 ">
-                        <div
-                            className="flex items-center space-x-2 text-gray-500 cursor-pointer"
-                            onClick={() => setChatSection((prev) => !prev)}
-                        >
-                            <span className="text-[#c2c5ca] font-semibold">
-                                {chatSection ? "Close chat" : "Open chat"}
-                            </span>
-                            <Info className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 mx-4 relative">
-                            <input
-                                type="text"
-                                placeholder="Add an integration or a source to get started"
-                                className="w-full rounded-md outline-none border-2 p-2 text-gray-700"
-                                value={inputChat}
-                                onChange={(e) => setInputChat(e.target.value)}
-                            />
-                            <div
-                                className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
-                                onClick={handleChat}
-                            >
-                                <img
-                                    src={"/icon6.svg"}
-                                    alt="sendIcon"
-                                    className="p-1"
-                                />
-                            </div>
-                        </div>
+                    <div
+        className="flex items-center space-x-2 text-gray-500 cursor-pointer"
+        onClick={() => setChatSection((prev) => !prev)}
+    >
+        <span className="text-[#0052CC] font-semibold">
+            {chatSection ? "Close chat" : "Open chat"}
+        </span>
+    </div>
+    <div className="flex-1 mx-4 relative">
+        <input
+            type="text"
+            placeholder="Add an integration or a source to get started"
+            className="w-full rounded-md outline-none border-2 p-2 text-[#878686] placeholder:text-[#878686]"
+            value={inputChat}
+            onChange={(e) => setInputChat(e.target.value)}
+        />
+        <div
+            className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
+            onClick={handleChat}
+        >
+            <img
+                src={"/icon6.svg"}
+                alt="sendIcon"
+                className="p-1"
+            />
+        </div>
+    </div>
+
                         <div className="flex flex-col">
                             <Sheet>
                                 <SheetTrigger>
-                                    <button className="text-blue-500">
-                                        Pull data
-                                    </button>
+                                <button className="text-[#0052CC] font-semibold text-[14px]">
+                    Pull Data
+                </button>
                                 </SheetTrigger>
                                 <SheetContent
                                     side={"right"}
@@ -1085,16 +1048,16 @@ Make sure that it’s easy to understand and contains the primary information in
                             </Sheet>
                             <Sheet>
                                 <SheetTrigger>
-                                    <button className="text-blue-500">
-                                        Generate
-                                    </button>
+                                <button className="text-[#0052CC] font-semibold text-[14px]">
+                    Generate
+                </button>
                                 </SheetTrigger>
                                 <SheetContent className="w-[30rem] flex flex-col items-center overflow-y-auto">
                                     <SheetHeader className="w-full text-start">
                                         <SheetTitle className="text-2xl font-light">
                                             Generate
                                         </SheetTitle>
-                                        <p className="border-b-2 mt-2">
+                                        <p className="border-b-2 mt-2 text-[#6DA2FF] font-semibold font-sfpro">
                                             Report
                                         </p>
                                     </SheetHeader>

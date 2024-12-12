@@ -84,7 +84,8 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
 
     return (
         <div
-            className="absolute w-screen h-screen flex justify-center items-center backdrop-blur-sm left-0 top-0"
+            className="absolute w-screen h-screen flex justify-center items-center left-0 top-0"
+            style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
             onClick={() => {
                 handleSaveNote();
                 handleNewNoteDisplay();
@@ -99,7 +100,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                 <div className="flex items-center justify-between pl-5 pr-5">
                     <div className="flex items-center space-x-2">
                         <Pen className="w-5 h-5 text-green-600" />
-                        <span className="text-green-600 font-medium">
+                        <span className="text-[#26AF36] font-semibold  font-sfpro">
                             Written Note
                         </span>
                     </div>
