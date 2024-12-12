@@ -92,3 +92,10 @@
     @apply text-[#1B2559];
   }
 }
+
+@font-face {
+  font-family: 'sfpro';
+  src: url('public/fonts/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}

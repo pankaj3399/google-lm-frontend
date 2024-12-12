@@ -266,15 +266,15 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     </div>
 
                     {/* Integrations Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className="grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                         {integrations.map((integration, indx) => (
                             <button
                                 key={integration.name}
-                                className={`aspect-square rounded-2xl border-2 border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
+                                className={`aspect-square rounded-2xl border-2 border-solid border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
-                                        ? "border-blue-500"
-                                        : "border-none"
+                                        ? "border-blue-400"
+                                        : "border"
                                 }
                                         
                                 `}
@@ -380,7 +380,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     <div className="flex flex-col lg:flex-row gap-8 border-t-2 pt-8">
         {/* Left Section */}
         <div className="flex-1 pr-5 ">
-            <h3 className="text-2xl font-bold text-[#1a1f36] mb-4 font-sans text-center">
+            <h3 className="text-2xl font-bold text-[#1B2559] mb-4 font-sans text-center">
                 Enter your OpenAI API Key
             </h3>
             <p className="text-[#718096] mb-4 text-center font-medium font-sfpro text-sm  ">
@@ -396,7 +396,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     className=" px-4 py-2 border w-64   border-gray-300 rounded-3xl text-sm text-[#718096] font-regular font-sfpro "
                 />
                 <button
-                    className="py-2 px-6 w-24 bg-[#0052CC] text-white  hover:bg-blue-600 transition-colors text-sm mb-2 text-center mt-2 font-bold font-sfpro"
+                    className="py-2 px-6 w-24 bg-[#0052CC] rounded-sm text-white  hover:bg-blue-600 transition-colors text-sm mb-2 text-center mt-2 font-bold font-sfpro"
                     onClick={() => saveApiKey(user?.id as string)}
                 >
                     Save

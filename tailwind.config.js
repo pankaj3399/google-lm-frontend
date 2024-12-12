@@ -10,6 +10,7 @@ export default {
   	extend: {
 		fontFamily: {
 			pops: ['Poppins', 'Arial', 'sans-serif'],
+			sfpro:['SF Pro Display', 'Arial', 'sans-serif']
 		},
   		borderRadius: {
   			lg: 'var(--radius)',
