@@ -785,7 +785,7 @@ Make sure that it’s easy to understand and contains the primary information in
         </>
     ) : (
         <>
-            <div className="flex w-full gap-5 h-4">
+            <div className="flex w-full gap-5 h-4  ">
                 <div
                     className="flex items-center cursor-pointer gap-1"
                     onClick={() => {
@@ -798,8 +798,8 @@ Make sure that it’s easy to understand and contains the primary information in
                 </div>
                 {notes.length > 0 && (
                     <>
-                        <Dialog>
-                            <DialogTrigger className="flex items-center">
+                        <Dialog >
+                            <DialogTrigger className="flex items-center ">
                                 <div className="flex items-center cursor-pointer">
                                     <Trash className="h-5 text-gray-600" />
                                     <span>Delete</span>
@@ -838,7 +838,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 )}
             </div>
             {notes.length > 0 ? (
-                <div className="flex mt-2 w-full flex-wrap">
+                <div className="flex mt-2  w-full flex-wrap ">
                     {notes.map((note: Note, indx) => (
                         <SingleNote
                             key={note._id}
@@ -890,14 +890,14 @@ Make sure that it’s easy to understand and contains the primary information in
 </div>
 
 
-            <div className="w-full h-32 ">
-                <div className="flex flex-col w-[90%] p-5  bg-white  rounded-t-xl shadow-2xl items-center h-full justify-center mx-auto">
-                    <div className="flex gap-2">
+            <div className="w-full h-48 ">
+                <div className="flex flex-col w-[90%] px-5 py-2 bg-white  rounded-t-xl shadow-2xl items-start h-full mx-auto">
+                    <div className="mx-1 flex gap-2 my-2">
                         {(selectedNotes.some(Boolean) ||
                             checkedSource.some(Boolean)) &&
                             suggestions.map((suggestion, indx) => (
                                 <div
-                                    className="p-2 bg-slate-00 rounded-2xl text-[#0052CC] font-semibold font-sfpro  cursor-pointer"
+                                    className="p-2 bg-[#E5EBF2] rounded-full text-[#0052CC] font-semibold font-sfpro  cursor-pointer"
                                     onClick={() =>
                                         handleChatWithSuggestion(suggestion)
                                     }
@@ -907,12 +907,13 @@ Make sure that it’s easy to understand and contains the primary information in
                                 </div>
                             ))}
                     </div>
+                    <div  className="w-full border bg-[#D9D9D9] h-0 rounded-full p-[4px] my-1"></div>
                     <div className="flex w-full mt-2 mb-2 ">
                     <div
         className="flex items-center space-x-2 text-gray-500 cursor-pointer"
         onClick={() => setChatSection((prev) => !prev)}
     >
-        <span className="text-[#0052CC] font-semibold">
+        <span className="text-[#0052CC] font-sfpro text-[14px] font-semibold">
             {chatSection ? "Close chat" : "Open chat"}
         </span>
     </div>
@@ -1200,7 +1201,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     className="w-[40rem] p-5 overflow-y-auto"
                 >
                     <SheetHeader>
-                        <SheetTitle>Report Summary</SheetTitle>
+                        <SheetTitle>Report ry</SheetTitle>
                     </SheetHeader>
                     <div className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200">
                         <p className="text-gray-700 whitespace-pre-line">

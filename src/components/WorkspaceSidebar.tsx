@@ -1,4 +1,4 @@
-import { CirclePlus, MessageSquare, Eye } from "lucide-react";
+import { CirclePlus, MessageSquare, Eye,Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -152,9 +152,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     ) => {
         setEditedName(event.target.value);
     };
-
+   
     return (
-        <div className="w-[270px] overflow-y-auto bg-[#FAFBFC] border-r border-gray-200 h-screen flex flex-col">
+        <div className="w-[270px] overflow-y-auto bg-[#FAFBFC] border-r border-gray-200 h-screen flex flex-col text-[#1B2559] font-pops">
             <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
                 <div
                     className="flex cursor-pointer text-2xl text-[#1B2559] font-pops"
@@ -170,7 +170,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-2 text-[#42526E]">
                             <span className="font-medium">Integrations</span>
-                            {/* <Info className="w-4 h-4 " /> */}
+                            <Info className="w-4 h-4 " />
                         </div>
                         <CirclePlus
                             className="w-4 h-4  cursor-pointer text-[#42526E]"
@@ -181,7 +181,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         <span className="text-[#42526E]">Select all integrations</span>
                         <input
                             type="checkbox"
-                            className="rounded text-blue-500"
+                            className="rounded text-[#0052CC] bg-[#0052CC]"
                             defaultChecked
                         />
                     </label>
@@ -199,7 +199,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     </div>
                                     <input
                                         type="checkbox"
-                                        className="rounded text-blue-500"
+                                        className="rounded text-[#0052CC] bg-[#0052CC]"
                                         defaultChecked
                                         disabled
                                     />
@@ -217,7 +217,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     </div>
                                     <input
                                         type="checkbox"
-                                        className="rounded text-blue-500"
+                                        className="rounded text-[#0052CC] bg-[#0052CC] "
                                         defaultChecked
                                         disabled
                                     />
@@ -228,10 +228,10 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 </div>
 
                 <div>
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-2 border-t-2 pt-5">
                         <div className="flex items-center space-x-2">
                             <span className="font-medium text-[#42526E]">Sources</span>
-                            {/* <Info className="w-4 h-4 text-[#42526E]" /> */}
+                            <Info className="w-4 h-4 text-[#42526E]" />
                         </div>
                         <CirclePlus
                             className="w-4 h-4 text-[#42526E] cursor-pointer"
@@ -242,7 +242,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         <span className="text-[#42526E]">Select all Sources</span>
                         <input
                             type="checkbox"
-                            className="rounded text-blue-500"
+                            className="rounded text-[#0052CC]"
                             checked={allSources}
                             onClick={() => setAllSources((prev) => !prev)}
                         />
@@ -255,19 +255,24 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     className="flex justify-between"
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
-                                        {source.uploadType === "file" ? (
-                                            <img
-                                                src={"/icon4.svg"}
-                                                alt="file icon"
-                                                className="h-[20px] ml-1"
-                                            />
-                                        ) : (
-                                            <img
-                                                src={"/icon3.svg"}
-                                                alt="file icon"
-                                                className="h-[12px]"
-                                            />
-                                        )}
+                                                                                        
+                                    <img
+                                            src={
+                                                source.uploadType === "file"
+                                                    ? "/icon4.svg"
+                                                    : "/icon3.svg"
+                                            }
+                                            alt="file icon"
+                                            className="h-[20px] "
+                                        />
+                                        <p
+
+                                            className="truncate max-w-[150px]  font-sfpro text-sm text-[#42526E]"
+                                        >
+                                            {source.name.length > 15
+                                                ? `${source.name.slice(0, 15)}...`
+                                                : source.name}
+                                        </p>
                                         {editingSourceId === source._id ? (
                                             <input
                                                 type="text"
@@ -296,7 +301,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                     setEditedName(source.name);
                                                 }}
                                             >
-                                                {source.name}
+                                                {/* {source.name} */}
                                             </p>
                                         )}
                                         <div
@@ -409,7 +414,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     </div>
                                     <input
                                         type="checkbox"
-                                        className="rounded text-blue-500"
+                                        className="rounded text-[#0052CC] bg-[#0052CC]"
                                         checked={checkedSource[indx]}
                                         onClick={() =>
                                             handleCheckboxChange(indx)
@@ -430,7 +435,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <button
-                                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+                                className="absolute top-2 right-2 text-gray-600 hover:text-gray-900 font-pops font-medium"
                                 onClick={closeModal}
                             >
                                 &times;
