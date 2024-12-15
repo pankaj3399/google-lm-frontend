@@ -78,7 +78,17 @@ const Navbar: React.FC = () => {
                         </div>
                     </div>
                     {clerkId ? (
-                        <UserButton />
+                        <>
+                        <div className="flex space-x-3">
+                         <button
+                             className="self-stretch my-auto text-base font-medium leading-none text-gray-600 whitespace-nowrap "
+                             onClick={() => navigate("/home")}
+                         >
+                             <span className="overflow-hidden px-2">Go to Home Page</span>
+                         </button>
+                         <UserButton />
+                         </div>
+                         </>
                     ) : (
                         <div
                             data-layername="r"

@@ -301,12 +301,12 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     </div>
 
                     {selectedIntegration === 1 && googleAnalytics && (
-                        <div className="flex border-t-2">
-                            <div className="flex p-2 mt-2 flex-col pr-5 border-r-2">
-                                <h2 className="text-xl font-semibold text-[#1a1f36] font-pops">
-                                    Connect to Google Analytics
+                        <div className="flex     border-t-2 ">
+                            <div className="flex  items-center justify-center p-2 mt-2 flex-col pr-5 border-r-2">
+            <h2 className="text-2xl font-bold text-[#1B2559] mb-4 font-sans text-center inline-block">
+                                                    Connect to Google Analytics
                                 </h2>
-                                <p className="mt-5 text-gray-600 mb-4 text-base font-pops">
+                                <p className="mt-5 text-[#718096] mb-4 text-base font-sfpro font-medium text=[16px] ">
                                     Connect and allow access to your Google
                                     Analytics. Once it’s done, select your
                                     website below.
@@ -318,7 +318,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                         fetchProperties(e.target.value)
                                     }
                                 >
-                                    <option value="" disabled selected>
+                                    <option value="" disabled selected className="font-sfpro text-[#718096] text-[14px]">
                                         Select Analytics Account
                                     </option>
                                     {accounts.map((account, indx) => (
@@ -352,11 +352,11 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                             </div>
 
                             <div className="p-5">
-                                <h3 className="text-base font-semibold text-[#1a1f36] mb-4 mt-5 text-start font-pops">
+                                <h3 className="text-base font-semibold  mb-4 mt-5 text-start font-sfpro text-[#718096]">
                                     Your Google Analytics Account is not
                                     working?
                                 </h3>
-                                <ul className="mt-5 space-y-4 text-gray-600 text-base font-pops">
+                                <ul className="mt-5 space-y-4  text-base font-sfpro list-disc ml-5 font-medium text-[#16px] text-[#718096]">
                                     <li className="pt-5 text-start">
                                         Make sure you have a{" "}
                                         <a href="#">Google Analytics</a>{" "}

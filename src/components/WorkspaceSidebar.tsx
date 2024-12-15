@@ -263,7 +263,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                     : "/icon3.svg"
                                             }
                                             alt="file icon"
-                                            className="h-[20px] "
+                                            className={`${source.uploadType==="file" ? "h-[20px]" : "h-[10px]"}   `}
                                         />
                                         <p
 

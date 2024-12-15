@@ -703,6 +703,8 @@ Make sure that it’s easy to understand and contains the primary information in
         doc.save("summary.pdf");
     };
 
+    const isAnyNoteSelected = selectedNotes.some((isSlected)=>isSlected);
+
     return (
         <div className={`h-screen w-[90%]   flex flex-col ${!chatSection ? "":"bg-[#E5EBF2]"} `}>
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
@@ -799,7 +801,14 @@ Make sure that it’s easy to understand and contains the primary information in
                 {notes.length > 0 && (
                     <>
                         <Dialog >
-                            <DialogTrigger className="flex items-center ">
+                            <DialogTrigger className={`flex items-center ${isAnyNoteSelected ? '' : ' opacity-50'}`}
+                            onClick={(e)=>{
+                                if(!isAnyNoteSelected){
+                                    e.preventDefault();
+                                    toast.error("Please select a note to delete");
+                                }
+                            }}
+                            >
                                 <div className="flex items-center cursor-pointer">
                                     <Trash className="h-5 text-gray-600" />
                                     <span>Delete</span>
@@ -897,7 +906,7 @@ Make sure that it’s easy to understand and contains the primary information in
                             checkedSource.some(Boolean)) &&
                             suggestions.map((suggestion, indx) => (
                                 <div
-                                    className="p-2 bg-[#E5EBF2] rounded-full text-[#0052CC] font-semibold font-sfpro  cursor-pointer"
+                                    className="p-2 bg-[#E5EBF2] rounded-full text-[#0052CC] font-semibold font-sfpro  cursor-pointer text-sm "
                                     onClick={() =>
                                         handleChatWithSuggestion(suggestion)
                                     }
@@ -1252,8 +1261,8 @@ Make sure that it’s easy to understand and contains the primary information in
                         onClick={() =>
                             handleSaveReport(
                                 pullDataResponse,
-                                "Analitics",
-                                "Analitics"
+                                "Analytics",
+                                "Analytics"
                             )
                         }
                     >
