@@ -55,76 +55,76 @@ const FaqSection: React.FC = () => {
     };
 
     return (
-        <div className="flex w-screen mx-auto px-4 py-3 sm:px-6 lg:px-8 mt-5">
-            <div className="flex w-7/12 items-start gap-x-4 mb-12">
-                <div className="flex-shrink-0"></div>
-                <div className="p-20">
-                    <div
-                        data-layername="smallEyebrowTagLabelStyle1"
-                        className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
+        <div id="_faq" className="flex w-screen  sm:flex-row flex-col mx-auto px-4 py-3 sm:px-6 lg:px-8 mt-5">
+        <div className="flex w-7/12 items-start gap-x-4  sm:mb-12">
+            <div className="flex-shrink-0 "></div>
+            <div className="">
+                <div
+                    data-layername="smallEyebrowTagLabelStyle1"
+                    className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
+                >
+                    <img
+                        loading="lazy"
+                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
+                        alt=""
+                        className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
+                    />
+                    <p
+                        data-layername="content"
+                        className="self-stretch my-auto"
                     >
-                        <img
-                            loading="lazy"
-                            src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
-                            alt=""
-                            className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
-                        />
-                        <p
-                            data-layername="content"
-                            className="self-stretch my-auto"
-                        >
-                            FAQ
-                        </p>
-                    </div>
-                    <h2 className="text-2xl font-semibold text-gray-900 w-56">
-                        Frequently asked questions
-                    </h2>
-                    <p className="mt-2 text-base text-gray-600 w-80">
-                        Find answers to common questions about MetricsLM,
-                        including its features, security measures, integration
-                        options, and more.
+                        FAQ
                     </p>
                 </div>
-            </div>
-
-            <div className="bg-white w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
-                {faqItems.map((item) => (
-                    <div
-                        key={item.id}
-                        className="border-b border-gray-200 last:border-0"
-                    >
-                        <button
-                            onClick={() => toggleItem(item.id)}
-                            className="flex w-full items-center justify-between py-5 text-left focus:outline-none group"
-                            aria-expanded={openItems.includes(item.id)}
-                        >
-                            <span className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                                {item.question}
-                            </span>
-                            <div
-                                className={`ml-6 flex-shrink-0 ${
-                                    openItems.includes(item.id)
-                                        ? "rotate-180"
-                                        : ""
-                                } transition-transform duration-200`}
-                            >
-                                <ChevronDown className="h-5 w-5 text-gray-500" />
-                            </div>
-                        </button>
-
-                        <div
-                            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                openItems.includes(item.id)
-                                    ? "max-h-[400px] opacity-100"
-                                    : "max-h-0 opacity-0"
-                            }`}
-                        >
-                            <p className="pb-5 text-gray-600">{item.answer}</p>
-                        </div>
-                    </div>
-                ))}
+                <h2 className="text-2xl font-semibold py-4 text-gray-900 w-56">
+                    Frequently asked questions
+                </h2>
+                <p className="mt-2 text-base text-gray-600 w-80">
+                    Find answers to common questions about MetricsLM,
+                    including its features, security measures, integration
+                    options, and more.
+                </p>
             </div>
         </div>
+
+        <div className="bg-white w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
+            {faqItems.map((item) => (
+                <div
+                    key={item.id}
+                    className="border-b border-gray-200 last:border-0"
+                >
+                    <button
+                        onClick={() => toggleItem(item.id)}
+                        className="flex w-full items-center justify-between py-5 text-left focus:outline-none group"
+                        aria-expanded={openItems.includes(item.id)}
+                    >
+                        <span className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {item.question}
+                        </span>
+                        <div
+                            className={`ml-6 flex-shrink-0 ${
+                                openItems.includes(item.id)
+                                    ? "rotate-180"
+                                    : ""
+                            } transition-transform duration-200`}
+                        >
+                            <ChevronDown className="h-5 w-5 text-gray-500" />
+                        </div>
+                    </button>
+
+                    <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            openItems.includes(item.id)
+                                ? "max-h-[400px] opacity-100"
+                                : "max-h-0 opacity-0"
+                        }`}
+                    >
+                        <p className="pb-5 text-gray-600">{item.answer}</p>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
     );
 };
 

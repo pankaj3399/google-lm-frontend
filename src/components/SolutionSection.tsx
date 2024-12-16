@@ -49,41 +49,41 @@ const solutions: SolutionData[] = [
 
 const SolutionSection: React.FC = () => {
   return (
-    <section data-layername="solutionSection1" className="flex overflow-hidden flex-col items-center px-8 pt-10 pb-10 w-full bg-white max-md:px-5 max-md:py-24 max-md:max-w-full">
-      <div data-layername="container" className="flex flex-col items-center w-full max-w-[1204px] max-md:max-w-full">
-        <div data-layername="secitonHeadlingLevel11" className="flex flex-col text-base text-center text-gray-600 max-w-[800px] w-[800px] max-md:max-w-full">
-          <div className="flex flex-col items-center w-full max-md:max-w-full">
-            <div data-layername="smallEyebrowTagLabelStyle1" className="flex gap-2 items-center px-3 py-2 font-medium leading-relaxed whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300">
-              <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95" alt="" className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square" />
-              <p data-layername="content" className="self-stretch my-auto" id='_application'>
-                Applications
-              </p>
-            </div>
-            <h2 data-layername="headingWrapper" className="flex-1 shrink gap-2 self-stretch mt-4 w-full text-4xl font-bold leading-none text-neutral-800 max-md:max-w-full">
-              Real-world solutions made simple
-            </h2>
-            <div data-layername="descrWrapper" className="flex gap-2 items-center px-5 mt-4 w-full leading-7 max-w-[820px] max-md:max-w-full">
-              <p data-layername="description" className="flex-1 shrink self-stretch my-auto opacity-80 basis-0 max-md:max-w-full">
-                Explore advanced business intelligence use cases that streamline operations, predict outcomes, and provide key insights for effective decision-making.
-              </p>
-            </div>
+    <section data-layername="solutionSection1" className="flex overflow-hidden flex-col items-center px-8 pt-10 pb-0 sm:pb-10 w-full bg-white max-md:px-5  max-md:max-w-full">
+    <div data-layername="container" className="flex flex-col items-center w-full max-w-[1204px] max-md:max-w-full">
+      <div data-layername="secitonHeadlingLevel11" className="flex flex-col text-base text-center text-gray-600 max-w-[800px] w-[800px] max-md:max-w-full">
+        <div className="flex flex-col items-center w-full max-md:max-w-full">
+          <div data-layername="smallEyebrowTagLabelStyle1" className="flex gap-2 items-center px-3 py-2 font-medium leading-relaxed whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300">
+            <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95" alt="" className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square" />
+            <p data-layername="content" className="self-stretch my-auto" id='_application'>
+              Applications
+            </p>
           </div>
-        </div>
-        <div data-layername="list" className="flex flex-wrap gap-8 justify-center items-start pb-20 mt-16 w-full max-md:mt-10 max-md:max-w-full">
-          <div data-layername="list" className="flex flex-wrap flex-1 shrink gap-8 justify-center items-start w-full basis-0 min-w-[240px] max-md:max-w-full">
-            {solutions.map((solution, index) => (
-              <SolutionCard
-                key={index}
-                icon={solution.icon}
-                title={solution.title}
-                description={solution.description}
-                field={solution.field}
-              />
-            ))}
+          <h2 data-layername="headingWrapper" className="flex-1 shrink gap-2 self-stretch mt-4 w-full text-4xl font-bold leading-none text-neutral-800 max-md:max-w-full">
+            Real-world solutions made simple
+          </h2>
+          <div data-layername="descrWrapper" className="flex gap-2 items-center px-5 mt-4 w-full leading-7 max-w-[820px] max-md:max-w-full">
+            <p data-layername="description" className="flex-1 shrink self-stretch my-auto opacity-80 basis-0 max-md:max-w-full">
+              Explore advanced business intelligence use cases that streamline operations, predict outcomes, and provide key insights for effective decision-making.
+            </p>
           </div>
         </div>
       </div>
-    </section>
+      <div data-layername="list" className="flex flex-wrap gap-8 justify-center items-start pb-20 mt-16 w-full max-md:mt-10 max-md:max-w-full">
+        <div data-layername="list" className="flex flex-wrap flex-1 shrink gap-8 justify-center items-start w-full basis-0 min-w-[240px] max-md:max-w-full">
+          {solutions.map((solution, index) => (
+            <SolutionCard
+              key={index}
+              icon={solution.icon}
+              title={solution.title}
+              description={solution.description}
+              field={solution.field}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
   );
 };
 
