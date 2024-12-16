@@ -18,7 +18,7 @@ const LandingPage: React.FC = () => {
     return (
         <div
             data-layername="landingPage"
-            className="flex flex-col min-h-screen bg-white"
+            className="flex flex-col min-h-screen bg-white overflow-x-hidden"
         >
             <header className="w-full bg-gray-200">
                 <Navbar />
