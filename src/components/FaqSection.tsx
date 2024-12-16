@@ -58,7 +58,7 @@ const FaqSection: React.FC = () => {
         <div className="flex w-screen mx-auto px-4 py-3 sm:px-6 lg:px-8 mt-5">
             <div className="flex w-7/12 items-start gap-x-4 mb-12">
                 <div className="flex-shrink-0"></div>
-                <div className="p-20">
+                <div className="">
                     <div
                         data-layername="smallEyebrowTagLabelStyle1"
                         className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
