@@ -1,13 +1,6 @@
-import {
-    
-    X,
-    Copy,
-    Pin,
-    Trash,
-    Check,
-    Ellipsis,
-} from "lucide-react";
+import { X, Copy, Pin, Trash, Check, Ellipsis } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import ReactDOM from 'react-dom';
 import { jsPDF } from "jspdf";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
@@ -36,8 +29,12 @@ import {
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
 import { CSpinner } from "@coreui/react";
+import { Chart, registerables } from 'chart.js';
+import { Bar, Line, Pie } from "react-chartjs-2";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+Chart.register(...registerables);
 
 interface Note {
     _id: string;
@@ -66,6 +63,24 @@ interface Chat {
 interface ReportCategory {
     category: string;
     options: string[];
+}
+interface Output {
+    text: string;
+    json: { visualizations: Visualization[] } | null;
+}
+interface ChartDataset {
+    label: string;
+    data: number[];
+    borderColor?: string | string[];
+    backgroundColor?: string | string[];
+}
+
+interface Visualization {
+    chartType: "bar_chart" | "line_chart" | "pie_chart";
+    data: {
+        labels: string[];
+        datasets: ChartDataset[];
+    };
 }
 
 const reportCategories: ReportCategory[] = [
@@ -188,6 +203,7 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const { getToken } = useAuth();
     const { user } = useUser();
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
+    const [output, setOutput] = useState<Output>({ text: "", json: null });
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
     const [pullDataLoading, setPullDataLoading] = useState(false);
@@ -369,7 +385,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             );
             setInputChat("");
             addChat(resp.data.message, "GPT");
-            setChatLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -380,6 +395,8 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
             } else {
                 console.error(error);
             }
+        } finally {
+            setChatLoading(false);
         }
     };
 
@@ -440,7 +457,6 @@ Make sure that it’s easy to understand and contains the primary information in
             );
             setInputChat("");
             addChat(resp.data.message, "GPT");
-            setChatLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -451,6 +467,8 @@ Make sure that it’s easy to understand and contains the primary information in
             } else {
                 console.error(error);
             }
+        } finally {
+            setChatLoading(false);
         }
     };
 
@@ -539,6 +557,28 @@ Make sure that it’s easy to understand and contains the primary information in
         setIsEditing(false);
     };
 
+    const separateTextAndJson = (inputText: string) => {
+        const jsonRegex = /```json([\s\S]*?)```/;
+        const match = inputText.match(jsonRegex);
+
+        if (match) {
+            const extractedJson = match[1].trim();
+            const remainingText = inputText.replace(jsonRegex, "").trim();
+            let parsedJson;
+
+            try {
+                parsedJson = JSON.parse(extractedJson);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                parsedJson = null;
+            }
+
+            return { text: remainingText, json: parsedJson };
+        }
+
+        return { text: inputText, json: null };
+    };
+
     const handleGenerateReport = async () => {
         const { startDate, endDate } = dates;
 
@@ -562,6 +602,10 @@ Make sure that it’s easy to understand and contains the primary information in
                 `${API_URL}/api/users/getWorkspace-report/${workspaceId}`,
                 data
             );
+
+            const result = separateTextAndJson(resp.data.summary);
+            setOutput(result);
+            console.log(resp.data.summary);
             setSelectedSummary(resp.data.summary);
             setFirstScreen(true);
             setGenerateReportText("");
@@ -569,7 +613,6 @@ Make sure that it’s easy to understand and contains the primary information in
                 startDate: null,
                 endDate: null,
             });
-            setGenerateReportLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -580,6 +623,8 @@ Make sure that it’s easy to understand and contains the primary information in
             } else {
                 console.error(error);
             }
+        } finally {
+            setGenerateReportLoading(false);
         }
     };
 
@@ -663,7 +708,6 @@ Make sure that it’s easy to understand and contains the primary information in
 
             setSecondScreen(true);
             setPullDataResponse(response.data);
-            setPullDataLoading(false);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const statusCode = error.response?.status;
@@ -684,29 +728,109 @@ Make sure that it’s easy to understand and contains the primary information in
                 console.error(error);
                 toast.error("An unexpected error occurred.");
             }
+        } finally {
+            setPullDataLoading(false);
         }
     };
 
-    const handleDownload = () => {
+    const handleDownload = async () => {
         const doc = new jsPDF();
         doc.setFont("helvetica", "normal");
         doc.setFontSize(12);
-        const text = selectedSummary;
+    
         const margin = 10;
+        const pageHeight = doc.internal.pageSize.getHeight();
         const pageWidth = doc.internal.pageSize.getWidth();
         const maxWidth = pageWidth - 2 * margin;
-
-        const textLines = doc.splitTextToSize(text as string, maxWidth);
-
-        doc.text(textLines, margin, margin + 10);
-
+        const lineHeight = 10;
+        let currentY = margin;
+    
+        const addPageIfNeeded = (requiredSpace: number) => {
+            if (currentY + requiredSpace > pageHeight - margin) {
+                doc.addPage();
+                currentY = margin;
+            }
+        };
+    
+        // Add Text Content (Markdown Rendering)
+        const markdownContainer = document.createElement('div');
+        markdownContainer.style.width = `${maxWidth}px`;
+        markdownContainer.style.visibility = 'hidden';
+        document.body.appendChild(markdownContainer);
+    
+        ReactDOM.render(<ReactMarkdown>{output.text}</ReactMarkdown>, markdownContainer);
+    
+        const textContent = markdownContainer.innerText;
+        document.body.removeChild(markdownContainer);
+    
+        const textLines = doc.splitTextToSize(textContent, maxWidth);
+    
+        for (const line of textLines) {
+            addPageIfNeeded(lineHeight);
+            doc.text(line, margin, currentY);
+            currentY += lineHeight;
+        }
+    
+        // Add Charts After Text
+        if (output.json && output.json.visualizations) {
+            for (const visualization of output.json.visualizations) {
+                const chartId = `chart-${visualization.chartType}-${Math.random()}`;
+    
+                let ChartComponent;
+                switch (visualization.chartType) {
+                    case 'bar_chart':
+                        ChartComponent = <Bar id={chartId} data={visualization.data} />;
+                        break;
+                    case 'line_chart':
+                        ChartComponent = <Line id={chartId} data={visualization.data} />;
+                        break;
+                    case 'pie_chart':
+                        ChartComponent = <Pie id={chartId} data={visualization.data} />;
+                        break;
+                    default:
+                        continue;
+                }
+    
+                const container = document.createElement('div');
+                document.body.appendChild(container);
+                ReactDOM.render(ChartComponent, container);
+    
+                await new Promise<void>((resolve) => {
+                    setTimeout(() => {
+                        const chartCanvas = document.getElementById(chartId) as HTMLCanvasElement | null;
+                        if (chartCanvas) {
+                            const imgData = chartCanvas.toDataURL('image/png');
+                            const chartHeight = 160;
+                            const chartWidth = 180;
+    
+                            addPageIfNeeded(chartHeight + lineHeight);
+                            doc.addImage(imgData, 'PNG', margin, currentY, chartWidth, chartHeight);
+                            currentY += chartHeight + lineHeight;
+                        } else {
+                            console.error(`Chart with ID ${chartId} not found.`);
+                        }
+    
+                        ReactDOM.unmountComponentAtNode(container);
+                        document.body.removeChild(container);
+                        resolve();
+                    }, 500); // Allow time for chart rendering
+                });
+            }
+        }
+    
+        // Save the PDF
         doc.save("summary.pdf");
     };
-
-    const isAnyNoteSelected = selectedNotes.some((isSlected)=>isSlected);
+    
+    
+    const isAnyNoteSelected = selectedNotes.some((isSlected) => isSlected);
 
     return (
-        <div className={`h-screen w-[90%]   flex flex-col ${!chatSection ? "":"bg-[#E5EBF2]"} `}>
+        <div
+            className={`h-screen w-[90%]   flex flex-col ${
+                !chatSection ? "" : "bg-[#E5EBF2]"
+            } `}
+        >
             <div className="h-14 flex items-center justify-between border-b border-gray-200 bg-white pl-5 pr-5">
                 {isEditing ? (
                     <input
@@ -728,176 +852,212 @@ Make sure that it’s easy to understand and contains the primary information in
                 <UserButton />
             </div>
 
-            <div className="flex-1 w-full p-6 overflow-y-auto relative" ref={containerRef}>
-    {chatSection ? (
-        <>
-            {chats.length > 0 ? (
-                chats.map((chat, indx) => (
-                    <div
-                        key={indx}
-                        className={`w-full flex ${
-                            chat.owner === "Me" ? "justify-end" : "justify-start"
-                        }`}
-                    >
-                        <p className="max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg">
-                            {chat.owner === "GPT" ? (
-                                <ReactMarkdown>{chat.message}</ReactMarkdown>
-                            ) : (
-                                <div>{chat.message}</div>
-                            )}
-                            {chat.owner === "GPT" && (
-                                <div className="flex justify-between pt-2 items-center">
-                                    <div className="flex gap-1">
-                                        <Copy size={15} className="cursor-pointer" />
-                                        {/* <ThumbsUp size={15} className="cursor-pointer" />
+            <div
+                className="flex-1 w-full p-6 overflow-y-auto relative"
+                ref={containerRef}
+            >
+                {chatSection ? (
+                    <>
+                        {chats.length > 0 ? (
+                            chats.map((chat, indx) => (
+                                <div
+                                    key={indx}
+                                    className={`w-full flex ${
+                                        chat.owner === "Me"
+                                            ? "justify-end"
+                                            : "justify-start"
+                                    }`}
+                                >
+                                    <p className="max-w-[80%] bg-slate-100 p-3 mt-5 rounded-b-md listItem tracking-wide shadow-lg">
+                                        {chat.owner === "GPT" ? (
+                                            <ReactMarkdown>
+                                                {chat.message}
+                                            </ReactMarkdown>
+                                        ) : (
+                                            <div>{chat.message}</div>
+                                        )}
+                                        {chat.owner === "GPT" && (
+                                            <div className="flex justify-between pt-2 items-center">
+                                                <div className="flex gap-1">
+                                                    <Copy
+                                                        size={15}
+                                                        className="cursor-pointer"
+                                                    />
+                                                    {/* <ThumbsUp size={15} className="cursor-pointer" />
                                         <ThumbsDown size={15} className="cursor-pointer" /> */}
+                                                </div>
+                                                <div
+                                                    className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
+                                                    onClick={() =>
+                                                        handleSaveNote(
+                                                            chat.message,
+                                                            indx
+                                                        )
+                                                    }
+                                                >
+                                                    <Pin size={16} />
+                                                    <span>
+                                                        Save to Workspace
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="flex justify-center">
+                                <h1 className="text-2xl text-[#43526E] font-sfpro">
+                                    Please start conversation
+                                </h1>
+                            </div>
+                        )}
+
+                        {chatLoading && (
+                            <div className="w-full flex justify-start mt-5">
+                                <div className="max-w-[80%] bg-slate-100 p-3 rounded-b-md listItem tracking-wide shadow-lg">
+                                    <Ellipsis size={30} />
+                                </div>
+                            </div>
+                        )}
+
+                        <X
+                            className="fixed right-5 top-16 cursor-pointer"
+                            onClick={() => setChatSection(false)}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <div className="flex w-full gap-5 h-4  ">
+                            <div
+                                className="flex items-center cursor-pointer gap-1"
+                                onClick={() => {
+                                    setSelectedNote(-1);
+                                    handleNewNoteDisplay();
+                                }}
+                            >
+                                <img
+                                    src="/icon7.svg"
+                                    alt="add note"
+                                    className="h-[18px]"
+                                />
+                                <span className="text-gray-600">Add Note</span>
+                            </div>
+                            {notes.length > 0 && (
+                                <>
+                                    <Dialog>
+                                        <DialogTrigger
+                                            className={`flex items-center ${
+                                                isAnyNoteSelected
+                                                    ? ""
+                                                    : " opacity-50"
+                                            }`}
+                                            onClick={(e) => {
+                                                if (!isAnyNoteSelected) {
+                                                    e.preventDefault();
+                                                    toast.error(
+                                                        "Please select a note to delete"
+                                                    );
+                                                }
+                                            }}
+                                        >
+                                            <div className="flex items-center cursor-pointer">
+                                                <Trash className="h-5 text-gray-600" />
+                                                <span>Delete</span>
+                                            </div>
+                                        </DialogTrigger>
+                                        <DialogContent className="flex flex-col w-60">
+                                            <h3>
+                                                Are you sure you want to delete
+                                                the notes?
+                                            </h3>
+                                            <DialogClose className="flex gap-2">
+                                                <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
+                                                    onClick={
+                                                        deleteSelectedNotes
+                                                    }
+                                                >
+                                                    Delete
+                                                </button>
+                                            </DialogClose>
+                                        </DialogContent>
+                                    </Dialog>
+                                    <div
+                                        className="flex items-center cursor-pointer"
+                                        onClick={handleSelectAll}
+                                    >
+                                        <Check className="h-5 text-gray-600" />
+                                        <span>Select all</span>
                                     </div>
                                     <div
-                                        className="flex items-center bg-[#FFFFFF] p-2 gap-1 rounded-md cursor-pointer hover:bg-gray-200"
-                                        onClick={() => handleSaveNote(chat.message, indx)}
+                                        className="flex items-center cursor-pointer"
+                                        onClick={handleDeselectAll}
                                     >
-                                        <Pin size={16} />
-                                        <span>Save to Workspace</span>
+                                        <X className="h-5 text-gray-600" />
+                                        <span>Deselect all</span>
                                     </div>
-                                </div>
+                                </>
                             )}
-                        </p>
-                    </div>
-                ))
-            ) : (
-                <div className="flex justify-center">
-                    <h1 className="text-2xl text-[#43526E] font-sfpro">
-                        Please start conversation
-                    </h1>
-                </div>
-            )}
-
-            {chatLoading && (
-                <div className="w-full flex justify-start mt-5">
-                    <div className="max-w-[80%] bg-slate-100 p-3 rounded-b-md listItem tracking-wide shadow-lg">
-                        <Ellipsis size={30} />
-                    </div>
-                </div>
-            )}
-
-            <X
-                className="fixed right-5 top-16 cursor-pointer"
-                onClick={() => setChatSection(false)}
-            />
-        </>
-    ) : (
-        <>
-            <div className="flex w-full gap-5 h-4  ">
-                <div
-                    className="flex items-center cursor-pointer gap-1"
-                    onClick={() => {
-                        setSelectedNote(-1);
-                        handleNewNoteDisplay();
-                    }}
-                >
-                    <img src="/icon7.svg" alt="add note" className="h-[18px]" />
-                    <span className="text-gray-600">Add Note</span>
-                </div>
-                {notes.length > 0 && (
-                    <>
-                        <Dialog >
-                            <DialogTrigger className={`flex items-center ${isAnyNoteSelected ? '' : ' opacity-50'}`}
-                            onClick={(e)=>{
-                                if(!isAnyNoteSelected){
-                                    e.preventDefault();
-                                    toast.error("Please select a note to delete");
-                                }
-                            }}
-                            >
-                                <div className="flex items-center cursor-pointer">
-                                    <Trash className="h-5 text-gray-600" />
-                                    <span>Delete</span>
-                                </div>
-                            </DialogTrigger>
-                            <DialogContent className="flex flex-col w-60">
-                                <h3>Are you sure you want to delete the notes?</h3>
-                                <DialogClose className="flex gap-2">
-                                    <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
-                                        Cancel
+                        </div>
+                        {notes.length > 0 ? (
+                            <div className="flex mt-2  w-full flex-wrap ">
+                                {notes.map((note: Note, indx) => (
+                                    <SingleNote
+                                        key={note._id}
+                                        indx={indx}
+                                        heading={note?.heading}
+                                        content={note?.content}
+                                        type={note?.type}
+                                        updatedAt={note?.updatedAt}
+                                        createdAt={note?.createdAt}
+                                        selectedNotes={selectedNotes}
+                                        handleToggleNote={handleToggleNote}
+                                        handleNewNoteDisplay={
+                                            handleNewNoteDisplay
+                                        }
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
+                                <h2 className="text-[40px] text-[#42526E] text-center leading-tight mb-2">
+                                    Your saved work will appear here
+                                </h2>
+                                <br />
+                                <p className="text-[14px] text-[#172B4D] font-sfpro w-[570px] h-[21px] font-medium text-center leading-relaxed mb-6">
+                                    Thanks for choosing MetricsLM. Your next
+                                    steps are to add integrations or sources in
+                                    your workspace.
+                                </p>
+                                <div className="flex gap-4">
+                                    <button
+                                        className="px-4 py-2 text-[14px] text-center font-medium font-sfpro bg-[#0052CC] text-white rounded-sm hover:bg-[#0055CC]"
+                                        onClick={setIntegrationPopup}
+                                    >
+                                        Add Integration
                                     </button>
                                     <button
-                                        className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
-                                        onClick={deleteSelectedNotes}
+                                        className="px-4 py-2 text-[14px] font-sfpro text-[#172B4D] text-center font-medium bg-[#F0F1F4]  rounded-sm border border-[#D9DADC] hover:bg-[#E3E4E6]"
+                                        onClick={setSourcePopup}
                                     >
-                                        Delete
+                                        Add Sources
                                     </button>
-                                </DialogClose>
-                            </DialogContent>
-                        </Dialog>
-                        <div
-                            className="flex items-center cursor-pointer"
-                            onClick={handleSelectAll}
-                        >
-                            <Check className="h-5 text-gray-600" />
-                            <span>Select all</span>
-                        </div>
-                        <div
-                            className="flex items-center cursor-pointer"
-                            onClick={handleDeselectAll}
-                        >
-                            <X className="h-5 text-gray-600" />
-                            <span>Deselect all</span>
-                        </div>
+                                </div>
+                                <a
+                                    href="/"
+                                    className="text-[#0C66E4] text-center font-sfpro font-semibold hover:underline mt-4 text-[14px]"
+                                >
+                                    Learn how
+                                </a>
+                            </div>
+                        )}
                     </>
                 )}
             </div>
-            {notes.length > 0 ? (
-                <div className="flex mt-2  w-full flex-wrap ">
-                    {notes.map((note: Note, indx) => (
-                        <SingleNote
-                            key={note._id}
-                            indx={indx}
-                            heading={note?.heading}
-                            content={note?.content}
-                            type={note?.type}
-                            updatedAt={note?.updatedAt}
-                            createdAt={note?.createdAt}
-                            selectedNotes={selectedNotes}
-                            handleToggleNote={handleToggleNote}
-                            handleNewNoteDisplay={handleNewNoteDisplay}
-                        />
-                    ))}
-                </div>
-            ) : (
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-250px)]">
-                    <h2 className="text-[40px] text-[#42526E] text-center leading-tight mb-2">
-                        Your saved work will appear here
-                    </h2>
-                    <br />
-                    <p className="text-[14px] text-[#172B4D] font-sfpro w-[570px] h-[21px] font-medium text-center leading-relaxed mb-6">
-                        Thanks for choosing MetricsLM. Your next steps are to add integrations or sources in your workspace.
-                    </p>
-                    <div className="flex gap-4">
-                        <button
-                            className="px-4 py-2 text-[14px] text-center font-medium font-sfpro bg-[#0052CC] text-white rounded-sm hover:bg-[#0055CC]"
-                            onClick={setIntegrationPopup}
-                        >
-                            Add Integration
-                        </button>
-                        <button
-                            className="px-4 py-2 text-[14px] font-sfpro text-[#172B4D] text-center font-medium bg-[#F0F1F4]  rounded-sm border border-[#D9DADC] hover:bg-[#E3E4E6]"
-                            onClick={setSourcePopup}
-                        >
-                            Add Sources
-                        </button>
-                    </div>
-                    <a
-                        href="/"
-                        className="text-[#0C66E4] text-center font-sfpro font-semibold hover:underline mt-4 text-[14px]"
-                    >
-                        Learn how
-                    </a>
-                </div>
-            )}
-        </>
-    )}
-</div>
-
 
             <div className="w-full h-48 ">
                 <div className="flex flex-col w-[90%] px-5 py-2 bg-white  rounded-t-xl shadow-2xl items-start h-full mx-auto">
@@ -916,42 +1076,42 @@ Make sure that it’s easy to understand and contains the primary information in
                                 </div>
                             ))}
                     </div>
-                    <div  className="w-full border bg-[#D9D9D9] h-0 rounded-full p-[4px] my-1"></div>
+                    <div className="w-full border bg-[#D9D9D9] h-0 rounded-full p-[4px] my-1"></div>
                     <div className="flex w-full mt-2 mb-2 ">
-                    <div
-        className="flex items-center space-x-2 text-gray-500 cursor-pointer"
-        onClick={() => setChatSection((prev) => !prev)}
-    >
-        <span className="text-[#0052CC] font-sfpro text-[14px] font-semibold">
-            {chatSection ? "Close chat" : "Open chat"}
-        </span>
-    </div>
-    <div className="flex-1 mx-4 relative">
-        <input
-            type="text"
-            placeholder="Add an integration or a source to get started"
-            className="w-full rounded-md outline-none border-2 p-2 text-[#878686] placeholder:text-[#878686]"
-            value={inputChat}
-            onChange={(e) => setInputChat(e.target.value)}
-        />
-        <div
-            className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
-            onClick={handleChat}
-        >
-            <img
-                src={"/icon6.svg"}
-                alt="sendIcon"
-                className="p-1"
-            />
-        </div>
-    </div>
+                        <div
+                            className="flex items-center space-x-2 text-gray-500 cursor-pointer"
+                            onClick={() => setChatSection((prev) => !prev)}
+                        >
+                            <span className="text-[#0052CC] font-sfpro text-[14px] font-semibold">
+                                {chatSection ? "Close chat" : "Open chat"}
+                            </span>
+                        </div>
+                        <div className="flex-1 mx-4 relative">
+                            <input
+                                type="text"
+                                placeholder="Add an integration or a source to get started"
+                                className="w-full rounded-md outline-none border-2 p-2 text-[#878686] placeholder:text-[#878686]"
+                                value={inputChat}
+                                onChange={(e) => setInputChat(e.target.value)}
+                            />
+                            <div
+                                className="flex justify-center items-center p-1 border-2 absolute top-1.5 bg-[#E5EBF2] right-1 rounded-md cursor-pointer"
+                                onClick={handleChat}
+                            >
+                                <img
+                                    src={"/icon6.svg"}
+                                    alt="sendIcon"
+                                    className="p-1"
+                                />
+                            </div>
+                        </div>
 
                         <div className="flex flex-col">
                             <Sheet>
                                 <SheetTrigger>
-                                <button className="text-[#0052CC] font-semibold text-[14px]">
-                    Pull Data
-                </button>
+                                    <button className="text-[#0052CC] font-semibold text-[14px]">
+                                        Pull Data
+                                    </button>
                                 </SheetTrigger>
                                 <SheetContent
                                     side={"right"}
@@ -1058,9 +1218,9 @@ Make sure that it’s easy to understand and contains the primary information in
                             </Sheet>
                             <Sheet>
                                 <SheetTrigger>
-                                <button className="text-[#0052CC] font-semibold text-[14px]">
-                    Generate
-                </button>
+                                    <button className="text-[#0052CC] font-semibold text-[14px]">
+                                        Generate
+                                    </button>
                                 </SheetTrigger>
                                 <SheetContent className="w-[30rem] flex flex-col items-center overflow-y-auto">
                                     <SheetHeader className="w-full text-start">
@@ -1210,12 +1370,39 @@ Make sure that it’s easy to understand and contains the primary information in
                     className="w-[40rem] p-5 overflow-y-auto"
                 >
                     <SheetHeader>
-                        <SheetTitle>Report ry</SheetTitle>
+                        <SheetTitle>Report Summary</SheetTitle>
                     </SheetHeader>
                     <div className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-                        <p className="text-gray-700 whitespace-pre-line">
-                            {markdownToTxt(selectedSummary || "")}
-                        </p>
+                        
+                            <ReactMarkdown className="text-gray-700 overflow-auto">
+                                {output.text}
+                            </ReactMarkdown>
+
+                        <h2 className="mt-4 text-lg font-semibold">
+                            Visualizations:
+                        </h2>
+                        {output.json && output.json.visualizations ? (
+                            output.json.visualizations.map(
+                                    (visualization: Visualization, index: number) => (
+                                        <div
+                                            key={index}
+                                            style={{ marginBottom: "20px" }}
+                                        >
+                                            {visualization.chartType === 'bar_chart' && (
+                                                <Bar data={visualization.data} />
+                                            )}
+                                            {visualization.chartType === 'line_chart' && (
+                                                <Line data={visualization.data} />
+                                            )}
+                                            {visualization.chartType === 'pie_chart' && (
+                                                <Pie data={visualization.data} />
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No visualizations found.</p>
+                                )
+                        }
                     </div>
                     <div className="flex gap-2 mt-5 justify-center">
                         <button
