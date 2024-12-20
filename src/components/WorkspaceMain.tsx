@@ -1,7 +1,7 @@
 import { X, Copy, Pin, Trash, Check, Ellipsis } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
-import ReactDOM from 'react-dom';
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { useParams } from "react-router-dom";
 import SingleNote from "./ui/SingleNote";
 import useUserStore from "../store/userStore";
@@ -29,7 +29,7 @@ import {
 } from "../components/ui/dialog";
 import ReactMarkdown from "react-markdown";
 import { CSpinner } from "@coreui/react";
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables } from "chart.js";
 import { Bar, Line, Pie } from "react-chartjs-2";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -64,23 +64,48 @@ interface ReportCategory {
     category: string;
     options: string[];
 }
-interface Output {
-    text: string;
-    json: { visualizations: Visualization[] } | null;
-}
-interface ChartDataset {
+interface Dataset {
     label: string;
     data: number[];
-    borderColor?: string | string[];
-    backgroundColor?: string | string[];
+    borderColor: string[];
+    backgroundColor: string[];
 }
 
 interface Visualization {
     chartType: "bar_chart" | "line_chart" | "pie_chart";
     data: {
         labels: string[];
-        datasets: ChartDataset[];
+        datasets: Dataset[];
     };
+}
+
+interface Analysis {
+    Traffic: {
+        Description: string;
+        Traffic_Visualization: Visualization;
+    };
+    User_Behavior: {
+        Description: string;
+        Behavior_Visualization: Visualization;
+    };
+    Engagement: {
+        Description: string;
+        Engagement_Visualization: Visualization;
+    };
+}
+
+interface Audit {
+    Technical_Aspects: string;
+    SEO_Performance: string;
+    Accessibility: string;
+}
+
+interface ReportData {
+    Summary: string;
+    Analysis: Analysis;
+    Audit: Audit;
+    Suggestions: string;
+    Visualization: Visualization[];
 }
 
 const reportCategories: ReportCategory[] = [
@@ -203,16 +228,19 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const { getToken } = useAuth();
     const { user } = useUser();
     const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
-    const [output, setOutput] = useState<Output>({ text: "", json: null });
+    const [reportData, setReportData] = useState<ReportData | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
     const [pullDataLoading, setPullDataLoading] = useState(false);
     const [generateReportLoading, setGenerateReportLoading] = useState(false);
     const [pullDataResponse, setPullDataResponse] = useState("");
+    const currentDate = new Date();
+    const pastDate = new Date();
+    pastDate.setDate(currentDate.getDate() - 30);
     const [dataToShowOnPull, setDataToShowOnPull] = useState(pullData);
     const [dates, setDates] = useState<DateRange>({
-        startDate: null,
-        endDate: null,
+        startDate: pastDate,
+        endDate: new Date(),
     });
     const [selectedNotes, setSelectedNotes] = useState<boolean[]>(
         new Array(notes.length).fill(false)
@@ -602,17 +630,12 @@ Make sure that it’s easy to understand and contains the primary information in
                 `${API_URL}/api/users/getWorkspace-report/${workspaceId}`,
                 data
             );
+            const response = separateTextAndJson(resp.data.summary);
 
-            const result = separateTextAndJson(resp.data.summary);
-            setOutput(result);
-            console.log(resp.data.summary);
-            setSelectedSummary(resp.data.summary);
+            setReportData(response.json);
+            setSelectedSummary(JSON.stringify(response.json));
             setFirstScreen(true);
             setGenerateReportText("");
-            setDates({
-                startDate: null,
-                endDate: null,
-            });
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -733,96 +756,66 @@ Make sure that it’s easy to understand and contains the primary information in
         }
     };
 
-    const handleDownload = async () => {
-        const doc = new jsPDF();
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(12);
-    
-        const margin = 10;
-        const pageHeight = doc.internal.pageSize.getHeight();
-        const pageWidth = doc.internal.pageSize.getWidth();
-        const maxWidth = pageWidth - 2 * margin;
-        const lineHeight = 10;
-        let currentY = margin;
-    
-        const addPageIfNeeded = (requiredSpace: number) => {
-            if (currentY + requiredSpace > pageHeight - margin) {
-                doc.addPage();
-                currentY = margin;
-            }
+    const renderChart = (
+        chartType: "bar_chart" | "line_chart" | "pie_chart",
+        data: { labels: string[]; datasets: Dataset[] }
+    ) => {
+        const chartComponents: {
+            [key in "bar_chart" | "line_chart" | "pie_chart"]: JSX.Element;
+        } = {
+            bar_chart: <Bar data={data} />,
+            line_chart: <Line data={data} />, 
+            pie_chart: <Pie data={data} />,
         };
+        return chartComponents[chartType] || <p>Unsupported chart type</p>;
+    };
     
-        // Add Text Content (Markdown Rendering)
-        const markdownContainer = document.createElement('div');
-        markdownContainer.style.width = `${maxWidth}px`;
-        markdownContainer.style.visibility = 'hidden';
-        document.body.appendChild(markdownContainer);
+    const downloadPDF = async () => {
+        const doc = new jsPDF("p", "pt", "a4");
+        const content = document.getElementById("report-content");
     
-        ReactDOM.render(<ReactMarkdown>{output.text}</ReactMarkdown>, markdownContainer);
-    
-        const textContent = markdownContainer.innerText;
-        document.body.removeChild(markdownContainer);
-    
-        const textLines = doc.splitTextToSize(textContent, maxWidth);
-    
-        for (const line of textLines) {
-            addPageIfNeeded(lineHeight);
-            doc.text(line, margin, currentY);
-            currentY += lineHeight;
+        if (!content) {
+            alert("Content not found!");
+            return;
         }
     
-        // Add Charts After Text
-        if (output.json && output.json.visualizations) {
-            for (const visualization of output.json.visualizations) {
-                const chartId = `chart-${visualization.chartType}-${Math.random()}`;
+        const canvas = await html2canvas(content, {
+            scale: 3, 
+            width: content.offsetWidth,
+        });
     
-                let ChartComponent;
-                switch (visualization.chartType) {
-                    case 'bar_chart':
-                        ChartComponent = <Bar id={chartId} data={visualization.data} />;
-                        break;
-                    case 'line_chart':
-                        ChartComponent = <Line id={chartId} data={visualization.data} />;
-                        break;
-                    case 'pie_chart':
-                        ChartComponent = <Pie id={chartId} data={visualization.data} />;
-                        break;
-                    default:
-                        continue;
-                }
+        const imgData = canvas.toDataURL("image/png");
+        const pdfWidth = doc.internal.pageSize.getWidth(); 
+        const pdfHeight = doc.internal.pageSize.getHeight(); 
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
     
-                const container = document.createElement('div');
-                document.body.appendChild(container);
-                ReactDOM.render(ChartComponent, container);
+
+        const ratio = pdfWidth / imgWidth;
+        const scaledHeight = imgHeight * ratio;
     
-                await new Promise<void>((resolve) => {
-                    setTimeout(() => {
-                        const chartCanvas = document.getElementById(chartId) as HTMLCanvasElement | null;
-                        if (chartCanvas) {
-                            const imgData = chartCanvas.toDataURL('image/png');
-                            const chartHeight = 160;
-                            const chartWidth = 180;
+        let position = 0; 
     
-                            addPageIfNeeded(chartHeight + lineHeight);
-                            doc.addImage(imgData, 'PNG', margin, currentY, chartWidth, chartHeight);
-                            currentY += chartHeight + lineHeight;
-                        } else {
-                            console.error(`Chart with ID ${chartId} not found.`);
-                        }
+        while (position < scaledHeight) {
+            if (position > 0) doc.addPage(); 
     
-                        ReactDOM.unmountComponentAtNode(container);
-                        document.body.removeChild(container);
-                        resolve();
-                    }, 500); // Allow time for chart rendering
-                });
-            }
+            doc.addImage(
+                imgData,
+                "PNG",
+                0, 
+                -position, 
+                pdfWidth,
+                scaledHeight
+            );
+    
+            position += pdfHeight; 
         }
     
-        // Save the PDF
-        doc.save("summary.pdf");
+        doc.save("report.pdf");
     };
     
     
+
     const isAnyNoteSelected = selectedNotes.some((isSlected) => isSlected);
 
     return (
@@ -1227,9 +1220,9 @@ Make sure that it’s easy to understand and contains the primary information in
                                         <SheetTitle className="text-2xl font-light">
                                             Generate
                                         </SheetTitle>
-                                        <p className="border-b-2 mt-2 text-[#6DA2FF] font-semibold font-sfpro">
-                                            Report
-                                        </p>
+                                        <span className="border-b-2 mt-2 font-semibold font-sfpro text-[14px]">
+                                            Reports
+                                        </span>
                                     </SheetHeader>
                                     <div className="flex gap-2 justify-center">
                                         <div className="space-y-2">
@@ -1276,6 +1269,17 @@ Make sure that it’s easy to understand and contains the primary information in
                                             />
                                         </div>
                                     </div>
+                                    <textarea
+                                        className="shadow-lg w-4/5 border-2 rounded-md min-h-20 outline-none p-1 placeholder-[#a5a5a5] text-[12px]"
+                                        style={{ resize: "none" }}
+                                        placeholder="Generate reports based on your query from connected sources or notes..."
+                                        value={generateReportText}
+                                        onChange={(e) =>
+                                            setGenerateReportText(
+                                                e.target.value
+                                            )
+                                        }
+                                    />
 
                                     <div className="flex flex-col w-full ml-20">
                                         {reportCategories.map((category) => (
@@ -1322,18 +1326,6 @@ Make sure that it’s easy to understand and contains the primary information in
                                         ))}
                                     </div>
 
-                                    <textarea
-                                        className="shadow-lg w-4/5 border-2 rounded-md min-h-20 outline-none p-1"
-                                        style={{ resize: "none" }}
-                                        placeholder="Query about report"
-                                        value={generateReportText}
-                                        onChange={(e) =>
-                                            setGenerateReportText(
-                                                e.target.value
-                                            )
-                                        }
-                                    />
-
                                     <button
                                         className={`p-2 rounded-md w-4/5 mt-5 ${
                                             generateReportLoading
@@ -1372,37 +1364,94 @@ Make sure that it’s easy to understand and contains the primary information in
                     <SheetHeader>
                         <SheetTitle>Report Summary</SheetTitle>
                     </SheetHeader>
-                    <div className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200">
-                        
-                            <ReactMarkdown className="text-gray-700 overflow-auto">
-                                {output.text}
-                            </ReactMarkdown>
+                    <div
+                        id="report-content"
+                        className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200"
+                    >
+                        <h2 className="font-bold">Summary</h2>
+                        <p>{reportData?.Summary}</p>
 
-                        <h2 className="mt-4 text-lg font-semibold">
-                            Visualizations:
-                        </h2>
-                        {output.json && output.json.visualizations ? (
-                            output.json.visualizations.map(
-                                    (visualization: Visualization, index: number) => (
-                                        <div
-                                            key={index}
-                                            style={{ marginBottom: "20px" }}
-                                        >
-                                            {visualization.chartType === 'bar_chart' && (
-                                                <Bar data={visualization.data} />
-                                            )}
-                                            {visualization.chartType === 'line_chart' && (
-                                                <Line data={visualization.data} />
-                                            )}
-                                            {visualization.chartType === 'pie_chart' && (
-                                                <Pie data={visualization.data} />
-                                            )}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p>No visualizations found.</p>
-                                )
-                        }
+                        <h2 className="font-bold">Analysis</h2>
+                        <div>
+                            <h3>Traffic</h3>
+                            <p>{reportData?.Analysis?.Traffic?.Description}</p>
+                            {reportData &&
+                            <div className="h-[300px] w-[400px] flex justify-center">
+                                {
+                                renderChart(
+                                    reportData.Analysis?.Traffic
+                                        ?.Traffic_Visualization?.chartType,
+                                    reportData.Analysis?.Traffic
+                                        ?.Traffic_Visualization.data
+                                )}
+                                </div>}
+
+                            <h3>User Behavior</h3>
+                            <p>
+                                {
+                                    reportData?.Analysis?.User_Behavior
+                                        ?.Description
+                                }
+                            </p>
+                            {reportData &&
+                            <div className="h-[300px] w-[400px] flex justify-center">
+                                {
+                                renderChart(
+                                    reportData.Analysis?.User_Behavior
+                                        ?.Behavior_Visualization.chartType,
+                                    reportData.Analysis?.User_Behavior
+                                        ?.Behavior_Visualization.data
+                                )}
+                                </div>
+                            }
+
+                            <h3>Engagement</h3>
+                            <p>
+                                {reportData?.Analysis?.Engagement?.Description}
+                            </p>
+                            {reportData &&
+                            <div className="h-[300px] w-[400px] flex justify-center">
+                                {renderChart(
+                                    reportData.Analysis?.Engagement
+                                        ?.Engagement_Visualization.chartType,
+                                    reportData.Analysis?.Engagement
+                                        ?.Engagement_Visualization.data
+                                )}
+                            </div>
+                            }
+                        </div>
+
+                        {/* Display Audit */}
+                        <h2 className="font-bold">Audit</h2>
+                        <div>
+                            <h3>Technical Aspects</h3>
+                            <p>{reportData?.Audit?.Technical_Aspects}</p>
+
+                            <h3>SEO Performance</h3>
+                            <p>{reportData?.Audit?.SEO_Performance}</p>
+
+                            <h3>Accessibility</h3>
+                            <p>{reportData?.Audit?.Accessibility}</p>
+                        </div>
+
+                        {/* Display Suggestions */}
+                        <h2 className="font-bold">Suggestions</h2>
+                        <p>{reportData?.Suggestions}</p>
+
+                        {/* Display Visualizations */}
+                        <h2 className="font-bold">Visualizations</h2>
+                        {reportData?.Visualization.map((viz, index) => (
+                            <div key={index} className="flex flex-col">
+                                <h3>
+                                    {viz.chartType
+                                        .replace("_", " ")
+                                        .toUpperCase()}
+                                </h3>
+                                <div className="h-[300px] w-[400px] flex justify-center">
+                                {renderChart(viz.chartType, viz.data)}
+                                </div>
+                            </div>
+                        ))}
                     </div>
                     <div className="flex gap-2 mt-5 justify-center">
                         <button
@@ -1419,7 +1468,7 @@ Make sure that it’s easy to understand and contains the primary information in
                         </button>
                         <button
                             className="p-3 bg-slate-200 rounded-md flex"
-                            onClick={handleDownload}
+                            onClick={downloadPDF}
                         >
                             <img src={"/download.svg"} />
                             Download
