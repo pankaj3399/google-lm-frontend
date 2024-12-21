@@ -8,6 +8,7 @@ import useUserStore from "../../store/userStore";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
+import { marked } from 'marked';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,7 +28,8 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     useEffect(() => {
         if (selectedNote != -1) {
             setHeading(notes[selectedNote].heading);
-            setValue(notes[selectedNote].content);
+            const markdownToHtml = marked(notes[selectedNote].content);
+            setValue(markdownToHtml as string);
         }
     }, []);
 
