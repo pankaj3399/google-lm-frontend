@@ -1,4 +1,4 @@
-import { CirclePlus, MessageSquare, Eye,Info } from "lucide-react";
+import { CirclePlus, MessageSquare, Eye, Info } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import useUserStore from "../store/userStore";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,15 @@ import {
     SheetTrigger,
 } from "../components/ui/sheet";
 import axios from "axios";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "../components/ui/dialog";
+import ReactMarkdown from "react-markdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -152,7 +161,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     ) => {
         setEditedName(event.target.value);
     };
-   
+
     return (
         <div className="w-[270px] overflow-y-auto bg-[#FAFBFC] border-r border-gray-200 h-screen flex flex-col text-[#1B2559] font-pops">
             <div className="flex items-center justify-center w-full h-14 border-b  border-gray-200 ">
@@ -178,7 +187,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         />
                     </div>
                     <label className="flex items-center justify-between space-x-2 text-sm ">
-                        <span className="text-[#42526E]">Select all integrations</span>
+                        <span className="text-[#42526E]">
+                            Select all integrations
+                        </span>
                         <input
                             type="checkbox"
                             className="rounded text-[#0052CC] bg-[#0052CC]"
@@ -195,7 +206,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             alt="gpt icon"
                                             className="h-[22px]"
                                         />
-                                        <p className="text-[#42526E]">ChatGpt</p>
+                                        <p className="text-[#42526E]">
+                                            ChatGpt
+                                        </p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -213,7 +226,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                             alt="analytics"
                                             className="h-[22px]"
                                         />
-                                        <p className="text-[#42526E] font-semibold font-sfpro">Google Analytics</p>
+                                        <p className="text-[#42526E] font-semibold font-sfpro">
+                                            Google Analytics
+                                        </p>
                                     </div>
                                     <input
                                         type="checkbox"
@@ -230,7 +245,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                 <div>
                     <div className="flex items-center justify-between mb-2 border-t-2 pt-5">
                         <div className="flex items-center space-x-2">
-                            <span className="font-medium text-[#42526E]">Sources</span>
+                            <span className="font-medium text-[#42526E]">
+                                Sources
+                            </span>
                             <Info className="w-4 h-4 text-[#42526E]" />
                         </div>
                         <CirclePlus
@@ -239,7 +256,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                         />
                     </div>
                     <label className="flex items-center space-x-2 text-sm text-[#42526E] justify-between">
-                        <span className="text-[#42526E]">Select all Sources</span>
+                        <span className="text-[#42526E]">
+                            Select all Sources
+                        </span>
                         <input
                             type="checkbox"
                             className="rounded text-[#0052CC]"
@@ -255,22 +274,25 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     className="flex justify-between"
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
-                                                                                        
-                                    <img
+                                        <img
                                             src={
                                                 source.uploadType === "file"
                                                     ? "/icon4.svg"
                                                     : "/icon3.svg"
                                             }
                                             alt="file icon"
-                                            className={`${source.uploadType==="file" ? "h-[20px]" : "h-[10px]"}   `}
+                                            className={`${
+                                                source.uploadType === "file"
+                                                    ? "h-[20px]"
+                                                    : "h-[10px]"
+                                            }   `}
                                         />
-                                        <p
-
-                                            className="truncate max-w-[150px]  font-sfpro text-sm text-[#42526E]"
-                                        >
+                                        <p className="truncate max-w-[150px]  font-sfpro text-sm text-[#42526E]">
                                             {source.name.length > 15
-                                                ? `${source.name.slice(0, 15)}...`
+                                                ? `${source.name.slice(
+                                                      0,
+                                                      15
+                                                  )}...`
                                                 : source.name}
                                         </p>
                                         {editingSourceId === source._id ? (
@@ -309,24 +331,52 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto 
                     shadow-md rounded-md z-10 transition-opacity duration-200"
                                         >
-                                            <div
-                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
-                                                onClick={() =>
-                                                    handleDeleteScource(
-                                                        source._id
-                                                    )
-                                                }
-                                            >
-                                                <Trash size={20} />
-                                                <p className="text-[#42526E]">Remove Item</p>
-                                            </div>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <div className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer">
+                                                        <Trash size={20} />
+                                                        <p className="text-[#42526E]">
+                                                            Remove Item
+                                                        </p>
+                                                    </div>
+                                                </DialogTrigger>
+                                                <DialogContent className="flex flex-col w-60">
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            Are you sure you
+                                                            want to delete the
+                                                            sorce?
+                                                        </DialogTitle>
+                                                    </DialogHeader>
+                                                    <DialogFooter>
+                                                        <button
+                                                            className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
+                                                            onClick={() =>
+                                                                handleDeleteScource(
+                                                                    source._id
+                                                                )
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                        <DialogTrigger asChild>
+                                                            <button className="p-3 hover:bg-slate-200 text-blue-600 rounded-md">
+                                                                Cancel
+                                                            </button>
+                                                        </DialogTrigger>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+
                                             <Sheet>
                                                 <SheetTrigger asChild>
                                                     <div className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer">
                                                         <MessageSquare
                                                             size={20}
                                                         />
-                                                        <p className="text-[#42526E]">View Summary</p>
+                                                        <p className="text-[#42526E]">
+                                                            View Summary
+                                                        </p>
                                                     </div>
                                                 </SheetTrigger>
                                                 <SheetContent
@@ -347,7 +397,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                                         paragraph,
                                                                         index
                                                                     ) => (
-                                                                        <p
+                                                                        <ReactMarkdown
                                                                             key={
                                                                                 index
                                                                             }
@@ -356,7 +406,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                                             {
                                                                                 paragraph
                                                                             }
-                                                                        </p>
+                                                                        </ReactMarkdown>
                                                                     )
                                                                 )
                                                         ) : (
@@ -402,7 +452,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                             </SheetTitle>
                                                         </SheetHeader>
                                                         <iframe
-                                                            src={`${source.url}`}
+                                                            src={`https://docs.google.com/gview?url=${encodeURIComponent(source.url)}&embedded=true`}
                                                             height={630}
                                                             width={700}
                                                             className="w-full h-full"

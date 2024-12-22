@@ -19,7 +19,6 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
-import markdownToTxt from "markdown-to-txt";
 import axios from "axios";
 import {
     Dialog,
@@ -1488,9 +1487,9 @@ Make sure that it’s easy to understand and contains the primary information in
                         <SheetTitle>Pulled Data</SheetTitle>
                     </SheetHeader>
                     <div className="mt-5">
-                        <p className="text-gray-700 whitespace-pre-line">
-                            {markdownToTxt(pullDataResponse)}
-                        </p>
+                        <ReactMarkdown className="text-gray-700 whitespace-pre-line">
+                            {pullDataResponse}
+                        </ReactMarkdown>
                     </div>
                     <button
                         className="p-3 bg-slate-200 rounded-md"
