@@ -14,6 +14,14 @@ import {
     SheetTrigger,
 } from "../components/ui/sheet";
 import axios from "axios";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "../components/ui/dialog";
 
 const API_URL = import.meta.env.VITE_API_URL;
 interface WorkspaceSidebarProps {
@@ -255,7 +263,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     className="flex justify-between"
                                 >
                                     <div className="flex items-center relative cursor-pointer group gap-2">
-                                                                                        
+
                                     <img
                                             src={
                                                 source.uploadType === "file"
@@ -309,17 +317,38 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                     opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto 
                     shadow-md rounded-md z-10 transition-opacity duration-200"
                                         >
-                                            <div
-                                                className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
-                                                onClick={() =>
-                                                    handleDeleteScource(
-                                                        source._id
-                                                    )
-                                                }
-                                            >
-                                                <Trash size={20} />
-                                                <p className="text-[#42526E]">Remove Item</p>
-                                            </div>
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <div
+                                                        className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer"
+                                                    >
+                                                        <Trash size={20} />
+                                                        <p className="text-[#42526E]">Remove Item</p>
+                                                    </div>
+                                                </DialogTrigger>
+                                                <DialogContent className="flex flex-col w-60">
+                                                    <DialogHeader>
+                                                        <DialogTitle>Are you sure you want to delete
+                                                        the sorce?</DialogTitle>
+                                                    </DialogHeader>
+                                                    <DialogFooter>
+                                                        <button
+                                                            className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
+                                                            onClick={() => handleDeleteScource(source._id)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                        <DialogTrigger asChild>
+                                                        <button
+                                                            className="p-3 hover:bg-slate-200 text-blue-600 rounded-md"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                        </DialogTrigger>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+
                                             <Sheet>
                                                 <SheetTrigger asChild>
                                                     <div className="flex gap-2 items-center hover:bg-slate-200 p-1 cursor-pointer">
