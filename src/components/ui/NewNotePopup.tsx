@@ -53,7 +53,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     ];
 
     const handleSaveNote = async () => {
-        if (heading === "" || value === "" || selectedNote !== -1) {
+        if (value === "" || selectedNote !== -1) {
             return;
         }
         try {
@@ -62,7 +62,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createNewNote/${workspaceId}`,
                 {
-                    heading: heading,
+                    heading: heading || "New Note",
                     content: value,
                     type: "Written Note",
                 }
