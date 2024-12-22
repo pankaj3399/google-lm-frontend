@@ -37,7 +37,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                 <div className="flex shrink-0 mt-7 rounded-3xl border border-gray-300 border-solid h-[110px] w-[110px]" />
             )}
             {type === "button" && (
-                <div className="flex gap-2 w-screen p-5">
+                <div className="flex gap-2 w-screen p-5 flex-wrap">
                     {/* Button */}
                     <button
                         className={`${title === 'Integrations'? 'min-w-40 h-40': 'min-w-48 h-48'} font-pops flex flex-col items-center justify-center px-4 py-4 text-lg font-medium rounded-3xl border border-gray-300 transition-transform duration-300 transform hover:scale-105 hover:bg-gray-200`}
@@ -56,7 +56,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                             {buttonText}
                         </span>
                     </button>
-                    <div className="flex flex-wrap w-screen gap-2">
+                    {/* <div className="flex flex-wrap w-screen gap-2"> */}
                         {/* Previous Creations */}
                         {previousCreations.length > 0 &&
                             previousCreations.map((previousCreation) => (
@@ -91,7 +91,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
                                 <Check className="text-green-500" />
                             </div>
                         )}
-                    </div>
+                    {/* </div> */}
                 </div>
             )}
         </div>

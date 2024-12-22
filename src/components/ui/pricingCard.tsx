@@ -45,7 +45,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                             >
                                 <p
                                     data-layername="00"
-                                    className="text-5xl font-bold tracking-tight leading-tight text-slate-900 max-md:text-4xl"
+                                    className="text-6xl font-bold tracking-tight leading-tight text-slate-900 md:text-4xl"
                                 >
                                     {price}
                                 </p>
@@ -58,14 +58,14 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                             </div>
                             <p
                                 data-layername="basicPlanBilledPerUser"
-                                className="self-stretch mt-5 text-base leading-tight text-neutral-600"
+                                className="self-stretch mt-5 text-xl sm:text-base leading-tight text-neutral-600"
                             >
-                                {description}
+                                {description} <span className="font-extralight text-base">Billed per user</span>
                             </p>
                         </div>
                         <div className="mt-7 w-full min-h-0 border border-blue-300 border-solid" />
                     </div>
-                    <div className="flex flex-col self-start mt-8 text-base leading-tight text-neutral-600">
+                    <div className="flex flex-col self-start mt-8 text-2xl sm:text-base leading-tight text-neutral-600">
                         {features.map((feature, index) => (
                             <div
                                 key={index}
@@ -94,7 +94,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
                     </div>
                 </div>
                 <button
-                    data-layername="buttonPrimaryWithIcon"
+                    data-layername="buttonPrimaryWithIcon "
                     className={buttonClassName}
                 >
                     <a

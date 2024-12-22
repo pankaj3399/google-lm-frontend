@@ -921,7 +921,7 @@ Make sure that it’s easy to understand and contains the primary information in
                     </>
                 ) : (
                     <>
-                        <div className="flex w-full gap-5 h-4  ">
+                        <div className="flex fixed  w-full gap-5 h-4  ">
                             <div
                                 className="flex items-center cursor-pointer gap-1"
                                 onClick={() => {
