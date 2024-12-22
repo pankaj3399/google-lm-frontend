@@ -6,6 +6,7 @@ import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import useUserStore from "../../store/userStore";
 import axios from "axios";
+import { cn } from "../../lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -270,14 +271,14 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                         {integrations.map((integration, indx) => (
                             <button
                                 key={integration.name}
-                                className={`aspect-square rounded-2xl border-2 border-solid border-gray-200 hover:border-gray-400 transition-colors p-6 flex flex-col items-center justify-center gap-4 
+                                className={cn(`aspect-square rounded-2xl border-2 border-solid border-gray-200  transition-colors p-6 flex flex-col items-center justify-center gap-4 
                                 ${
                                     selectedIntegration === indx
                                         ? "border-blue-400"
-                                        : "border"
+                                        : "border hover:border-gray-400"
                                 }
                                         
-                                `}
+                                `)}
                                 onClick={() => {
                                     updateSelectedIntegration(indx);
                                     handleCheck(indx);
@@ -301,7 +302,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                     </div>
 
                     {selectedIntegration === 1 && googleAnalytics && (
-                        <div className="flex     border-t-2 ">
+                        <div className="grid grid-cols-2  border-t-2 ">
                             <div className="flex  items-center justify-center p-2 mt-2 flex-col pr-5 border-r-2">
             <h2 className="text-2xl font-bold text-[#1B2559] mb-4 font-sans text-center inline-block">
                                                     Connect to Google Analytics

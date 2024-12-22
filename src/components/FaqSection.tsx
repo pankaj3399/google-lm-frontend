@@ -55,31 +55,33 @@ const FaqSection: React.FC = () => {
     };
 
     return (
-        <div id="_faq" className="flex w-screen  sm:flex-row flex-col mx-auto px-4 py-3 sm:px-6 lg:px-8 mt-5">
-        <div className="flex w-7/12 items-start gap-x-4  sm:mb-12">
+        <div id="_faq" className="flex w-screen  sm:flex-row flex-col justify-between mx-auto px-4 py-3 sm:px-6 lg:px-24 mt-5">
+        <div className="flex w-7/12 items-start gap-x-4 p py-12">
             <div className="flex-shrink-0 "></div>
             <div className="">
-                <div
-                    data-layername="smallEyebrowTagLabelStyle1"
-                    className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
-                >
-                    <img
-                        loading="lazy"
-                        src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
-                        alt=""
-                        className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
-                    />
-                    <p
-                        data-layername="content"
-                        className="self-stretch my-auto"
+                <div className="flex flex-col items-center sm:items-start">
+                    <div
+                        data-layername="smallEyebrowTagLabelStyle1"
+                        className="flex  gap-2 items-center px-4 py-3 my-4 sm:px-3 sm:py-2  text-xl sm:text-base font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-full border border-solid shadow-xl border-slate-300"
                     >
-                        FAQ
-                    </p>
+                        <img
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/TEMP/fca6a06dfd0f3a5211a89604267850cacf9069f1934935456882018489d58572?placeholderIfAbsent=true&apiKey=185142cafc424ef59bd121ce5895eb95"
+                            alt=""
+                            className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
+                        />
+                        <p
+                            data-layername="content"
+                            className="self-stretch "
+                        >
+                            FAQ
+                        </p>
+                    </div>
                 </div>
-                <h2 className="text-2xl font-semibold py-4 text-gray-900 w-56">
+                <h2 className="text-4xl sm:text-2xl font-semibold py-4 text-gray-900 ">
                     Frequently asked questions
                 </h2>
-                <p className="mt-2 text-base text-gray-600 w-80">
+                <p className="mt-2 sm:text-base text-2xl font-extralight tracking-wide sm:font-normal sm:tracking-normal text-gray-600 w-80">
                     Find answers to common questions about MetricsLM,
                     including its features, security measures, integration
                     options, and more.
@@ -87,7 +89,7 @@ const FaqSection: React.FC = () => {
             </div>
         </div>
 
-        <div className="bg-white w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
+        <div className="bg-white sm:w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
             {faqItems.map((item) => (
                 <div
                     key={item.id}
@@ -98,8 +100,8 @@ const FaqSection: React.FC = () => {
                         className="flex w-full items-center justify-between py-5 text-left focus:outline-none group"
                         aria-expanded={openItems.includes(item.id)}
                     >
-                        <span className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                            {item.question}
+                        <span className="text-2xl sm:text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-start justify-center gap-2">
+                            <img src="/Linewrapper.png" alt="" className="hidden sm:inline-block" /> {item.question}
                         </span>
                         <div
                             className={`ml-6 flex-shrink-0 ${
@@ -119,11 +121,12 @@ const FaqSection: React.FC = () => {
                                 : "max-h-0 opacity-0"
                         }`}
                     >
-                        <p className="pb-5 text-gray-600">{item.answer}</p>
+                        <p className="pb-5 text-lg sm:text-base tracking-wide sm:tracking-normal  text-gray-900/50 sm:text-gray-600">{item.answer}</p>
                     </div>
                 </div>
             ))}
         </div>
+        <div className="sm:hidden h-[2px] bg-gray-900/30 w-full px-16 my-8"></div>
     </div>
     );
 };
