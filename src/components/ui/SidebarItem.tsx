@@ -40,11 +40,17 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         setWorkspaceToDelete(workspaceId);
     };
 
-    const handleDeleteConfirm = () => {
+    const handleDeleteConfirm = async () => {
         if (workspaceToDelete && deleteWorkspace) {
-            deleteWorkspace(workspaceToDelete);
+            try {
+                await deleteWorkspace(workspaceToDelete);
+                // Only clear the workspaceToDelete if deletion was successful
+                setWorkspaceToDelete(null);
+            } catch (error) {
+                // Error handling is done in the deleteWorkspace function
+                console.error('Error in handleDeleteConfirm:', error);
+            }
         }
-        setWorkspaceToDelete(null);
     };
 
     const handleWorkspaceClick = (workspaceId: string) => {
