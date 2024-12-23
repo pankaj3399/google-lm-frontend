@@ -9,6 +9,7 @@ import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
 import { marked } from 'marked';
+import DOMPurify from "dompurify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,12 +27,23 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const { getToken } = useAuth();
 
     useEffect(() => {
-        if (selectedNote != -1) {
-            setHeading(notes[selectedNote].heading);
-            const markdownToHtml = marked(notes[selectedNote].content);
-            setValue(markdownToHtml as string);
-        }
-    }, []);
+        const convertMarkdownToHtml = () => {
+            if (selectedNote !== -1) {
+                const markdownContent = notes[selectedNote].content;
+
+                // Convert Markdown to HTML
+                const parsedHtml = marked(markdownContent);
+
+                // Sanitize the HTML
+                const sanitizedHtml = DOMPurify.sanitize(parsedHtml as string);
+
+                // Set the sanitized HTML as value
+                setValue(sanitizedHtml);
+            }
+        };
+
+        convertMarkdownToHtml();
+    }, [notes, selectedNote]);
 
     const modules = {
         toolbar: [

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import moment from "moment";
 import useUserStore from "../../store/userStore";
-import markdownToTxt from "markdown-to-txt";
 import { Sheet, SheetTrigger, SheetContent } from "../../components/ui/sheet";
 import { Chart, registerables } from "chart.js";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import ReactMarkdown from "react-markdown";
 
 Chart.register(...registerables);
 
@@ -93,7 +93,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     }
 
     useEffect(() => {
-        if(type === "Report"){
+        if (type === "Report") {
             const resp = JSON.parse(content);
             setReportData(resp);
         }
@@ -112,18 +112,18 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     };
 
     const renderChart = (
-            chartType: "bar_chart" | "line_chart" | "pie_chart",
-            data: { labels: string[]; datasets: Dataset[] }
-        ) => {
-            const chartComponents: {
-                [key in "bar_chart" | "line_chart" | "pie_chart"]: JSX.Element;
-            } = {
-                bar_chart: <Bar data={data} />,
-                line_chart: <Line data={data} />,
-                pie_chart: <Pie data={data} />,
-            };
-            return chartComponents[chartType] || <p>Unsupported chart type</p>;
+        chartType: "bar_chart" | "line_chart" | "pie_chart",
+        data: { labels: string[]; datasets: Dataset[] }
+    ) => {
+        const chartComponents: {
+            [key in "bar_chart" | "line_chart" | "pie_chart"]: JSX.Element;
+        } = {
+            bar_chart: <Bar data={data} />,
+            line_chart: <Line data={data} />,
+            pie_chart: <Pie data={data} />,
         };
+        return chartComponents[chartType] || <p>Unsupported chart type</p>;
+    };
 
     return type === "Report" ? (
         <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
@@ -163,64 +163,53 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                         </h3>
 
                         <div className="space-y-6 tracking-wide">
-                            <p className="text-gray-700">
-                                {(content &&
-                                    markdownToTxt(
-                                        content
-                                            .replace(/(<([^>]+)>)/gi, "")
-                                            .substring(0, 330)
-                                    )) ||
-                                    "No Data Available."}
-                                {content && content.length > 330 ? "..." : ""}
-                            </p>
+                            <ReactMarkdown className="text-gray-700">
+                                {content.length > 330
+                                    ? `${content.substring(0, 330)}...`
+                                    : content}
+                            </ReactMarkdown>
                         </div>
                     </div>
                 </div>
             </SheetTrigger>
             <SheetContent side="left" className="w-[700px] overflow-y-auto">
                 <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 mt-4">
-                <h2 className="font-bold">Summary</h2>
-                        <p>{reportData?.Summary}</p>
+                    <h2 className="font-bold">Summary</h2>
+                    <p>{reportData?.Summary}</p>
 
-                        <h2 className="font-bold">Analysis</h2>
-                        <div>
-                            <h3>Traffic</h3>
-                            <p>{reportData?.Analysis?.Traffic?.Description}</p>
-                            {reportData &&
+                    <h2 className="font-bold">Analysis</h2>
+                    <div>
+                        <h3>Traffic</h3>
+                        <p>{reportData?.Analysis?.Traffic?.Description}</p>
+                        {reportData && (
                             <div className="h-[300px] w-[400px] flex justify-center">
-                                {
-                                renderChart(
+                                {renderChart(
                                     reportData.Analysis?.Traffic
                                         ?.Traffic_Visualization?.chartType,
                                     reportData.Analysis?.Traffic
                                         ?.Traffic_Visualization.data
                                 )}
-                                </div>}
+                            </div>
+                        )}
 
-                            <h3>User Behavior</h3>
-                            <p>
-                                {
-                                    reportData?.Analysis?.User_Behavior
-                                        ?.Description
-                                }
-                            </p>
-                            {reportData &&
+                        <h3>User Behavior</h3>
+                        <p>
+                            {reportData?.Analysis?.User_Behavior?.Description}
+                        </p>
+                        {reportData && (
                             <div className="h-[300px] w-[400px] flex justify-center">
-                                {
-                                renderChart(
+                                {renderChart(
                                     reportData.Analysis?.User_Behavior
                                         ?.Behavior_Visualization.chartType,
                                     reportData.Analysis?.User_Behavior
                                         ?.Behavior_Visualization.data
                                 )}
-                                </div>
-                            }
+                            </div>
+                        )}
 
-                            <h3>Engagement</h3>
-                            <p>
-                                {reportData?.Analysis?.Engagement?.Description}
-                            </p>
-                            {reportData &&
+                        <h3>Engagement</h3>
+                        <p>{reportData?.Analysis?.Engagement?.Description}</p>
+                        {reportData && (
                             <div className="h-[300px] w-[400px] flex justify-center">
                                 {renderChart(
                                     reportData.Analysis?.Engagement
@@ -229,40 +218,38 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                                         ?.Engagement_Visualization.data
                                 )}
                             </div>
-                            }
-                        </div>
+                        )}
+                    </div>
 
-                        {/* Display Audit */}
-                        <h2 className="font-bold">Audit</h2>
-                        <div>
-                            <h3>Technical Aspects</h3>
-                            <p>{reportData?.Audit?.Technical_Aspects}</p>
+                    {/* Display Audit */}
+                    <h2 className="font-bold">Audit</h2>
+                    <div>
+                        <h3>Technical Aspects</h3>
+                        <p>{reportData?.Audit?.Technical_Aspects}</p>
 
-                            <h3>SEO Performance</h3>
-                            <p>{reportData?.Audit?.SEO_Performance}</p>
+                        <h3>SEO Performance</h3>
+                        <p>{reportData?.Audit?.SEO_Performance}</p>
 
-                            <h3>Accessibility</h3>
-                            <p>{reportData?.Audit?.Accessibility}</p>
-                        </div>
+                        <h3>Accessibility</h3>
+                        <p>{reportData?.Audit?.Accessibility}</p>
+                    </div>
 
-                        {/* Display Suggestions */}
-                        <h2 className="font-bold">Suggestions</h2>
-                        <p>{reportData?.Suggestions}</p>
+                    {/* Display Suggestions */}
+                    <h2 className="font-bold">Suggestions</h2>
+                    <p>{reportData?.Suggestions}</p>
 
-                        {/* Display Visualizations */}
-                        <h2 className="font-bold">Visualizations</h2>
-                        {reportData?.Visualization.map((viz, index) => (
-                            <div key={index} className="flex flex-col">
-                                <h3>
-                                    {viz.chartType
-                                        .replace("_", " ")
-                                        .toUpperCase()}
-                                </h3>
-                                <div className="h-[300px] w-[400px] flex justify-center">
+                    {/* Display Visualizations */}
+                    <h2 className="font-bold">Visualizations</h2>
+                    {reportData?.Visualization.map((viz, index) => (
+                        <div key={index} className="flex flex-col">
+                            <h3>
+                                {viz.chartType.replace("_", " ").toUpperCase()}
+                            </h3>
+                            <div className="h-[300px] w-[400px] flex justify-center">
                                 {renderChart(viz.chartType, viz.data)}
-                                </div>
                             </div>
-                        ))}
+                        </div>
+                    ))}
                 </div>
             </SheetContent>
         </Sheet>
@@ -311,16 +298,11 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 </h3>
 
                 <div className="space-y-6 tracking-wide">
-                    <p className="text-gray-700">
-                        {(content &&
-                            markdownToTxt(
-                                content
-                                    .replace(/(<([^>]+)>)/gi, "")
-                                    .substring(0, 330)
-                            )) ||
-                            "No Data Available."}
-                        {content && content.length > 330 ? "..." : ""}
-                    </p>
+                    <ReactMarkdown className="text-gray-700">
+                        {content.length > 330
+                            ? `${content.substring(0, 330)}...`
+                            : content}
+                    </ReactMarkdown>
                 </div>
             </div>
         </div>
