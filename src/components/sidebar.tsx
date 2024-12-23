@@ -108,6 +108,26 @@ const Sidebar = () => {
         }
     };
 
+    const deleteWorkspace = async (workspaceId:string) =>{
+         try{
+            const token = await getToken();
+            setAuthToken(token);
+            await apiClient.delete(`${API_URL}/api/users/workspaces/${user?.id}/${workspaceId}`);
+            setWorkspace(workspace.filter((workspace) => workspace._id !== workspaceId));
+            toast.success("Workspace deleted successfully!");
+        }catch(error){
+            if (axios.isAxiosError(error)) {
+                console.log(error.status);
+                console.error(error.response);
+                toast.error(
+                    error.response?.data.message || "Something went wrong"
+                );
+            } else {
+                console.error(error);
+        }        
+    }
+}
+
     const sidebarItems = [
         {
             title: "Integrations",
@@ -131,12 +151,11 @@ const Sidebar = () => {
     return (
         <aside className="flex flex-col items-start mt-14 pl-5 relative ]">
             {sidebarItems.map((item, index) => (
-                <SidebarItem key={index} {...item} />
+                <SidebarItem key={index} {...item} deleteWorkspace={deleteWorkspace} />
             ))}
             {/* {PopupSection &&  Integrations*/}
             {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
         </aside>
     );
-};
-
+}
 export default Sidebar;
