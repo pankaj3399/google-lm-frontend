@@ -30,15 +30,10 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
         const convertMarkdownToHtml = () => {
             if (selectedNote !== -1) {
                 const markdownContent = notes[selectedNote].content;
-
-                // Convert Markdown to HTML
                 const parsedHtml = marked(markdownContent);
-
-                // Sanitize the HTML
                 const sanitizedHtml = DOMPurify.sanitize(parsedHtml as string);
-
-                // Set the sanitized HTML as value
                 setValue(sanitizedHtml);
+                setHeading(notes[selectedNote].heading)
             }
         };
 

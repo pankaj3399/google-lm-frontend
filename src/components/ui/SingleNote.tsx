@@ -99,6 +99,10 @@ const SingleNote: React.FC<SingleNoteProps> = ({
         }
     }, [content]);
 
+    function stripHtml(html: string): string {
+        return html.replace(/<[^>]*>/g, ""); // Removes all HTML tags
+    }
+
     const IconComponent = getIcon(type);
     const { setSelectedNote } = useUserStore();
 
@@ -299,9 +303,9 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 
                 <div className="space-y-6 tracking-wide">
                     <ReactMarkdown className="text-gray-700">
-                        {content.length > 330
-                            ? `${content.substring(0, 330)}...`
-                            : content}
+                        {stripHtml(content).length > 330
+                            ? `${stripHtml(content).substring(0, 330)}...`
+                            : stripHtml(content)}
                     </ReactMarkdown>
                 </div>
             </div>
