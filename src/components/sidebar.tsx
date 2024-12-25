@@ -20,6 +20,7 @@ const Sidebar = () => {
         setOpenAiKey,
         setGoogleAnalytics,
         setPropertyId,
+        setPropertyName
     } = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
@@ -95,6 +96,7 @@ const Sidebar = () => {
                 `${API_URL}/api/users/getAllWorkspaces/${user?.id}`
             );
             setWorkspace(resp.data.workspaces);
+            setPropertyName(resp.data.propertyName);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);

@@ -48,10 +48,10 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         googleAnalytics,
         openAiKey,
         propertyId,
+        setPropertyName,
         setOpenAiKey,
         setGoogleAnalytics,
         setPropertyId,
-        setWorkspace,
     } = useUserStore();
     const [selectedIntegration, updateSelectedIntegration] = useState(-1);
     const { user } = useUser();
@@ -192,7 +192,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                 }
             );
             setShowProperty(true);
-            console.log(response.data);
             setProperties(response.data.properties);
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -207,18 +206,19 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
         }
     };
 
-    const fetchReport = async (propertyId: string) => {
+    const fetchReport = async (propertyId: string, selectedDisplayName: string) => {
         try {
             const token = await getToken();
             setAuthToken(token);
             const response = await apiClient.get(
                 `${API_URL}/api/users/analytics/report`,
                 {
-                    params: { propertyId, clerkId: user?.id },
+                    params: { propertyId, clerkId: user?.id, displayName: selectedDisplayName },
                 }
             );
             setPropertyId(response.data.propertyId);
-            setWorkspace(response.data.workspace);
+            setPropertyName(response.data.propertyName);
+            toast.success('Google Analytics connected successfully. Pull data through any workspaces')
             handlePopup();
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -332,10 +332,11 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
                                 <br />
                                 <select
                                     disabled={properties.length === 0}
-                                    onChange={(e) =>
-                                        fetchReport(e.target.value)
-                                    }
-                                    className="p-4 border-2 rounded-3xl appearance-none outline-none"
+                                    onChange={(e) =>{
+                                        const selectedDisplayName = e.target.selectedOptions[0].dataset.displayName;
+                                        fetchReport(e.target.value, selectedDisplayName as string)
+                                    }}
+                                    className="p-4 border}-2 rounded-3xl appearance-none outline-none"
                                 >
                                     <option disabled selected>
                                         Select Property

@@ -5,6 +5,8 @@ import { Sheet, SheetTrigger, SheetContent } from "../../components/ui/sheet";
 import { Chart, registerables } from "chart.js";
 import { Bar, Line, Pie } from "react-chartjs-2";
 import ReactMarkdown from "react-markdown";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 Chart.register(...registerables);
 
@@ -92,10 +94,33 @@ const SingleNote: React.FC<SingleNoteProps> = ({
         }
     }
 
+    const separateTextAndJson = (inputText: string) => {
+        const jsonRegex = /```json([\s\S]*?)```/;
+        const match = inputText.match(jsonRegex);
+
+        if (match) {
+            const extractedJson = match[1].trim();
+            const remainingText = inputText.replace(jsonRegex, "").trim();
+            let parsedJson;
+
+            try {
+                parsedJson = JSON.parse(extractedJson);
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+                parsedJson = null;
+            }
+
+            return { text: remainingText, json: parsedJson };
+        }
+
+        return { text: inputText, json: null };
+    };
+
     useEffect(() => {
         if (type === "Report") {
-            const resp = JSON.parse(content);
-            setReportData(resp);
+            const response = separateTextAndJson(content);
+            // const resp = JSON.parse(response.json);
+            setReportData(response.json);
         }
     }, [content]);
 
@@ -118,7 +143,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
     const renderChart = (
         chartType: "bar_chart" | "line_chart" | "pie_chart",
         data: { labels: string[]; datasets: Dataset[] }
-    ) => {
+    ): JSX.Element | null => {
         const chartComponents: {
             [key in "bar_chart" | "line_chart" | "pie_chart"]: JSX.Element;
         } = {
@@ -126,7 +151,50 @@ const SingleNote: React.FC<SingleNoteProps> = ({
             line_chart: <Line data={data} />,
             pie_chart: <Pie data={data} />,
         };
-        return chartComponents[chartType] || <p>Unsupported chart type</p>;
+        return chartComponents[chartType] || null;
+    };
+
+    const downloadPDF = async () => {
+        const doc = new jsPDF("p", "pt", "a4");
+        const content = document.getElementById("report-content");
+        const downloadButton = document.querySelector(
+            "#download_button"
+        ) as HTMLElement | null;
+
+        if (!content) {
+            alert("Content not found!");
+            return;
+        }
+
+        if (downloadButton) downloadButton.style.display = "none";
+
+        const canvas = await html2canvas(content, {
+            scale: 3,
+            width: content.offsetWidth,
+        });
+
+        if (downloadButton) downloadButton.style.display = "";
+
+        const imgData = canvas.toDataURL("image/png");
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = doc.internal.pageSize.getHeight();
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+
+        const ratio = pdfWidth / imgWidth;
+        const scaledHeight = imgHeight * ratio;
+
+        let position = 0;
+
+        while (position < scaledHeight) {
+            if (position > 0) doc.addPage();
+
+            doc.addImage(imgData, "PNG", 0, -position, pdfWidth, scaledHeight);
+
+            position += pdfHeight;
+        }
+
+        doc.save("report.pdf");
     };
 
     return type === "Report" ? (
@@ -161,9 +229,8 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                             </div>
                         </div>
 
-                        <h3 className="mb-5 text-[#5F6369]">
-                            {heading && heading.substring(0, 20)}
-                            {heading && heading.length > 20 ? ".. " : ""}
+                        <h3 className="mb-5 text-[#2c342a]">
+                            {heading && heading.length > 35 ? `${heading.substring(0, 35)}...`  : heading}
                         </h3>
 
                         <div className="space-y-6 tracking-wide">
@@ -177,56 +244,74 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                 </div>
             </SheetTrigger>
             <SheetContent side="left" className="w-[700px] overflow-y-auto">
-                <div className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 mt-4">
-                    <h2 className="font-bold">Summary</h2>
+                <div
+                    className="bg-white rounded-lg shadow-lg p-6 border border-gray-200 mt-4"
+                    id="report-content"
+                >
+                    <h2 className="font-bold text-xl">Summary</h2>
                     <p>{reportData?.Summary}</p>
 
-                    <h2 className="font-bold">Analysis</h2>
+                    <h2 className="font-bold text-xl">Analysis</h2>
                     <div>
                         <h3>Traffic</h3>
                         <p>{reportData?.Analysis?.Traffic?.Description}</p>
-                        {reportData && (
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(
+                        {reportData &&
+                            (() => {
+                                const chart = renderChart(
                                     reportData.Analysis?.Traffic
                                         ?.Traffic_Visualization?.chartType,
                                     reportData.Analysis?.Traffic
-                                        ?.Traffic_Visualization.data
-                                )}
-                            </div>
-                        )}
+                                        ?.Traffic_Visualization?.data
+                                );
+
+                                return chart ? (
+                                    <div className="h-[300px] w-[400px] flex justify-center">
+                                        {chart}
+                                    </div>
+                                ) : null;
+                            })()}
 
                         <h3>User Behavior</h3>
                         <p>
                             {reportData?.Analysis?.User_Behavior?.Description}
                         </p>
-                        {reportData && (
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(
+                        {reportData &&
+                            (() => {
+                                const chart = renderChart(
                                     reportData.Analysis?.User_Behavior
-                                        ?.Behavior_Visualization.chartType,
+                                        ?.Behavior_Visualization?.chartType,
                                     reportData.Analysis?.User_Behavior
-                                        ?.Behavior_Visualization.data
-                                )}
-                            </div>
-                        )}
+                                        ?.Behavior_Visualization?.data
+                                );
+
+                                return chart ? (
+                                    <div className="h-[300px] w-[400px] flex justify-center">
+                                        {chart}
+                                    </div>
+                                ) : null;
+                            })()}
 
                         <h3>Engagement</h3>
                         <p>{reportData?.Analysis?.Engagement?.Description}</p>
-                        {reportData && (
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(
+                        {reportData &&
+                            (() => {
+                                const chart = renderChart(
                                     reportData.Analysis?.Engagement
-                                        ?.Engagement_Visualization.chartType,
+                                        ?.Engagement_Visualization?.chartType,
                                     reportData.Analysis?.Engagement
-                                        ?.Engagement_Visualization.data
-                                )}
-                            </div>
-                        )}
+                                        ?.Engagement_Visualization?.data
+                                );
+
+                                return chart ? (
+                                    <div className="h-[300px] w-[400px] flex justify-center">
+                                        {chart}
+                                    </div>
+                                ) : null;
+                            })()}
                     </div>
 
                     {/* Display Audit */}
-                    <h2 className="font-bold">Audit</h2>
+                    <h2 className="font-bold text-xl">Audit</h2>
                     <div>
                         <h3>Technical Aspects</h3>
                         <p>{reportData?.Audit?.Technical_Aspects}</p>
@@ -239,21 +324,33 @@ const SingleNote: React.FC<SingleNoteProps> = ({
                     </div>
 
                     {/* Display Suggestions */}
-                    <h2 className="font-bold">Suggestions</h2>
+                    <h2 className="font-bold text-xl">Suggestions</h2>
                     <p>{reportData?.Suggestions}</p>
 
                     {/* Display Visualizations */}
-                    <h2 className="font-bold">Visualizations</h2>
-                    {reportData?.Visualization.map((viz, index) => (
-                        <div key={index} className="flex flex-col">
-                            <h3>
-                                {viz.chartType.replace("_", " ").toUpperCase()}
-                            </h3>
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(viz.chartType, viz.data)}
+                    <h2 className="font-bold text-xl">Visualizations</h2>
+                    {reportData?.Visualization.map((viz, index) => {
+                        const chart = renderChart(viz.chartType, viz.data);
+                        return chart ? (
+                            <div key={index} className="flex flex-col">
+                                <div className="h-[300px] w-[400px] flex justify-center">
+                                    {chart}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ) : null;
+                    })}
+                    <div
+                        className="flex gap-2 mt-5 justify-center"
+                        id="download_button"
+                    >
+                        <button
+                            className="p-3 bg-slate-200 rounded-md flex"
+                            onClick={downloadPDF}
+                        >
+                            <img src={"/download.svg"} />
+                            Download
+                        </button>
+                    </div>
                 </div>
             </SheetContent>
         </Sheet>
