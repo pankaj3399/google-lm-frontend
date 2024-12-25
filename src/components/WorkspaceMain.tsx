@@ -226,7 +226,6 @@ const WorkspaceMain: React.FC<WorkspaceMainProps> = ({
     const containerRef = useRef<HTMLDivElement | null>(null);
     const { getToken } = useAuth();
     const { user } = useUser();
-    const [selectedSummary, setSelectedSummary] = useState<string | null>(null);
     const [reportData, setReportData] = useState<ReportData | null>(null);
     const [firstScreen, setFirstScreen] = useState(false);
     const [secondScreen, setSecondScreen] = useState(false);
@@ -632,7 +631,7 @@ Make sure that it’s easy to understand and contains the primary information in
             const response = separateTextAndJson(resp.data.summary);
 
             setReportData(response.json);
-            setSelectedSummary(JSON.stringify(response.json));
+            addNote(resp.data.newNote);
             setFirstScreen(true);
             setGenerateReportText("");
         } catch (error) {
@@ -725,11 +724,13 @@ Make sure that it’s easy to understand and contains the primary information in
                     startDate: dates.startDate.toISOString().split("T")[0],
                     endDate: dates.endDate.toISOString().split("T")[0],
                     metrics: selectedMetrics,
+                    workspaceId,
                 }
             );
 
             setSecondScreen(true);
-            setPullDataResponse(response.data);
+            setPullDataResponse(response.data.analysis);
+            addNote(response.data.newNote);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const statusCode = error.response?.status;
@@ -758,62 +759,57 @@ Make sure that it’s easy to understand and contains the primary information in
     const renderChart = (
         chartType: "bar_chart" | "line_chart" | "pie_chart",
         data: { labels: string[]; datasets: Dataset[] }
-    ) => {
+    ): JSX.Element | null => {
         const chartComponents: {
             [key in "bar_chart" | "line_chart" | "pie_chart"]: JSX.Element;
         } = {
             bar_chart: <Bar data={data} />,
-            line_chart: <Line data={data} />, 
+            line_chart: <Line data={data} />,
             pie_chart: <Pie data={data} />,
         };
-        return chartComponents[chartType] || <p>Unsupported chart type</p>;
+        return chartComponents[chartType] || null;
     };
-    
+
     const downloadPDF = async () => {
         const doc = new jsPDF("p", "pt", "a4");
         const content = document.getElementById("report-content");
-    
+        const downloadButton = document.querySelector("#download_button") as HTMLElement | null;;
+
         if (!content) {
             alert("Content not found!");
             return;
         }
-    
+        
+        if (downloadButton) downloadButton.style.display = "none";
+
         const canvas = await html2canvas(content, {
-            scale: 3, 
+            scale: 3,
             width: content.offsetWidth,
         });
-    
+
+        if (downloadButton) downloadButton.style.display = "";
+
         const imgData = canvas.toDataURL("image/png");
-        const pdfWidth = doc.internal.pageSize.getWidth(); 
-        const pdfHeight = doc.internal.pageSize.getHeight(); 
+        const pdfWidth = doc.internal.pageSize.getWidth();
+        const pdfHeight = doc.internal.pageSize.getHeight();
         const imgWidth = canvas.width;
         const imgHeight = canvas.height;
-    
 
         const ratio = pdfWidth / imgWidth;
         const scaledHeight = imgHeight * ratio;
-    
-        let position = 0; 
-    
+
+        let position = 0;
+
         while (position < scaledHeight) {
-            if (position > 0) doc.addPage(); 
-    
-            doc.addImage(
-                imgData,
-                "PNG",
-                0, 
-                -position, 
-                pdfWidth,
-                scaledHeight
-            );
-    
-            position += pdfHeight; 
+            if (position > 0) doc.addPage();
+
+            doc.addImage(imgData, "PNG", 0, -position, pdfWidth, scaledHeight);
+
+            position += pdfHeight;
         }
-    
+
         doc.save("report.pdf");
     };
-    
-    
 
     const isAnyNoteSelected = selectedNotes.some((isSlected) => isSlected);
 
@@ -1367,23 +1363,28 @@ Make sure that it’s easy to understand and contains the primary information in
                         id="report-content"
                         className="mt-5 bg-white rounded-lg shadow-lg p-6 border border-gray-200"
                     >
-                        <h2 className="font-bold">Summary</h2>
+                        <h2 className="font-bold text-xl">Summary</h2>
                         <p>{reportData?.Summary}</p>
 
-                        <h2 className="font-bold">Analysis</h2>
+                        <h2 className="font-bold text-xl">Analysis</h2>
                         <div>
                             <h3>Traffic</h3>
                             <p>{reportData?.Analysis?.Traffic?.Description}</p>
                             {reportData &&
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {
-                                renderChart(
-                                    reportData.Analysis?.Traffic
-                                        ?.Traffic_Visualization?.chartType,
-                                    reportData.Analysis?.Traffic
-                                        ?.Traffic_Visualization.data
-                                )}
-                                </div>}
+                                (() => {
+                                    const chart = renderChart(
+                                        reportData.Analysis?.Traffic
+                                            ?.Traffic_Visualization?.chartType,
+                                        reportData.Analysis?.Traffic
+                                            ?.Traffic_Visualization?.data
+                                    );
+
+                                    return chart ? (
+                                        <div className="h-[300px] w-[400px] flex justify-center">
+                                            {chart}
+                                        </div>
+                                    ) : null;
+                                })()}
 
                             <h3>User Behavior</h3>
                             <p>
@@ -1393,35 +1394,45 @@ Make sure that it’s easy to understand and contains the primary information in
                                 }
                             </p>
                             {reportData &&
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {
-                                renderChart(
-                                    reportData.Analysis?.User_Behavior
-                                        ?.Behavior_Visualization.chartType,
-                                    reportData.Analysis?.User_Behavior
-                                        ?.Behavior_Visualization.data
-                                )}
-                                </div>
-                            }
+                                (() => {
+                                    const chart = renderChart(
+                                        reportData.Analysis?.User_Behavior
+                                            ?.Behavior_Visualization?.chartType,
+                                        reportData.Analysis?.User_Behavior
+                                            ?.Behavior_Visualization?.data
+                                    );
+
+                                    return chart ? (
+                                        <div className="h-[300px] w-[400px] flex justify-center">
+                                            {chart}
+                                        </div>
+                                    ) : null;
+                                })()}
 
                             <h3>Engagement</h3>
                             <p>
                                 {reportData?.Analysis?.Engagement?.Description}
                             </p>
                             {reportData &&
-                            <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(
-                                    reportData.Analysis?.Engagement
-                                        ?.Engagement_Visualization.chartType,
-                                    reportData.Analysis?.Engagement
-                                        ?.Engagement_Visualization.data
-                                )}
-                            </div>
-                            }
+                                (() => {
+                                    const chart = renderChart(
+                                        reportData.Analysis?.Engagement
+                                            ?.Engagement_Visualization
+                                            ?.chartType,
+                                        reportData.Analysis?.Engagement
+                                            ?.Engagement_Visualization?.data
+                                    );
+
+                                    return chart ? (
+                                        <div className="h-[300px] w-[400px] flex justify-center">
+                                            {chart}
+                                        </div>
+                                    ) : null;
+                                })()}
                         </div>
 
                         {/* Display Audit */}
-                        <h2 className="font-bold">Audit</h2>
+                        <h2 className="font-bold text-xl">Audit</h2>
                         <div>
                             <h3>Technical Aspects</h3>
                             <p>{reportData?.Audit?.Technical_Aspects}</p>
@@ -1434,37 +1445,26 @@ Make sure that it’s easy to understand and contains the primary information in
                         </div>
 
                         {/* Display Suggestions */}
-                        <h2 className="font-bold">Suggestions</h2>
+                        <h2 className="font-bold text-xl">Suggestions</h2>
                         <p>{reportData?.Suggestions}</p>
 
                         {/* Display Visualizations */}
-                        <h2 className="font-bold">Visualizations</h2>
-                        {reportData?.Visualization.map((viz, index) => (
-                            <div key={index} className="flex flex-col">
-                                <h3>
-                                    {viz.chartType
-                                        .replace("_", " ")
-                                        .toUpperCase()}
-                                </h3>
-                                <div className="h-[300px] w-[400px] flex justify-center">
-                                {renderChart(viz.chartType, viz.data)}
+                        <h2 className="font-bold text-xl">Visualizations</h2>
+                        {reportData?.Visualization.map((viz, index) => {
+                            const chart = renderChart(viz.chartType, viz.data);
+                            return chart ? (
+                                <div key={index} className="flex flex-col">
+                                    <div className="h-[300px] w-[400px] flex justify-center">
+                                        {chart}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ) : null;
+                        })}
                     </div>
-                    <div className="flex gap-2 mt-5 justify-center">
-                        <button
-                            className="p-3 bg-slate-200 rounded-md"
-                            onClick={() =>
-                                handleSaveReport(
-                                    selectedSummary as string,
-                                    "Report",
-                                    "Report"
-                                )
-                            }
-                        >
-                            Save As Note
-                        </button>
+                    <div
+                        className="flex gap-2 mt-5 justify-center"
+                        id="download_button"
+                    >
                         <button
                             className="p-3 bg-slate-200 rounded-md flex"
                             onClick={downloadPDF}

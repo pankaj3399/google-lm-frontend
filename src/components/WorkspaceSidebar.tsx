@@ -43,6 +43,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         googleAnalytics,
         openAiKey,
         propertyId,
+        propertyName,
         deleteSource,
         updateSourceName,
         setSourcePopup,
@@ -57,6 +58,11 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
     const [editingSourceId, setEditingSourceId] = useState<string | null>(null);
     const [editedName, setEditedName] = useState<string>("");
     const [allSources, setAllSources] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const handleLoad = () => {
+        setIsLoading(false);
+    };
 
     const closeModal = () => {
         setIsModalOpen(false);
@@ -238,6 +244,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                     />
                                 </div>
                             )}
+                            <p className="text-[12px] ml-7 text-emerald-500">
+                                {propertyName !== "" ? propertyName : ""}
+                            </p>
                         </div>
                     )}
                 </div>
@@ -451,12 +460,30 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                                                                 Source View
                                                             </SheetTitle>
                                                         </SheetHeader>
-                                                        <iframe
-                                                            src={`https://docs.google.com/gview?url=${encodeURIComponent(source.url)}&embedded=true`}
-                                                            height={630}
-                                                            width={700}
-                                                            className="w-full h-full"
-                                                        ></iframe>
+                                                        <div className="relative w-full h-full">
+                                                            {isLoading && (
+                                                                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                                                    <div className="loader">
+                                                                        Loading...
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            <iframe
+                                                                src={`https://docs.google.com/gview?url=${encodeURIComponent(
+                                                                    source.url
+                                                                )}&embedded=true`}
+                                                                height={630}
+                                                                width={700}
+                                                                className={`w-full h-full ${
+                                                                    isLoading
+                                                                        ? "opacity-0"
+                                                                        : "opacity-100"
+                                                                }`}
+                                                                onLoad={
+                                                                    handleLoad
+                                                                }
+                                                            ></iframe>
+                                                        </div>
                                                     </SheetContent>
                                                 )}
                                             </Sheet>
