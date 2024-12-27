@@ -630,35 +630,35 @@ Make sure that it’s easy to understand and contains the primary information in
     }
   };
 
-  const handleSaveReport = async (
-    content: string,
-    heading: string,
-    type: string,
-  ) => {
-    try {
-      const token = await getToken();
-      setAuthToken(token);
+  // const handleSaveReport = async (
+  //   content: string,
+  //   heading: string,
+  //   type: string,
+  // ) => {
+  //   try {
+  //     const token = await getToken();
+  //     setAuthToken(token);
 
-      const resp = await apiClient.post(
-        `${API_URL}/api/users/createNewNote/${workspaceId}`,
-        {
-          heading: heading,
-          content: content,
-          type: type,
-        },
-      );
-      addNote(resp.data.savedNote);
-      toast.success("Successfully added");
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.log(error.status);
-        console.error(error.response);
-        toast.error(error.response?.data.message || "Something went wrong");
-      } else {
-        console.error(error);
-      }
-    }
-  };
+  //     const resp = await apiClient.post(
+  //       `${API_URL}/api/users/createNewNote/${workspaceId}`,
+  //       {
+  //         heading: heading,
+  //         content: content,
+  //         type: type,
+  //       },
+  //     );
+  //     addNote(resp.data.savedNote);
+  //     toast.success("Successfully added");
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       console.log(error.status);
+  //       console.error(error.response);
+  //       toast.error(error.response?.data.message || "Something went wrong");
+  //     } else {
+  //       console.error(error);
+  //     }
+  //   }
+  // };
 
   const handlePullDataCheck = (index: number) => {
     setDataToShowOnPull((prev) =>
@@ -1358,14 +1358,14 @@ Make sure that it’s easy to understand and contains the primary information in
               {pullDataResponse}
             </ReactMarkdown>
           </div>
-          <button
+          {/* <button
             className="p-3 bg-slate-200 rounded-md"
             onClick={() =>
               handleSaveReport(pullDataResponse, "Analytics", "Analytics")
             }
           >
             Save As Note
-          </button>
+          </button> */}
         </SheetContent>
       </Sheet>
     </div>
