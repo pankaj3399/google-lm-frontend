@@ -214,7 +214,7 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
       setPropertyId(response.data.propertyId);
       setPropertyName(response.data.propertyName);
       toast.success(
-        "Google Analytics connected successfully. Pull data through any workspaces",
+        "Google Analytics connected successfully. Pull your data in any workspace.",
       );
       handlePopup();
     } catch (error) {
