@@ -8,6 +8,8 @@ import useUserStore from "../../store/userStore";
 import apiClient, { setAuthToken } from "../../api/axiosClient";
 import { useAuth } from "@clerk/clerk-react";
 import axios from "axios";
+import { marked } from 'marked';
+import DOMPurify from "dompurify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,11 +27,18 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     const { getToken } = useAuth();
 
     useEffect(() => {
-        if (selectedNote != -1) {
-            setHeading(notes[selectedNote].heading);
-            setValue(notes[selectedNote].content);
-        }
-    }, []);
+        const convertMarkdownToHtml = () => {
+            if (selectedNote !== -1) {
+                const markdownContent = notes[selectedNote].content;
+                const parsedHtml = marked(markdownContent);
+                const sanitizedHtml = DOMPurify.sanitize(parsedHtml as string);
+                setValue(sanitizedHtml);
+                setHeading(notes[selectedNote].heading)
+            }
+        };
+
+        convertMarkdownToHtml();
+    }, [notes, selectedNote]);
 
     const modules = {
         toolbar: [
@@ -51,7 +60,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
     ];
 
     const handleSaveNote = async () => {
-        if (heading === "" || value === "" || selectedNote !== -1) {
+        if (value === "" || selectedNote !== -1) {
             return;
         }
         try {
@@ -60,7 +69,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
             const resp = await apiClient.post(
                 `${API_URL}/api/users/createNewNote/${workspaceId}`,
                 {
-                    heading: heading,
+                    heading: heading || "New Note",
                     content: value,
                     type: "Written Note",
                 }

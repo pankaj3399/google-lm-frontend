@@ -20,6 +20,7 @@ const Sidebar = () => {
         setOpenAiKey,
         setGoogleAnalytics,
         setPropertyId,
+        setPropertyName
     } = useUserStore();
     const [integrations, setIntegrations] = useState([]);
     const { user } = useUser();
@@ -95,6 +96,7 @@ const Sidebar = () => {
                 `${API_URL}/api/users/getAllWorkspaces/${user?.id}`
             );
             setWorkspace(resp.data.workspaces);
+            setPropertyName(resp.data.propertyName);
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.log(error.status);
@@ -107,6 +109,59 @@ const Sidebar = () => {
             }
         }
     };
+
+    // const deleteWorkspace = async (workspaceId:string) =>{
+    //      try{
+    //         const token = await getToken();
+    //         setAuthToken(token);
+    //         const loadingToast = toast.loading("Deleting Workspace...");
+    //         await apiClient.delete(`${API_URL}/api/users/workspaces/${user?.id}/${workspaceId}`);
+    //         setWorkspace(workspace.filter((workspace) => workspace._id !== workspaceId));
+    //         toast.success("Workspace deleted successfully!");
+    //     }catch(error){
+    //         if (axios.isAxiosError(error)) {
+    //             console.log(error.status);
+    //             console.error(error.response);
+    //             toast.error(
+    //                 error.response?.data.message || "Something went wrong"
+    //             );
+    //         } else {
+    //             console.error(error);
+    //     }        
+    // }
+// }
+
+const deleteWorkspace = async (workspaceId: string) => {
+    try {
+        const token = await getToken();
+        setAuthToken(token);
+        
+        // Show loading toast
+        const loadingToast = toast.loading('Deleting workspace...');
+        
+        await apiClient.delete(`${API_URL}/api/users/workspaces/${user?.id}/${workspaceId}`);
+        
+        // Update local state only after successful deletion
+        setWorkspace(workspace.filter((ws) => ws._id !== workspaceId));
+        
+        // If user is currently on the deleted workspace's page, redirect to home
+        if (window.location.pathname.includes(workspaceId)) {
+            navigate('/');
+        }
+        
+        // Dismiss loading toast and show success
+        toast.dismiss(loadingToast);
+        toast.success("Workspace and all associated data deleted successfully");
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            console.error('Delete workspace error:', error.response);
+            toast.error(error.response?.data.message || "Failed to delete workspace");
+        } else {
+            console.error('Delete workspace error:', error);
+            toast.error("An unexpected error occurred");
+        }
+    }
+};
 
     const sidebarItems = [
         {
@@ -131,12 +186,11 @@ const Sidebar = () => {
     return (
         <aside className="flex flex-col items-start mt-14 pl-5 relative ]">
             {sidebarItems.map((item, index) => (
-                <SidebarItem key={index} {...item} />
+                <SidebarItem key={index} {...item} deleteWorkspace={deleteWorkspace} />
             ))}
             {/* {PopupSection &&  Integrations*/}
             {integrationPopup && <IntegrationPopup handlePopup={handlePopup} />}
         </aside>
     );
-};
-
+}
 export default Sidebar;

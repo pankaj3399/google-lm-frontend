@@ -18,12 +18,12 @@ const LandingPage: React.FC = () => {
     return (
         <div
             data-layername="landingPage"
-            className="flex flex-col min-h-screen bg-white"
+            className="flex flex-col min-h-screen bg-white overflow-x-hidden"
         >
             <header className="w-full bg-gray-200">
                 <Navbar />
             </header>
-            <main className="flex flex-col pb-16 w-full max-md:max-w-full">
+            <main className="flex flex-col sm: w-full max-md:max-w-full">
                 <HeroBanner />
                 <SolutionSection />
                 <PricingSection />

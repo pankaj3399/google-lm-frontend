@@ -178,7 +178,7 @@ const AddSourcePopup = () => {
                                                 type="file"
                                                 className="hidden"
                                                 onChange={handleFileInputChange}
-                                                accept=".pdf,.txt,.xls"
+                                                accept=".pdf,.txt,.xls,.xlsx,.xlsm,.doc,.docx"
                                                 disabled={!!url}
                                             />
                                         </label>{" "}

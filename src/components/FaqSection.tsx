@@ -55,13 +55,14 @@ const FaqSection: React.FC = () => {
     };
 
     return (
-        <div className="flex w-screen mx-auto px-4 py-3 sm:px-6 lg:px-8 mt-5">
-            <div className="flex w-7/12 items-start gap-x-4 mb-12">
-                <div className="flex-shrink-0"></div>
-                <div className="p-20">
+        <div id="_faq" className="flex w-screen  sm:flex-row flex-col justify-between mx-auto px-4 py-3 sm:px-6 lg:px-24 mt-5">
+        <div className="flex w-7/12 items-start gap-x-4 p py-12">
+            <div className="flex-shrink-0 "></div>
+            <div className="">
+                <div className="flex flex-col items-center sm:items-start">
                     <div
                         data-layername="smallEyebrowTagLabelStyle1"
-                        className="flex w-24 gap-2 items-center px-3 py-2 font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-3xl border border-solid shadow border-slate-300"
+                        className="flex  gap-2 items-center px-4 py-3 my-4 sm:px-3 sm:py-2  text-xl sm:text-base font-medium leading-relaxed text-gray-600 whitespace-nowrap bg-white rounded-full border border-solid shadow-xl border-slate-300"
                     >
                         <img
                             loading="lazy"
@@ -71,60 +72,62 @@ const FaqSection: React.FC = () => {
                         />
                         <p
                             data-layername="content"
-                            className="self-stretch my-auto"
+                            className="self-stretch "
                         >
                             FAQ
                         </p>
                     </div>
-                    <h2 className="text-2xl font-semibold text-gray-900 w-56">
-                        Frequently asked questions
-                    </h2>
-                    <p className="mt-2 text-base text-gray-600 w-80">
-                        Find answers to common questions about MetricsLM,
-                        including its features, security measures, integration
-                        options, and more.
-                    </p>
                 </div>
-            </div>
-
-            <div className="bg-white w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
-                {faqItems.map((item) => (
-                    <div
-                        key={item.id}
-                        className="border-b border-gray-200 last:border-0"
-                    >
-                        <button
-                            onClick={() => toggleItem(item.id)}
-                            className="flex w-full items-center justify-between py-5 text-left focus:outline-none group"
-                            aria-expanded={openItems.includes(item.id)}
-                        >
-                            <span className="text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
-                                {item.question}
-                            </span>
-                            <div
-                                className={`ml-6 flex-shrink-0 ${
-                                    openItems.includes(item.id)
-                                        ? "rotate-180"
-                                        : ""
-                                } transition-transform duration-200`}
-                            >
-                                <ChevronDown className="h-5 w-5 text-gray-500" />
-                            </div>
-                        </button>
-
-                        <div
-                            className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                                openItems.includes(item.id)
-                                    ? "max-h-[400px] opacity-100"
-                                    : "max-h-0 opacity-0"
-                            }`}
-                        >
-                            <p className="pb-5 text-gray-600">{item.answer}</p>
-                        </div>
-                    </div>
-                ))}
+                <h2 className="text-4xl sm:text-2xl font-semibold py-4 text-gray-900 ">
+                    Frequently asked questions
+                </h2>
+                <p className="mt-2 sm:text-base text-2xl font-extralight tracking-wide sm:font-normal sm:tracking-normal text-gray-600 w-80">
+                    Find answers to common questions about MetricsLM,
+                    including its features, security measures, integration
+                    options, and more.
+                </p>
             </div>
         </div>
+
+        <div className="bg-white sm:w-4/5 rounded-2xl shadow-sm divide-y divide-gray-200 px-6 py-6">
+            {faqItems.map((item) => (
+                <div
+                    key={item.id}
+                    className="border-b border-gray-200 last:border-0"
+                >
+                    <button
+                        onClick={() => toggleItem(item.id)}
+                        className="flex w-full items-center justify-between py-5 text-left focus:outline-none group"
+                        aria-expanded={openItems.includes(item.id)}
+                    >
+                        <span className="text-2xl sm:text-base font-medium text-gray-900 group-hover:text-blue-600 transition-colors flex items-start justify-center gap-2">
+                            <img src="/Linewrapper.png" alt="" className="hidden sm:inline-block" /> {item.question}
+                        </span>
+                        <div
+                            className={`ml-6 flex-shrink-0 ${
+                                openItems.includes(item.id)
+                                    ? "rotate-180"
+                                    : ""
+                            } transition-transform duration-200`}
+                        >
+                            <ChevronDown className="h-5 w-5 text-gray-500" />
+                        </div>
+                    </button>
+
+                    <div
+                        className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            openItems.includes(item.id)
+                                ? "max-h-[400px] opacity-100"
+                                : "max-h-0 opacity-0"
+                        }`}
+                    >
+                        <p className="pb-5 text-lg sm:text-base tracking-wide sm:tracking-normal  text-gray-900/50 sm:text-gray-600">{item.answer}</p>
+                    </div>
+                </div>
+            ))}
+        </div>
+        <div className="sm:hidden h-[2px] bg-gray-900/30 w-full px-16 my-8"></div>
+    </div>
     );
 };
 
