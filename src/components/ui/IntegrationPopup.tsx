@@ -198,7 +198,6 @@ const IntegrationPopup: React.FC<IntegrationPopupProps> = ({ handlePopup }) => {
     propertyId: string,
     selectedDisplayName: string,
   ) => {
-    console.log(selectedDisplayName, "XYZ");
     try {
       const token = await getToken();
       setAuthToken(token);
