@@ -9,65 +9,65 @@ import ReactGA from "react-ga4";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function SignUpPage() {
-    const { isSignedIn } = useAuth();
-    const { user: clerkUser } = useUser();
-    const { setUser } = useUserStore();
-    const navigate = useNavigate();
-    const location = useLocation();
+  const { isSignedIn } = useAuth();
+  const { user: clerkUser } = useUser();
+  const { setUser } = useUserStore();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    useEffect(() => {
-        ReactGA.send({ hitType: "pageview", page: location.pathname });
-    }, [location]);
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
 
-    useEffect(() => {
-        if (isSignedIn === null || !clerkUser) return;
+  useEffect(() => {
+    if (isSignedIn === null || !clerkUser) return;
 
-        const clerkId = clerkUser.id;
-        const email = clerkUser.primaryEmailAddress?.emailAddress;
+    const clerkId = clerkUser.id;
+    const email = clerkUser.primaryEmailAddress?.emailAddress;
 
-        if (isSignedIn && clerkId && email) {
-            sendUserDataToBackend(clerkId, email);
-            navigate("/home");
-        }
-    }, [isSignedIn, clerkUser]);
+    if (isSignedIn && clerkId && email) {
+      sendUserDataToBackend(clerkId, email);
+      navigate("/home");
+    }
+  }, [isSignedIn, clerkUser]);
 
-    useEffect(() => {
-        if (isSignedIn === null) return;
-        if (isSignedIn) navigate("/home");
-    }, [isSignedIn]);
+  useEffect(() => {
+    if (isSignedIn === null) return;
+    if (isSignedIn) navigate("/home");
+  }, [isSignedIn]);
 
-    const sendUserDataToBackend = async (
-        clerkId: string,
-        email: string
-    ): Promise<void> => {
-        try {
-            const resp = await axios.post(`${API_URL}/api/users/signup`, {
-                email,
-                clerkId,
-            });
-            const userData = {
-                userId: resp.data.clerkId,
-                email: resp.data.email,
-                openAikey: resp.data.openAikey,
-            };
-            setUser(userData);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                console.log(error.status);
-                console.error(error.response);
-            } else {
-                console.error(error);
-            }
-        }
-    };
+  const sendUserDataToBackend = async (
+    clerkId: string,
+    email: string,
+  ): Promise<void> => {
+    try {
+      const resp = await axios.post(`${API_URL}/api/users/signup`, {
+        email,
+        clerkId,
+      });
+      const userData = {
+        userId: resp.data.clerkId,
+        email: resp.data.email,
+        openAikey: resp.data.openAikey,
+      };
+      setUser(userData);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.log(error.status);
+        console.error(error.response);
+      } else {
+        console.error(error);
+      }
+    }
+  };
 
-    return (
-        <div className="flex items-center justify-center w-screen h-screen">
-            <SignUp
-                signInUrl="/login"
-                forceRedirectUrl={"/home"}
-                signInForceRedirectUrl={"/home"}
-            />
-        </div>
-    );
+  return (
+    <div className="flex items-center justify-center w-screen h-screen">
+      <SignUp
+        signInUrl="/login"
+        forceRedirectUrl={"/home"}
+        signInForceRedirectUrl={"/home"}
+      />
+    </div>
+  );
 }

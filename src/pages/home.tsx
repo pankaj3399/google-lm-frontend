@@ -5,17 +5,17 @@ import Navigation from "../components/homeNav";
 import Sidebar from "../components/sidebar";
 
 const MyComponent = () => {
-    const location = useLocation();
+  const location = useLocation();
 
-    useEffect(() => {
-        ReactGA.send({ hitType: "pageview", page: location.pathname });
-    }, [location]);
-    return (
-        <main className="flex flex-col bg-white overflow-x-hidden">
-            <Navigation />
-            <Sidebar />
-        </main>
-    );
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+  return (
+    <main className="flex flex-col bg-white overflow-x-hidden">
+      <Navigation />
+      <Sidebar />
+    </main>
+  );
 };
 
 export default MyComponent;
