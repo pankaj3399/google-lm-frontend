@@ -10,28 +10,28 @@ import { useLocation } from "react-router-dom";
 import ReactGA from "react-ga4";
 
 const LandingPage: React.FC = () => {
-    const location = useLocation();
+  const location = useLocation();
 
-    useEffect(() => {
-        ReactGA.send({ hitType: "pageview", page: location.pathname });
-    }, [location]);
-    return (
-        <div
-            data-layername="landingPage"
-            className="flex flex-col min-h-screen bg-white overflow-x-hidden"
-        >
-            <header className="w-full bg-gray-200">
-                <Navbar />
-            </header>
-            <main className="flex flex-col sm: w-full max-md:max-w-full">
-                <HeroBanner />
-                <SolutionSection />
-                <PricingSection />
-                <FaqSection />
-            </main>
-            <Footer />
-        </div>
-    );
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname });
+  }, [location]);
+  return (
+    <div
+      data-layername="landingPage"
+      className="flex flex-col min-h-screen bg-white overflow-x-hidden"
+    >
+      <header className="w-full bg-gray-200">
+        <Navbar />
+      </header>
+      <main className="flex flex-col sm: w-full max-md:max-w-full">
+        <HeroBanner />
+        <SolutionSection />
+        <PricingSection />
+        <FaqSection />
+      </main>
+      <Footer />
+    </div>
+  );
 };
 
 export default LandingPage;

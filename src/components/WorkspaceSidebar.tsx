@@ -232,7 +232,8 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
                   />
                 </div>
               )}
-              <p className="text-[12px] ml-7 text-emerald-500">
+              <p className="text-[12px] ml-7 text-emerald-500 font-semibold">
+                {"Property name: "}
                 {propertyName !== "" ? propertyName : ""}
               </p>
             </div>
