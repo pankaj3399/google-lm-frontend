@@ -30,10 +30,10 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
         const convertMarkdownToHtml = () => {
             if (selectedNote !== -1) {
                 const markdownContent = notes[selectedNote].content;
-
+                
                 // Convert Markdown to HTML
                 const parsedHtml = marked(markdownContent);
-
+                
                 // Sanitize the HTML
                 const sanitizedHtml = DOMPurify.sanitize(parsedHtml as string);
 
@@ -143,7 +143,10 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
                     <ReactQuill
                         theme="snow"
                         value={value}
-                        onChange={setValue}
+                        onChange={(value) => {
+                            console.log(value);
+                            setValue(value)
+                        }}
                         modules={modules}
                         formats={formats}
                         className="h-[90%] rounded-lg"

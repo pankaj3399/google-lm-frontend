@@ -76,6 +76,7 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 }) => {
     const [isSheetOpen, setSheetOpen] = useState(false);
     const [reportData, setReportData] = useState<ReportData | null>(null);
+    
 
     function getIcon(iconType: string) {
         switch (iconType) {
@@ -94,7 +95,9 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 
     useEffect(() => {
         if (type === "Report") {
-            const resp = JSON.parse(content);
+            console.log(content.substring(0, content.lastIndexOf("}")+1).replace("```json",""));
+            
+            const resp = JSON.parse(content.substring(0, content.lastIndexOf("}")+1).replace("```json",""));
             setReportData(resp);
         }
     }, [content]);
@@ -164,9 +167,9 @@ const SingleNote: React.FC<SingleNoteProps> = ({
 
                         <div className="space-y-6 tracking-wide">
                             <ReactMarkdown className="text-gray-700">
-                                {content.length > 330
-                                    ? `${content.substring(0, 330)}...`
-                                    : content}
+                                {reportData && reportData?.Summary.length > 330
+                                    ? `${reportData?.Summary.substring(0,330)}...`
+                                    : reportData?.Summary}
                             </ReactMarkdown>
                         </div>
                     </div>
