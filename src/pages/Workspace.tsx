@@ -47,7 +47,7 @@ function Workspace() {
   };
 
   return (
-    <main className="flex w-screen h-screen relative">
+    <main className="flex h-screen relative">
       <WorkspaceSidebar
         handleCheckboxChange={handleCheckboxChange}
         checkedSource={checkedSource}

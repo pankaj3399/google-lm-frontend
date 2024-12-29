@@ -23,7 +23,7 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
   const [value, setValue] = useState("");
   const [heading, setHeading] = useState("");
   const { workspaceId } = useParams();
-  const { addNote, selectedNote, notes } = useUserStore();
+  const { addNote, selectedNote, notes, updateNote } = useUserStore();
   const { getToken } = useAuth();
 
   useEffect(() => {
@@ -60,9 +60,38 @@ const NewNotePopup: React.FC<NewNotePopupProps> = ({
   ];
 
   const handleSaveNote = async () => {
+    console.log("Handle save");
+    
+    
     if (value === "" || selectedNote !== -1) {
+      if(selectedNote && (heading !== notes[selectedNote].heading || value !== notes[selectedNote].content)){
+        try {
+          const token = await getToken();
+          setAuthToken(token);
+          const resp = await apiClient.put(
+            `${API_URL}/api/users/updateNote/${notes[selectedNote]._id}`,
+            {
+              heading: heading || "New Note",
+              content: value,
+            },
+          );
+          updateNote(selectedNote,resp.data.note);
+          toast.success("Updated Note");
+          setValue("");
+          setHeading("");
+        } catch (error) {
+          if (axios.isAxiosError(error)) {
+            console.log(error.status);
+            console.error(error.response);
+            toast.error(error.response?.data.message || "Something went wrong");
+          } else {
+            console.error(error);
+          }
+        }
+      }
       return;
     }
+   
     try {
       const token = await getToken();
       setAuthToken(token);

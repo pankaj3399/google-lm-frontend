@@ -172,7 +172,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </div>
       </div>
 
-      <div className="p-4 flex-1 text-[#42526E]">
+      <div className="p-4 pb-0 flex-1 text-[#42526E]">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2 text-[#42526E]">

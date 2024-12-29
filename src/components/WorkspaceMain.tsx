@@ -30,6 +30,7 @@ import ReactMarkdown from "react-markdown";
 import { CSpinner } from "@coreui/react";
 import { Chart, registerables } from "chart.js";
 import { Bar, Line, Pie } from "react-chartjs-2";
+import { cn } from "../lib/utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -818,7 +819,7 @@ Make sure that it’s easy to understand and contains the primary information in
       </div>
 
       <div
-        className="flex-1 w-full p-6 overflow-y-auto relative"
+        className="flex-1 w-full px-6 pb-6 overflow-y-auto relative"
         ref={containerRef}
       >
         {chatSection ? (
@@ -840,7 +841,10 @@ Make sure that it’s easy to understand and contains the primary information in
                     {chat.owner === "GPT" && (
                       <div className="flex justify-between pt-2 items-center">
                         <div className="flex gap-1">
-                          <Copy size={15} className="cursor-pointer" />
+                          <Copy onClick={()=>{
+                            window.navigator.clipboard.writeText(chat.message)
+                            toast("Copied To Clipboard")
+                          }} size={15} className="cursor-pointer" />
                           {/* <ThumbsUp size={15} className="cursor-pointer" />
                                         <ThumbsDown size={15} className="cursor-pointer" /> */}
                         </div>
@@ -879,7 +883,7 @@ Make sure that it’s easy to understand and contains the primary information in
           </>
         ) : (
           <>
-            <div className="flex fixed  w-full gap-5 h-4  ">
+            <div className="flex fixed bg-white  w-full gap-5 py-4  ">
               <div
                 className="flex items-center cursor-pointer gap-1"
                 onClick={() => {
@@ -890,6 +894,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 <img src="/icon7.svg" alt="add note" className="h-[18px]" />
                 <span className="text-gray-600">Add Note</span>
               </div>
+              
               {notes.length > 0 && (
                 <>
                   <Dialog>
@@ -942,7 +947,7 @@ Make sure that it’s easy to understand and contains the primary information in
               )}
             </div>
             {notes.length > 0 ? (
-              <div className="flex mt-2  w-full flex-wrap ">
+              <div className="flex mt-12 w-full flex-wrap ">
                 {notes.map((note: Note, indx) => (
                   <SingleNote
                     key={note._id}
@@ -995,8 +1000,8 @@ Make sure that it’s easy to understand and contains the primary information in
         )}
       </div>
 
-      <div className="w-full h-48 ">
-        <div className="flex flex-col w-[90%] px-5 py-2 bg-white  rounded-t-xl shadow-2xl items-start h-full mx-auto">
+      <div className="w-full h-fit bg-transparent ">
+        <div className={cn(`flex flex-col w-[90%] px-5 py-2 bg-white  rounded-t-xl shadow-2xl items-start ${selectedNotes.filter(item => item).length > 0 ? "h-48 ":"h-32"} mx-auto transition-all duration-100 ease-linear`)}>
           <div className="mx-1 flex gap-2 my-2">
             {(selectedNotes.some(Boolean) || checkedSource.some(Boolean)) &&
               suggestions.map((suggestion, indx) => (
@@ -1010,7 +1015,7 @@ Make sure that it’s easy to understand and contains the primary information in
               ))}
           </div>
           <div className="w-full border bg-[#D9D9D9] h-0 rounded-full p-[4px] my-1"></div>
-          <div className="flex w-full mt-2 mb-2 ">
+          <div className="flex w-full  mb-2 ">
             <div
               className="flex items-center space-x-2 text-gray-500 cursor-pointer"
               onClick={() => setChatSection((prev) => !prev)}
