@@ -891,6 +891,7 @@ Make sure that it’s easy to understand and contains the primary information in
                 <img src="/icon7.svg" alt="add note" className="h-[18px]" />
                 <span className="text-gray-600">Add Note</span>
               </div>
+              
               {notes.length > 0 && (
                 <>
                   <Dialog>
