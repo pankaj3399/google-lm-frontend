@@ -841,7 +841,10 @@ Make sure that it’s easy to understand and contains the primary information in
                     {chat.owner === "GPT" && (
                       <div className="flex justify-between pt-2 items-center">
                         <div className="flex gap-1">
-                          <Copy size={15} className="cursor-pointer" />
+                          <Copy onClick={()=>{
+                            window.navigator.clipboard.writeText(chat.message)
+                            toast("Copied To Clipboard")
+                          }} size={15} className="cursor-pointer" />
                           {/* <ThumbsUp size={15} className="cursor-pointer" />
                                         <ThumbsDown size={15} className="cursor-pointer" /> */}
                         </div>
@@ -1012,7 +1015,7 @@ Make sure that it’s easy to understand and contains the primary information in
               ))}
           </div>
           <div className="w-full border bg-[#D9D9D9] h-0 rounded-full p-[4px] my-1"></div>
-          <div className="flex w-full mt-2 mb-2 ">
+          <div className="flex w-full  mb-2 ">
             <div
               className="flex items-center space-x-2 text-gray-500 cursor-pointer"
               onClick={() => setChatSection((prev) => !prev)}
