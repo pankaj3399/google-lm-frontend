@@ -172,8 +172,8 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </div>
       </div>
 
-      <div className="p-4 pb-0 flex-1 text-[#42526E]">
-        <div className="mb-6">
+      <div className="py-4 pb-0 flex-1 text-[#42526E]">
+        <div className="mb-6 px-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2 text-[#42526E]">
               <span className="font-medium">Integrations</span>
@@ -241,7 +241,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-2 border-t-2 pt-5">
+          <div className="flex items-center justify-between mb-2 border-t-2 pt-5 px-4">
             <div className="flex items-center space-x-2">
               <span className="font-medium text-[#42526E]">Sources</span>
               <Info className="w-4 h-4 text-[#42526E]" />
@@ -251,7 +251,7 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
               onClick={setSourcePopup}
             />
           </div>
-          <label className="flex items-center space-x-2 text-sm text-[#42526E] justify-between">
+          <label className="flex items-center space-x-2 text-sm text-[#42526E] justify-between px-4">
             <span className="text-[#42526E]">Select all Sources</span>
             <input
               type="checkbox"
@@ -261,10 +261,10 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             />
           </label>
           {sources.length > 0 && (
-            <div className="flex flex-col gap-2 mt-3">
+            <div className="flex hover:bg-[#091E420A] flex-col gap-2 py-3 px-4">
               {sources.map((source, indx) => (
                 <div key={indx} className="flex justify-between">
-                  <div className="flex items-center relative cursor-pointer group gap-2">
+                  <div className="flex items-center relative cursor-pointer group gap-2 ">
                     <img
                       src={
                         source.uploadType === "file"
