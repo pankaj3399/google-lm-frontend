@@ -261,9 +261,9 @@ const WorkspaceSidebar: React.FC<WorkspaceSidebarProps> = ({
             />
           </label>
           {sources.length > 0 && (
-            <div className="flex hover:bg-[#091E420A] flex-col gap-2 py-3 px-4">
+            <div className="flex  flex-col gap-2 py-2">
               {sources.map((source, indx) => (
-                <div key={indx} className="flex justify-between">
+                <div key={indx} className="flex justify-between hover:bg-[#091E420A] py-2 px-4">
                   <div className="flex items-center relative cursor-pointer group gap-2 ">
                     <img
                       src={
